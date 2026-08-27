@@ -1,5 +1,6 @@
 import React from 'react'
-import { Navbar } from './components/layout/Navbar'
+import { Header } from './components/layout/Header'
+import { Sidebar } from './components/layout/Sidebar'
 import { useHospitalStore } from './store/hospitalStore'
 import { AdminPage } from './pages/admin/AdminPage'
 import { ReceptionPage } from './pages/reception/ReceptionPage'
@@ -37,9 +38,12 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white">
-      <Navbar />
-      <main className="flex-1 pb-10">{renderActiveModule()}</main>
+    <div className="h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white overflow-hidden">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto pb-10">{renderActiveModule()}</main>
+      </div>
     </div>
   )
 }
