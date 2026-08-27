@@ -9,7 +9,7 @@ import {
   Receipt,
   Building2
 } from 'lucide-react'
-import { useHospitalStore, Invoice } from '../store/hospitalStore'
+import { useHospitalStore, Invoice } from '../../store/hospitalStore'
 
 export const BillingPage: React.FC = () => {
   const { invoices, dailyClosure, payInvoice, closeDailyRegister } = useHospitalStore()
