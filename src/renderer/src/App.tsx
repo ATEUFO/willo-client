@@ -1,6 +1,7 @@
 import React from 'react'
 import { Header } from './components/layout/Header'
 import { Sidebar } from './components/layout/Sidebar'
+import { StatusBar } from './components/layout/StatusBar'
 import { useHospitalStore } from './store/hospitalStore'
 import { AdminPage } from './pages/admin/AdminPage'
 import { ReceptionPage } from './pages/reception/ReceptionPage'
@@ -42,8 +43,9 @@ function App(): React.JSX.Element {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto pb-10">{renderActiveModule()}</main>
+        <main className="flex-1 overflow-y-auto pb-6">{renderActiveModule()}</main>
       </div>
+      <StatusBar />
     </div>
   )
 }
