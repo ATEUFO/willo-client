@@ -1,34 +1,46 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import React from 'react'
+import { Navbar } from './components/layout/Navbar'
+import { useHospitalStore } from './store/hospitalStore'
+import { AdminPage } from './pages/admin/AdminPage'
+import { ReceptionPage } from './pages/reception/ReceptionPage'
+import { NursingPage } from './pages/nursing/NursingPage'
+import { ConsultationPage } from './pages/consultation/ConsultationPage'
+import { LaboratoryPage } from './pages/laboratory/LaboratoryPage'
+import { PharmacyPage } from './pages/pharmacy/PharmacyPage'
+import { BillingPage } from './pages/billing/BillingPage'
+import { ManagementPage } from './pages/management/ManagementPage'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+  const { currentRole } = useHospitalStore()
+
+  const renderActiveModule = () => {
+    switch (currentRole) {
+      case 'admin':
+        return <AdminPage />
+      case 'reception':
+        return <ReceptionPage />
+      case 'nursing':
+        return <NursingPage />
+      case 'consultation':
+        return <ConsultationPage />
+      case 'laboratory':
+        return <LaboratoryPage />
+      case 'pharmacy':
+        return <PharmacyPage />
+      case 'billing':
+        return <BillingPage />
+      case 'management':
+        return <ManagementPage />
+      default:
+        return <AdminPage />
+    }
+  }
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+      <Navbar />
+      <main className="flex-1 pb-10">{renderActiveModule()}</main>
+    </div>
   )
 }
 
