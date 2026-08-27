@@ -41,17 +41,17 @@ const monthlyRevenueData = [
 ]
 
 const departmentAttendanceData = [
-  { name: 'Urgences', count: 320, color: '#f43f5e' },
-  { name: 'Médecine Générale', count: 540, color: '#38bdf8' },
-  { name: 'Cardiologie', count: 210, color: '#818cf8' },
-  { name: 'Pédiatrie', count: 380, color: '#34d399' },
-  { name: 'Gynécologie', count: 190, color: '#c084fc' }
+  { name: 'Urgences', count: 320, color: '#EF4444' },
+  { name: 'Médecine Générale', count: 540, color: '#00C853' },
+  { name: 'Cardiologie', count: 210, color: '#0A192F' },
+  { name: 'Pédiatrie', count: 380, color: '#10B981' },
+  { name: 'Gynécologie', count: 190, color: '#8B5CF6' }
 ]
 
 const recoveryMortalityData = [
-  { name: 'Guéris / Sorties', value: 94.2, color: '#10b981' },
-  { name: 'Transferts', value: 4.3, color: '#f59e0b' },
-  { name: 'Décès', value: 1.5, color: '#ef4444' }
+  { name: 'Guéris / Sorties', value: 94.2, color: '#00C853' },
+  { name: 'Transferts', value: 4.3, color: '#F59E0B' },
+  { name: 'Décès', value: 1.5, color: '#EF4444' }
 ]
 
 export const ManagementPage: React.FC = () => {
@@ -70,40 +70,40 @@ export const ManagementPage: React.FC = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-medical-border pb-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <BarChart3 className="w-7 h-7 text-cyan-400" />
+          <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
+            <BarChart3 className="w-7 h-7 text-medical-primary" />
             Espace Décisionnel & Direction Hospitalière
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500">
             Tableaux de bord analytiques, indicateurs de performance et générateur de rapports statistiques
           </p>
         </div>
 
         {/* Report Generator Controls */}
-        <div className="flex items-center gap-3 bg-slate-900 p-2 rounded-xl border border-slate-800 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Période:</span>
+        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-medical-border flex-wrap shadow-sm">
+          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+            <Calendar className="w-3.5 h-3.5 text-medical-primary" />
+            <span>Période :</span>
             <input
               type="month"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="bg-slate-950 text-slate-100 font-mono px-2.5 py-1 rounded-lg border border-slate-700 focus:outline-none"
+              className="bg-slate-50 text-slate-800 font-mono px-2.5 py-1 rounded-lg border border-medical-border focus:outline-none focus:border-medical-primary"
             />
           </div>
 
           <button
             onClick={handleExportPDF}
-            className="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md"
+            className="bg-medical-primary hover:bg-medical-hover text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
           >
             <FileText className="w-3.5 h-3.5" /> Export PDF
           </button>
 
           <button
             onClick={handleExportExcel}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md"
+            className="bg-medical-subtle text-emerald-800 border border-emerald-200 hover:bg-emerald-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" /> Export Excel
           </button>
@@ -112,52 +112,52 @@ export const ManagementPage: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-          <div className="flex justify-between items-center text-slate-400 text-xs">
+        <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
+          <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
             <span>Revenu Mensuel Cumulé</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <DollarSign className="w-4 h-4 text-medical-primary" />
           </div>
-          <p className="text-2xl font-bold text-slate-100 font-mono">19,800,000 F</p>
-          <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-semibold">
-            <TrendingUp className="w-3 h-3" /> +13.1% vs mois précédent
+          <p className="text-2xl font-bold text-slate-900 font-mono">19,800,000 F</p>
+          <span className="text-[11px] text-emerald-800 flex items-center gap-1 font-semibold">
+            <TrendingUp className="w-3 h-3 text-medical-primary" /> +13.1% vs mois précédent
           </span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-          <div className="flex justify-between items-center text-slate-400 text-xs">
+        <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
+          <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
             <span>Fréquentation Mensuelle</span>
-            <Users className="w-4 h-4 text-sky-400" />
+            <Users className="w-4 h-4 text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-slate-100 font-mono">640 Patients</p>
-          <span className="text-[11px] text-sky-400 font-semibold">+8.4% de nouvelles admissions</span>
+          <p className="text-2xl font-bold text-slate-900 font-mono">640 Patients</p>
+          <span className="text-[11px] text-blue-700 font-semibold">+8.4% de nouvelles admissions</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-          <div className="flex justify-between items-center text-slate-400 text-xs">
+        <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
+          <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
             <span>Taux de Guérison / Sorties</span>
-            <HeartPulse className="w-4 h-4 text-emerald-400" />
+            <HeartPulse className="w-4 h-4 text-medical-primary" />
           </div>
-          <p className="text-2xl font-bold text-emerald-400 font-mono">94.2%</p>
-          <span className="text-[11px] text-slate-500">Mortalité hospitalière: 1.5%</span>
+          <p className="text-2xl font-bold text-emerald-800 font-mono">94.2%</p>
+          <span className="text-[11px] text-slate-500">Mortalité hospitalière : 1.5%</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-          <div className="flex justify-between items-center text-slate-400 text-xs">
+        <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
+          <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
             <span>Temps d'Attente Moyen</span>
-            <Clock className="w-4 h-4 text-amber-400" />
+            <Clock className="w-4 h-4 text-amber-500" />
           </div>
-          <p className="text-2xl font-bold text-amber-400 font-mono">18 min</p>
-          <span className="text-[11px] text-emerald-400 font-semibold">-4 min grâce au triage Willo</span>
+          <p className="text-2xl font-bold text-amber-700 font-mono">18 min</p>
+          <span className="text-[11px] text-emerald-800 font-semibold">-4 min grâce au triage Willo</span>
         </div>
       </div>
 
       {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Revenue Evolution Curve */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-semibold text-slate-100 text-base">Évolution des Revenus Hospitaliers (F CFA)</h3>
-            <p className="text-xs text-slate-400">Progression mensuelle des encaissements globaux</p>
+            <h3 className="font-bold text-medical-dark text-base">Évolution des Revenus Hospitaliers (F CFA)</h3>
+            <p className="text-xs text-slate-500">Progression mensuelle des encaissements globaux</p>
           </div>
 
           <div className="h-64 w-full">
@@ -165,37 +165,37 @@ export const ManagementPage: React.FC = () => {
               <AreaChart data={monthlyRevenueData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#00C853" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#00C853" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="month" stroke="#64748B" fontSize={11} />
+                <YAxis stroke="#64748B" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                <Area type="monotone" dataKey="revenue" stroke="#00C853" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Chart 2: Attendance per Department BarChart */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-semibold text-slate-100 text-base">Fréquentation par Service Médical</h3>
-            <p className="text-xs text-slate-400">Volume de consultations enregistrées par département</p>
+            <h3 className="font-bold text-medical-dark text-base">Fréquentation par Service Médical</h3>
+            <p className="text-xs text-slate-500">Volume de consultations enregistrées par département</p>
           </div>
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={departmentAttendanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" fontSize={11} />
+                <YAxis stroke="#64748B" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                   {departmentAttendanceData.map((entry, index) => (
@@ -208,10 +208,10 @@ export const ManagementPage: React.FC = () => {
         </div>
 
         {/* Chart 3: Recovery vs Mortality PieChart */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-semibold text-slate-100 text-base">Issue des Patients (Guérisons vs Mortalité)</h3>
-            <p className="text-xs text-slate-400">Répartition en pourcentage des fins de séjour</p>
+            <h3 className="font-bold text-medical-dark text-base">Issue des Patients (Guérisons vs Mortalité)</h3>
+            <p className="text-xs text-slate-500">Répartition en pourcentage des fins de séjour</p>
           </div>
 
           <div className="h-64 w-full flex items-center justify-center">
@@ -231,37 +231,37 @@ export const ManagementPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
                 />
-                <Legend formatter={(value) => <span style={{ color: '#cbd5e1', fontSize: '11px' }}>{value}</span>} />
+                <Legend formatter={(value) => <span style={{ color: '#334155', fontSize: '11px', fontWeight: 600 }}>{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Executive Summary Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-semibold text-slate-100 text-base flex items-center gap-2">
-              <Activity className="w-5 h-5 text-cyan-400" />
+            <h3 className="font-bold text-medical-dark text-base flex items-center gap-2">
+              <Activity className="w-5 h-5 text-medical-primary" />
               Synthèse Exécutive pour le Conseil d'Administration
             </h3>
-            <p className="text-xs text-slate-400">Point de vue global sur la santé financière et opérationnelle</p>
+            <p className="text-xs text-slate-500">Point de vue global sur la santé financière et opérationnelle</p>
           </div>
 
-          <div className="space-y-3 text-xs text-slate-300">
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-              <strong className="text-cyan-400 block mb-1">Occupation de la Capacité Lit:</strong>
+          <div className="space-y-3 text-xs text-slate-700">
+            <div className="bg-slate-50 p-3.5 rounded-xl border border-medical-border">
+              <strong className="text-medical-dark block mb-1">Occupation de la Capacité Lits :</strong>
               L'établissement enregistre {hospitalSettings.occupiedBeds} lits occupés sur {hospitalSettings.totalBeds} ({Math.round((hospitalSettings.occupiedBeds/hospitalSettings.totalBeds)*100)}% de taux d'occupation).
             </div>
 
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-              <strong className="text-emerald-400 block mb-1">Rendement Pharmaceutique & Labo:</strong>
+            <div className="bg-medical-subtle p-3.5 rounded-xl border border-emerald-200">
+              <strong className="text-emerald-900 block mb-1">Rendement Pharmaceutique & Labo :</strong>
               La pharmacie et le laboratoire génèrent 58% du chiffre d'affaires récurrent de l'hôpital.
             </div>
 
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-              <strong className="text-amber-400 block mb-1">Recommandations d'Amélioration:</strong>
+            <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+              <strong className="text-amber-800 block mb-1">Recommandations d'Amélioration :</strong>
               Augmenter le stock d'Antibiotiques pour anticiper la hausse de fréquentation du service Pédiatrie.
             </div>
           </div>

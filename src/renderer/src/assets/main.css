@@ -1,13 +1,30 @@
 @import "tailwindcss";
+@config "../../../../tailwind.config.ts";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+
+  --color-medical-primary: #00C853;
+  --color-medical-hover: #00B048;
+  --color-medical-subtle: #DCFCE7;
+  --color-medical-dark: #0A192F;
+  --color-medical-lightBg: #F8F9FA;
+  --color-medical-light-bg: #F8F9FA;
+  --color-medical-cardBg: #FFFFFF;
+  --color-medical-card-bg: #FFFFFF;
+  --color-medical-border: #E2E8F0;
+  --color-medical-danger: #EF4444;
+  --color-medical-warning: #F59E0B;
+}
 
 @layer base {
   body {
     min-height: 100vh;
-    background-color: #020617;
-    color: #f8fafc;
+    background-color: var(--color-medical-lightBg, #F8F9FA);
+    color: #0f172a;
     overflow-x: hidden;
     overflow-y: auto;
-    font-family: Inter, system-ui, sans-serif;
+    font-family: var(--font-sans);
   }
 
   #root {

@@ -37,7 +37,7 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white">
       <Navbar />
       <main className="flex-1 pb-10">{renderActiveModule()}</main>
     </div>
