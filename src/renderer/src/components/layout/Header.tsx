@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Settings, Bell, Globe, X, Check } from 'lucide-react'
-import { useHospitalStore } from '../../store/hospitalStore'
+import { useHospitalStore } from '../../pages/store/hospitalStore'
 import willoLogo from '../../assets/willo_logo1.png'
 
 export const Header: React.FC = () => {
@@ -72,25 +72,22 @@ export const Header: React.FC = () => {
             <div className="flex border-b border-medical-border bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold text-slate-600">
               <button
                 onClick={() => setActiveTab('account')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${
-                  activeTab === 'account' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'account' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                  }`}
               >
                 Profil & Compte
               </button>
               <button
                 onClick={() => setActiveTab('preferences')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${
-                  activeTab === 'preferences' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'preferences' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                  }`}
               >
                 Préférences IHM
               </button>
               <button
                 onClick={() => setActiveTab('system')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${
-                  activeTab === 'system' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'system' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                  }`}
               >
                 Informations Système
               </button>
@@ -165,9 +162,8 @@ export const Header: React.FC = () => {
                     </div>
                     <button
                       onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-                      className={`px-3 py-1 rounded-lg font-semibold text-xs transition-colors ${
-                        notificationsEnabled ? 'bg-medical-subtle text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'
-                      }`}
+                      className={`px-3 py-1 rounded-lg font-semibold text-xs transition-colors ${notificationsEnabled ? 'bg-medical-subtle text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'
+                        }`}
                     >
                       {notificationsEnabled ? 'Activées' : 'Désactivées'}
                     </button>

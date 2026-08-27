@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Wifi, WifiOff, Database, Globe, Clock, Hospital } from 'lucide-react'
-import { useHospitalStore } from '../../store/hospitalStore'
+import { useHospitalStore } from '../../pages/store/hospitalStore'
 
 export const StatusBar: React.FC = () => {
   const { currentRole, isOnline, toggleOnline, hospitalSettings } = useHospitalStore()
@@ -34,11 +34,10 @@ export const StatusBar: React.FC = () => {
         {/* Remote Server Connection Toggle */}
         <button
           onClick={toggleOnline}
-          className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-all cursor-pointer ${
-            isOnline
+          className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-all cursor-pointer ${isOnline
               ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
               : 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30'
-          }`}
+            }`}
           title="Cliquer pour basculer le statut du serveur distant"
         >
           {isOnline ? (

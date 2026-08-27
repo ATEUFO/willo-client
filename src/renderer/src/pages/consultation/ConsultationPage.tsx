@@ -11,7 +11,7 @@ import {
   Sparkles,
   Send
 } from 'lucide-react'
-import { useHospitalStore, Patient } from '../../store/hospitalStore'
+import { useHospitalStore, Patient } from '../store/hospitalStore'
 
 export const ConsultationPage: React.FC = () => {
   const {
@@ -147,33 +147,29 @@ export const ConsultationPage: React.FC = () => {
               <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-medical-border">
                 <button
                   onClick={() => setActiveTab360('vitals')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-                    activeTab360 === 'vitals' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${activeTab360 === 'vitals' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   Constantes du jour
                 </button>
                 <button
                   onClick={() => setActiveTab360('history')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-                    activeTab360 === 'history' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${activeTab360 === 'history' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   Historique
                 </button>
                 <button
                   onClick={() => setActiveTab360('prescriptions')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-                    activeTab360 === 'prescriptions' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${activeTab360 === 'prescriptions' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   Prescriptions
                 </button>
                 <button
                   onClick={() => setActiveTab360('labs')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${
-                    activeTab360 === 'labs' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                  className={`px-3 py-1 rounded text-xs font-semibold transition-all ${activeTab360 === 'labs' ? 'bg-medical-primary text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
                 >
                   Analyses Labo ({patientLabs.length})
                 </button>

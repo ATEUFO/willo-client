@@ -8,7 +8,7 @@ import {
   FilePlus,
   Layers
 } from 'lucide-react'
-import { useHospitalStore, StockItem } from '../../store/hospitalStore'
+import { useHospitalStore, StockItem } from '../store/hospitalStore'
 
 export const PharmacyPage: React.FC = () => {
   const {
@@ -104,27 +104,24 @@ export const PharmacyPage: React.FC = () => {
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveTab('dispense')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'dispense' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'dispense' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             Comptoir Délivrance
           </button>
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'inventory' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'inventory' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <Layers className="w-3.5 h-3.5" />
             Gestion des Stocks ({inventory.length})
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'orders' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'orders' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <FilePlus className="w-3.5 h-3.5" />
             Bons de Commande ({purchaseOrders.length})
@@ -165,11 +162,10 @@ export const PharmacyPage: React.FC = () => {
                 </div>
 
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    currentDispense.status === 'Dispensed'
+                  className={`px-3 py-1 rounded-full text-xs font-bold ${currentDispense.status === 'Dispensed'
                       ? 'bg-medical-subtle text-emerald-800 border border-emerald-200'
                       : 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
-                  }`}
+                    }`}
                 >
                   {currentDispense.status === 'Dispensed' ? 'Délivré' : 'En Attente de Délivrance'}
                 </span>
@@ -242,9 +238,8 @@ export const PharmacyPage: React.FC = () => {
                   <button
                     key={f}
                     onClick={() => setStockFilter(f)}
-                    className={`px-3 py-1 rounded-lg transition-all font-mono text-xs ${
-                      stockFilter === f ? 'bg-medical-primary text-white font-bold' : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`px-3 py-1 rounded-lg transition-all font-mono text-xs ${stockFilter === f ? 'bg-medical-primary text-white font-bold' : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     {f === 'ALL' ? 'Tous' : f === 'Expiring Soon' ? 'Péremption <30j' : f === 'Low Stock' ? 'Stock Faible' : 'Rupture'}
                   </button>
@@ -288,13 +283,12 @@ export const PharmacyPage: React.FC = () => {
                     <td className="p-3 font-mono text-slate-600">{item.expiryDate}</td>
                     <td className="p-3">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          item.status === 'Normal'
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.status === 'Normal'
                             ? 'bg-medical-subtle text-emerald-800 border border-emerald-200'
                             : item.status === 'Expiring Soon'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
-                            : 'bg-red-50 text-medical-danger border border-red-200'
-                        }`}
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
+                              : 'bg-red-50 text-medical-danger border border-red-200'
+                          }`}
                       >
                         {item.status === 'Normal' ? 'Normal' : item.status === 'Expiring Soon' ? 'Péremption Proche' : item.status === 'Low Stock' ? 'Stock Bas' : 'Rupture'}
                       </span>

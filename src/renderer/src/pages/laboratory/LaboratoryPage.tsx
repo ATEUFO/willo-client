@@ -7,7 +7,7 @@ import {
   FileCheck,
   ArrowRight
 } from 'lucide-react'
-import { useHospitalStore, LabRequest, LabResultItem } from '../../store/hospitalStore'
+import { useHospitalStore, LabRequest, LabResultItem } from '../store/hospitalStore'
 
 export const LaboratoryPage: React.FC = () => {
   const { labRequests, updateLabRequestStatus } = useHospitalStore()
@@ -71,18 +71,16 @@ export const LaboratoryPage: React.FC = () => {
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveView('kanban')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeView === 'kanban' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${activeView === 'kanban' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <Clock className="w-3.5 h-3.5" />
             Vue Kanban Demandes ({labRequests.length})
           </button>
           <button
             onClick={() => setActiveView('results_entry')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
-              activeView === 'results_entry' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${activeView === 'results_entry' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
             Grille de Saisie des Résultats
@@ -252,9 +250,8 @@ export const LaboratoryPage: React.FC = () => {
                           type="text"
                           value={item.value}
                           onChange={(e) => handleResultValueChange(idx, e.target.value)}
-                          className={`w-32 bg-white border rounded-xl p-2 font-mono font-bold text-xs text-slate-800 focus:outline-none ${
-                            item.isAbnormal ? 'border-red-300 text-medical-danger' : 'border-medical-border focus:border-medical-primary'
-                          }`}
+                          className={`w-32 bg-white border rounded-xl p-2 font-mono font-bold text-xs text-slate-800 focus:outline-none ${item.isAbnormal ? 'border-red-300 text-medical-danger' : 'border-medical-border focus:border-medical-primary'
+                            }`}
                         />
                       </td>
                       <td className="p-3 text-slate-500 font-mono">{item.unit}</td>

@@ -26,7 +26,7 @@ import {
   Cell,
   Legend
 } from 'recharts'
-import { useHospitalStore } from '../../store/hospitalStore'
+import { useHospitalStore } from '../store/hospitalStore'
 
 // Chart Data Mock
 const monthlyRevenueData = [
@@ -252,7 +252,7 @@ export const ManagementPage: React.FC = () => {
           <div className="space-y-3 text-xs text-slate-700">
             <div className="bg-slate-50 p-3.5 rounded-xl border border-medical-border">
               <strong className="text-medical-dark block mb-1">Occupation de la Capacité Lits :</strong>
-              L'établissement enregistre {hospitalSettings.occupiedBeds} lits occupés sur {hospitalSettings.totalBeds} ({Math.round((hospitalSettings.occupiedBeds/hospitalSettings.totalBeds)*100)}% de taux d'occupation).
+              L'établissement enregistre {hospitalSettings.occupiedBeds} lits occupés sur {hospitalSettings.totalBeds} ({Math.round((hospitalSettings.occupiedBeds / hospitalSettings.totalBeds) * 100)}% de taux d'occupation).
             </div>
 
             <div className="bg-medical-subtle p-3.5 rounded-xl border border-emerald-200">

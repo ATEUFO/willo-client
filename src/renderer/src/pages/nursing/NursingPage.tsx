@@ -11,7 +11,7 @@ import {
   CheckCircle,
   FileText
 } from 'lucide-react'
-import { useHospitalStore, Patient } from '../../store/hospitalStore'
+import { useHospitalStore, Patient } from '../store/hospitalStore'
 
 export const NursingPage: React.FC = () => {
   const {
@@ -81,33 +81,30 @@ export const NursingPage: React.FC = () => {
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveTab('worklist')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'worklist'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'worklist'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Activity className="w-3.5 h-3.5" />
             Saisie Constantes ({waitingPatients.length})
           </button>
           <button
             onClick={() => setActiveTab('vitals_history')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'vitals_history'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'vitals_history'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <FileText className="w-3.5 h-3.5" />
             Historique Relevés ({vitals.length})
           </button>
           <button
             onClick={() => setActiveTab('care_plan')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'care_plan'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'care_plan'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Syringe className="w-3.5 h-3.5" />
             Plan de Soins ({careTasks.filter((t) => t.status === 'Pending').length})
@@ -130,11 +127,10 @@ export const NursingPage: React.FC = () => {
                 <div
                   key={p.id}
                   onClick={() => setSelectedPatient(p)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                    selectedPatient?.id === p.id
+                  className={`p-3 rounded-xl border cursor-pointer transition-all ${selectedPatient?.id === p.id
                       ? 'bg-medical-subtle border-emerald-300 shadow-xs'
                       : 'bg-white border-medical-border hover:border-slate-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-slate-900 text-xs">{p.name}</span>
@@ -371,20 +367,18 @@ export const NursingPage: React.FC = () => {
             {careTasks.map((task) => (
               <div
                 key={task.id}
-                className={`p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all ${
-                  task.status === 'Administered'
+                className={`p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all ${task.status === 'Administered'
                     ? 'bg-slate-50 border-medical-border opacity-75'
                     : 'bg-white border-emerald-300 shadow-xs'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => toggleCareTaskStatus(task.id)}
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
-                      task.status === 'Administered'
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${task.status === 'Administered'
                         ? 'bg-medical-primary border-emerald-500 text-white'
                         : 'border-slate-300 hover:border-emerald-500'
-                    }`}
+                      }`}
                   >
                     {task.status === 'Administered' && <CheckCircle className="w-4 h-4" />}
                   </button>

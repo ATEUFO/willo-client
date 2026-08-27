@@ -13,7 +13,7 @@ import {
   CheckCircle,
   HardDrive
 } from 'lucide-react'
-import { useHospitalStore, Role } from '../../store/hospitalStore'
+import { useHospitalStore, Role } from '../store/hospitalStore'
 
 export const AdminPage: React.FC = () => {
   const {
@@ -73,44 +73,40 @@ export const AdminPage: React.FC = () => {
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveTab('supervision')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'supervision'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'supervision'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Server className="w-3.5 h-3.5" />
             Supervision
           </button>
           <button
             onClick={() => setActiveTab('users')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'users'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'users'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Users className="w-3.5 h-3.5" />
             Gestion Accès ({users.length})
           </button>
           <button
             onClick={() => setActiveTab('settings')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'settings'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'settings'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Sliders className="w-3.5 h-3.5" />
             Paramètres Globaux
           </button>
           <button
             onClick={() => setActiveTab('backups')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'backups'
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'backups'
                 ? 'bg-medical-primary text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
+              }`}
           >
             <Database className="w-3.5 h-3.5" />
             Sauvegardes
@@ -182,11 +178,10 @@ export const AdminPage: React.FC = () => {
                   <button
                     key={lvl}
                     onClick={() => setLogFilter(lvl)}
-                    className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
-                      logFilter === lvl
+                    className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${logFilter === lvl
                         ? 'bg-medical-dark text-white font-semibold'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
+                      }`}
                   >
                     {lvl}
                   </button>
@@ -210,13 +205,12 @@ export const AdminPage: React.FC = () => {
                       <td className="p-3 text-slate-500">{log.timestamp}</td>
                       <td className="p-3">
                         <span
-                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${
-                            log.level === 'ERROR'
+                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${log.level === 'ERROR'
                               ? 'bg-red-50 text-medical-danger border border-red-200'
                               : log.level === 'WARNING'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : 'bg-medical-subtle text-emerald-800 border border-emerald-200'
-                          }`}
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : 'bg-medical-subtle text-emerald-800 border border-emerald-200'
+                            }`}
                         >
                           {log.level}
                         </span>
@@ -276,11 +270,10 @@ export const AdminPage: React.FC = () => {
                     <td className="p-3 text-slate-500 font-mono text-[11px]">{usr.lastLogin}</td>
                     <td className="p-3">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                          usr.status === 'Active'
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${usr.status === 'Active'
                             ? 'bg-medical-subtle text-emerald-800 border border-emerald-200'
                             : 'bg-slate-100 text-slate-500 border border-slate-200'
-                        }`}
+                          }`}
                       >
                         {usr.status === 'Active' ? 'Actif' : 'Inactif'}
                       </span>
@@ -296,11 +289,10 @@ export const AdminPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => updateUserStatus(usr.id, usr.status === 'Active' ? 'Inactive' : 'Active')}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] inline-flex items-center gap-1 border font-medium ${
-                          usr.status === 'Active'
+                        className={`px-2.5 py-1 rounded-lg text-[11px] inline-flex items-center gap-1 border font-medium ${usr.status === 'Active'
                             ? 'bg-red-50 border-red-200 text-medical-danger hover:bg-red-100'
                             : 'bg-medical-subtle border-emerald-200 text-emerald-800 hover:bg-emerald-200'
-                        }`}
+                          }`}
                       >
                         {usr.status === 'Active' ? 'Désactiver' : 'Activer'}
                       </button>

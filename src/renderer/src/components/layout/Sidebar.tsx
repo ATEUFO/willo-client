@@ -9,7 +9,7 @@ import {
   CreditCard,
   BarChart3
 } from 'lucide-react'
-import { useHospitalStore, Role } from '../../store/hospitalStore'
+import { useHospitalStore, Role } from '../../pages/store/hospitalStore'
 
 interface RoleConfig {
   id: Role
@@ -41,11 +41,10 @@ export const Sidebar: React.FC = () => {
             <div key={r.id} className="relative group flex items-center justify-center w-full">
               <button
                 onClick={() => setRole(r.id)}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
-                  isActive
+                className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${isActive
                     ? 'bg-medical-primary text-white shadow-md shadow-emerald-500/30 font-bold scale-105'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
-                }`}
+                  }`}
                 aria-label={r.label}
               >
                 <Icon className="w-5 h-5" />

@@ -9,7 +9,7 @@ import {
   Receipt,
   Building2
 } from 'lucide-react'
-import { useHospitalStore, Invoice } from '../../store/hospitalStore'
+import { useHospitalStore, Invoice } from '../store/hospitalStore'
 
 export const BillingPage: React.FC = () => {
   const { invoices, dailyClosure, payInvoice, closeDailyRegister } = useHospitalStore()
@@ -48,27 +48,24 @@ export const BillingPage: React.FC = () => {
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveTab('pos')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'pos' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'pos' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <DollarSign className="w-3.5 h-3.5" />
             Point d'Encaissement ({unpaidInvoices.length})
           </button>
           <button
             onClick={() => setActiveTab('invoices')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'invoices' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'invoices' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <Receipt className="w-3.5 h-3.5" />
             Historique Reçus ({paidInvoices.length})
           </button>
           <button
             onClick={() => setActiveTab('closure')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeTab === 'closure' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'closure' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+              }`}
           >
             <Lock className="w-3.5 h-3.5" />
             Clôture de Caisse
@@ -90,11 +87,10 @@ export const BillingPage: React.FC = () => {
                 <div
                   key={inv.id}
                   onClick={() => setSelectedInvoice(inv)}
-                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                    selectedInvoice?.id === inv.id
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${selectedInvoice?.id === inv.id
                       ? 'bg-medical-subtle border-emerald-300 shadow-xs'
                       : 'bg-white border-medical-border hover:border-slate-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-slate-900 text-xs">{inv.patientName}</span>
@@ -195,11 +191,10 @@ export const BillingPage: React.FC = () => {
                         <button
                           key={m}
                           onClick={() => setPaymentMethod(m)}
-                          className={`p-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1.5 ${
-                            paymentMethod === m
+                          className={`p-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center gap-1.5 ${paymentMethod === m
                               ? 'bg-medical-primary text-white border-emerald-500 shadow-sm'
                               : 'bg-white border-medical-border text-slate-600 hover:text-slate-900'
-                          }`}
+                            }`}
                         >
                           <Wallet className="w-4 h-4" />
                           {m}
@@ -288,11 +283,10 @@ export const BillingPage: React.FC = () => {
             <button
               onClick={closeDailyRegister}
               disabled={dailyClosure.status === 'Closed'}
-              className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm flex items-center gap-2 ${
-                dailyClosure.status === 'Open'
+              className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-sm flex items-center gap-2 ${dailyClosure.status === 'Open'
                   ? 'bg-medical-danger hover:bg-red-600 text-white'
                   : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-              }`}
+                }`}
             >
               <Lock className="w-4 h-4" />
               {dailyClosure.status === 'Open' ? 'Verrouiller & Clôturer la Caisse' : 'Caisse Clôturée'}
