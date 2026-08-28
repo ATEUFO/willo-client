@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Settings, Bell, Globe, X, Check, LogOut } from 'lucide-react'
 import { useHospitalStore } from '../../pages/store/hospitalStore'
+import { ROLE_CONFIGS } from '../../config/permissions'
 import willoLogo from '../../assets/willo_logo1.png'
 
 export const Header: React.FC = () => {
@@ -51,7 +52,7 @@ export const Header: React.FC = () => {
               </div>
               <div className="hidden md:block text-left">
                 <p className="font-bold text-white leading-tight">{currentUser.name}</p>
-                <p className="text-[10px] text-slate-400 font-medium capitalize">{currentUser.department}</p>
+                <p className="text-[10px] text-emerald-400 font-medium">{ROLE_CONFIGS[currentUser.role]?.label || currentUser.role}</p>
               </div>
             </div>
           )}

@@ -13,15 +13,27 @@ import { LaboratoryPage } from './pages/laboratory/LaboratoryPage'
 import { PharmacyPage } from './pages/pharmacy/PharmacyPage'
 import { BillingPage } from './pages/billing/BillingPage'
 import { ManagementPage } from './pages/management/ManagementPage'
+import { hasModuleAccess, getAllowedModules } from './config/permissions'
+import { ShieldAlert } from 'lucide-react'
 import willoLogo from './assets/willo_logo1.png'
 
 function App(): React.JSX.Element {
-  const { isAuthenticated, isLoadingSession, currentRole, checkAuthSession } = useHospitalStore()
+  const { isAuthenticated, isLoadingSession, currentUser, currentRole, setRole, checkAuthSession } = useHospitalStore()
   const [authView, setAuthView] = useState<'login' | 'signin'>('login')
 
   useEffect(() => {
     checkAuthSession()
   }, [])
+
+  // Auto reset active module if user role changes or currentUser is not allowed to view currentRole module
+  useEffect(() => {
+    if (currentUser && !hasModuleAccess(currentUser.role, currentRole)) {
+      const allowed = getAllowedModules(currentUser.role)
+      if (allowed.length > 0) {
+        setRole(allowed[0])
+      }
+    }
+  }, [currentUser, currentRole])
 
   if (isLoadingSession) {
     return (
@@ -45,6 +57,25 @@ function App(): React.JSX.Element {
   }
 
   const renderActiveModule = () => {
+    // Guard check: User role permission
+    if (currentUser && !hasModuleAccess(currentUser.role, currentRole)) {
+      return (
+        <div className="p-12 text-center max-w-xl mx-auto space-y-4 my-12">
+          <ShieldAlert className="w-16 h-16 text-rose-500 mx-auto animate-bounce" />
+          <h2 className="text-xl font-bold text-slate-800">Accès Réstreint / Non Autorisé</h2>
+          <p className="text-sm text-slate-600">
+            Votre rôle actuel (<span className="font-bold text-slate-900">{currentUser.role}</span>) n'a pas les droits requis pour accéder au module sélectionné.
+          </p>
+          <button
+            onClick={() => setRole(currentUser.role)}
+            className="px-4 py-2 bg-medical-primary text-white text-xs font-bold rounded-xl shadow-md hover:bg-emerald-600 transition-all"
+          >
+            Retourner à mon espace principal
+          </button>
+        </div>
+      )
+    }
+
     switch (currentRole) {
       case 'admin':
         return <AdminPage />

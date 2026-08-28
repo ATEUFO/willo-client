@@ -10,6 +10,7 @@ import {
   BarChart3
 } from 'lucide-react'
 import { useHospitalStore, Role } from '../../pages/store/hospitalStore'
+import { hasModuleAccess } from '../../config/permissions'
 
 interface RoleConfig {
   id: Role
@@ -17,7 +18,7 @@ interface RoleConfig {
   icon: React.ElementType
 }
 
-const roles: RoleConfig[] = [
+const allRoles: RoleConfig[] = [
   { id: 'admin', label: 'Admin Système', icon: ShieldAlert },
   { id: 'reception', label: 'Accueil & Triage', icon: UserCheck },
   { id: 'nursing', label: 'Soins & Constantes', icon: Activity },
@@ -29,12 +30,16 @@ const roles: RoleConfig[] = [
 ]
 
 export const Sidebar: React.FC = () => {
-  const { currentRole, setRole } = useHospitalStore()
+  const { currentRole, currentUser, setRole } = useHospitalStore()
+
+  const userRole = currentUser?.role || currentRole
+
+  const visibleRoles = allRoles.filter((r) => hasModuleAccess(userRole, r.id))
 
   return (
     <aside className="w-16 bg-medical-dark border-r border-slate-800 flex flex-col items-center py-4 space-y-3 shrink-0 z-40 shadow-lg">
       <div className="flex flex-col items-center gap-3 w-full px-2">
-        {roles.map((r) => {
+        {visibleRoles.map((r) => {
           const Icon = r.icon
           const isActive = currentRole === r.id
           return (
