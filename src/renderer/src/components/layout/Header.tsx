@@ -23,11 +23,8 @@ export const Header: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-bold text-lg tracking-tight text-white">
-                WILLO HOSPITAL
+                WILLO
               </h1>
-              <span className="text-[11px] px-2 py-0.5 rounded-full font-mono bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-semibold">
-                v1.0.0
-              </span>
             </div>
             <p className="text-xs text-slate-300 flex items-center gap-1.5">
               <span>{hospitalSettings.name}</span>
@@ -45,7 +42,7 @@ export const Header: React.FC = () => {
             title="Paramètres de compte & préférences"
           >
             <Settings className="w-4 h-4 text-medical-primary animate-spin-slow" />
-            <span className="hidden sm:inline">Paramètres & Compte</span>
+            <span className="hidden sm:inline"></span>
           </button>
         </div>
       </div>
