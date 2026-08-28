@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Stethoscope,
   Brain,
@@ -22,7 +22,16 @@ export const ConsultationPage: React.FC = () => {
   } = useHospitalStore()
 
   // Selected Patient
-  const [selectedPatient, setSelectedPatient] = useState<Patient>(patients[2] || patients[0])
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(patients[2] || patients[0] || null)
+
+  useEffect(() => {
+    if (!selectedPatient && patients.length > 0) {
+      setSelectedPatient(patients[2] || patients[0])
+    }
+  }, [patients, selectedPatient])
+
+  const activePatient = selectedPatient || patients[2] || patients[0] || null
+
   const [activeTab360, setActiveTab360] = useState<'history' | 'vitals' | 'prescriptions' | 'labs'>('vitals')
 
   // Consultation Form State
@@ -71,9 +80,10 @@ export const ConsultationPage: React.FC = () => {
 
   const handleSaveConsultation = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!activePatient) return
     addConsultation({
-      patientId: selectedPatient.id,
-      patientName: selectedPatient.name,
+      patientId: activePatient.id,
+      patientName: activePatient.name,
       doctorName: 'Dr. Sarah Kouassi',
       chiefComplaint,
       clinicalNotes,
@@ -82,12 +92,22 @@ export const ConsultationPage: React.FC = () => {
       labOrders
     })
 
-    alert(`Consultation enregistrée avec succès pour ${selectedPatient.name}!`)
+    alert(`Consultation enregistrée avec succès pour ${activePatient.name}!`)
   }
 
   // Filter vitals for patient
-  const patientVitals = vitals.filter((v) => v.patientId === selectedPatient.id)
-  const patientLabs = labRequests.filter((l) => l.patientId === selectedPatient.id)
+  const patientVitals = activePatient ? vitals.filter((v) => v.patientId === activePatient.id) : []
+  const patientLabs = activePatient ? labRequests.filter((l) => l.patientId === activePatient.id) : []
+
+  if (!activePatient) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto text-center py-16">
+        <Stethoscope className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+        <h3 className="text-lg font-bold text-slate-700">Aucun patient disponible</h3>
+        <p className="text-sm text-slate-500 mt-1">Veuillez d'abord ajouter ou sélectionner un patient.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -108,7 +128,7 @@ export const ConsultationPage: React.FC = () => {
           <User className="w-4 h-4 text-medical-primary" />
           <span className="text-xs text-slate-500 font-medium">Patient Actif :</span>
           <select
-            value={selectedPatient.id}
+            value={activePatient.id}
             onChange={(e) => {
               const p = patients.find((pat) => pat.id === e.target.value)
               if (p) setSelectedPatient(p)
@@ -133,12 +153,12 @@ export const ConsultationPage: React.FC = () => {
             <div className="flex items-center justify-between border-b border-medical-border pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-medical-subtle border border-emerald-200 flex items-center justify-center text-emerald-800 font-bold">
-                  {selectedPatient.gender}
+                  {activePatient.gender}
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">{selectedPatient.name}</h3>
+                  <h3 className="font-bold text-slate-900 text-base">{activePatient.name}</h3>
                   <p className="text-xs text-slate-500">
-                    {selectedPatient.age} ans • Groupe {selectedPatient.bloodType} • Tél : {selectedPatient.phone}
+                    {activePatient.age} ans • Groupe {activePatient.bloodType} • Tél : {activePatient.phone}
                   </p>
                 </div>
               </div>

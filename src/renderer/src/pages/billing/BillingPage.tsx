@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CreditCard,
   Printer,
@@ -15,16 +15,24 @@ export const BillingPage: React.FC = () => {
   const { invoices, dailyClosure, payInvoice, closeDailyRegister } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'pos' | 'invoices' | 'closure'>('pos')
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice>(invoices[0] || invoices[1])
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(invoices[0] || null)
   const [paymentMethod, setPaymentMethod] = useState<'Espèces' | 'Carte Bancaire' | 'Mobile Money'>('Espèces')
+
+  useEffect(() => {
+    if (!selectedInvoice && invoices.length > 0) {
+      setSelectedInvoice(invoices[0])
+    }
+  }, [invoices, selectedInvoice])
+
+  const activeInvoice = selectedInvoice || invoices[0] || null
 
   const unpaidInvoices = invoices.filter((i) => i.status === 'Unpaid')
   const paidInvoices = invoices.filter((i) => i.status === 'Paid')
 
   const handleProcessPayment = () => {
-    if (!selectedInvoice) return
-    payInvoice(selectedInvoice.id, paymentMethod)
-    alert(`Paiement de ${selectedInvoice.patientShare} F CFA reçu par ${paymentMethod}. Facture clôturée!`)
+    if (!activeInvoice) return
+    payInvoice(activeInvoice.id, paymentMethod)
+    alert(`Paiement de ${activeInvoice.patientShare} F CFA reçu par ${paymentMethod}. Facture clôturée!`)
   }
 
   const handlePrintReceipt = () => {
