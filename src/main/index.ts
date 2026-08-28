@@ -5,7 +5,14 @@ import { getDatabase, closeDatabase } from './database'
 import { registerIpcHandlers } from './ipc'
 import icon from '../../resources/icon.png?asset'
 
+import { existsSync } from 'fs'
+
 function createWindow(): void {
+  // Determine correct preload path (.mjs or .js)
+  const preloadMjs = join(__dirname, '../preload/index.mjs')
+  const preloadJs = join(__dirname, '../preload/index.js')
+  const preloadPath = existsSync(preloadMjs) ? preloadMjs : preloadJs
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -14,7 +21,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: preloadPath,
       sandbox: false
     }
   })
