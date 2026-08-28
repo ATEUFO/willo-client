@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { getDatabase, closeDatabase } from './database'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -39,6 +40,9 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // Initialize local SQLite database
+  getDatabase()
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -65,6 +69,7 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  closeDatabase()
   if (process.platform !== 'darwin') {
     app.quit()
   }
