@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
-import { Settings, Bell, Globe, X, Check } from 'lucide-react'
+import { Settings, Bell, Globe, X, Check, LogOut } from 'lucide-react'
 import { useHospitalStore } from '../../pages/store/hospitalStore'
 import willoLogo from '../../assets/willo_logo1.png'
 
 export const Header: React.FC = () => {
-  const { hospitalSettings } = useHospitalStore()
+  const { hospitalSettings, currentUser, logout } = useHospitalStore()
   const [showSettingsModal, setShowSettingsModal] = useState(false)
 
   // User Preferences State
   const [language, setLanguage] = useState<'fr' | 'en'>('fr')
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [activeTab, setActiveTab] = useState<'account' | 'preferences' | 'system'>('account')
+
+  const getUserInitials = (name?: string) => {
+    if (!name) return 'US'
+    const parts = name.split(' ').filter(Boolean)
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    return name.substring(0, 2).toUpperCase()
+  }
 
   return (
     <header className="bg-medical-dark border-b border-slate-800 text-white sticky top-0 z-50 shadow-md">
@@ -34,15 +41,38 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* User Account & Settings Action */}
+        {/* User Account & Settings Actions */}
         <div className="flex items-center gap-3">
+          {/* User Profile Card Badge */}
+          {currentUser && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs">
+              <div className="w-6 h-6 rounded-lg bg-medical-subtle text-emerald-800 font-bold flex items-center justify-center text-[10px]">
+                {getUserInitials(currentUser.name)}
+              </div>
+              <div className="hidden md:block text-left">
+                <p className="font-bold text-white leading-tight">{currentUser.name}</p>
+                <p className="text-[10px] text-slate-400 font-medium capitalize">{currentUser.department}</p>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={() => setShowSettingsModal(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 hover:text-white border border-slate-700/80 text-xs font-semibold transition-all shadow-xs"
             title="Paramètres de compte & préférences"
           >
-            <Settings className="w-4 h-4 text-medical-primary animate-spin-slow" />
-            <span className="hidden sm:inline"></span>
+            <Settings className="w-4 h-4 text-medical-primary" />
+            <span className="hidden sm:inline">Préférences</span>
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => logout()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-xs font-semibold transition-all shadow-xs"
+            title="Déconnexion du poste"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+            <span className="hidden sm:inline">Déconnexion</span>
           </button>
         </div>
       </div>
@@ -69,22 +99,25 @@ export const Header: React.FC = () => {
             <div className="flex border-b border-medical-border bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold text-slate-600">
               <button
                 onClick={() => setActiveTab('account')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'account' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                  }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${
+                  activeTab === 'account' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                }`}
               >
                 Profil & Compte
               </button>
               <button
                 onClick={() => setActiveTab('preferences')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'preferences' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                  }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${
+                  activeTab === 'preferences' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                }`}
               >
                 Préférences IHM
               </button>
               <button
                 onClick={() => setActiveTab('system')}
-                className={`pb-2.5 px-3 border-b-2 transition-all ${activeTab === 'system' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
-                  }`}
+                className={`pb-2.5 px-3 border-b-2 transition-all ${
+                  activeTab === 'system' ? 'border-medical-primary text-medical-primary font-bold' : 'border-transparent hover:text-slate-900'
+                }`}
               >
                 Informations Système
               </button>
@@ -96,25 +129,15 @@ export const Header: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-medical-border">
                     <div className="w-12 h-12 rounded-xl bg-medical-subtle border border-emerald-200 flex items-center justify-center text-emerald-800 font-bold text-base">
-                      SK
+                      {getUserInitials(currentUser?.name)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Dr. Sarah Kouassi</h4>
-                      <p className="text-slate-500 text-[11px]">Médecin Référent • Service Médecine Générale</p>
+                      <h4 className="font-bold text-slate-900 text-sm">{currentUser?.name || 'Utilisateur Non Connecté'}</h4>
+                      <p className="text-slate-500 text-[11px]">Rôle: <span className="font-semibold text-slate-800 capitalize">{currentUser?.role}</span> • {currentUser?.department}</p>
                       <span className="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[10px] font-semibold">
-                        Compte Vérifié & Sécurisé
+                        Compte Authentifié SQLite
                       </span>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-600 font-semibold mb-1">Email Professionnel</label>
-                    <input
-                      type="email"
-                      readOnly
-                      defaultValue="s.kouassi@willo-hospital.org"
-                      className="w-full bg-slate-50 border border-medical-border rounded-xl p-2.5 text-slate-700 font-mono"
-                    />
                   </div>
 
                   <div>
@@ -122,7 +145,17 @@ export const Header: React.FC = () => {
                     <input
                       type="text"
                       readOnly
-                      defaultValue="USER-SK-8840"
+                      defaultValue={currentUser?.username || 'N/A'}
+                      className="w-full bg-slate-50 border border-medical-border rounded-xl p-2.5 text-slate-700 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-600 font-semibold mb-1">Dernière Connexion</label>
+                    <input
+                      type="text"
+                      readOnly
+                      defaultValue={currentUser?.lastLogin || 'Maintenant'}
                       className="w-full bg-slate-50 border border-medical-border rounded-xl p-2.5 text-slate-700 font-mono"
                     />
                   </div>
@@ -159,8 +192,9 @@ export const Header: React.FC = () => {
                     </div>
                     <button
                       onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-                      className={`px-3 py-1 rounded-lg font-semibold text-xs transition-colors ${notificationsEnabled ? 'bg-medical-subtle text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'
-                        }`}
+                      className={`px-3 py-1 rounded-lg font-semibold text-xs transition-colors ${
+                        notificationsEnabled ? 'bg-medical-subtle text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'
+                      }`}
                     >
                       {notificationsEnabled ? 'Activées' : 'Désactivées'}
                     </button>
@@ -172,10 +206,10 @@ export const Header: React.FC = () => {
                 <div className="space-y-3 text-slate-700">
                   <div className="p-3 bg-slate-50 rounded-xl border border-medical-border space-y-1">
                     <p className="font-semibold text-slate-900">WILLO Client Electron v1.0.0</p>
-                    <p className="text-[11px] text-slate-500 font-mono">React 19 • TypeScript 5.9 • Tailwind CSS v4</p>
+                    <p className="text-[11px] text-slate-500 font-mono">better-sqlite3 • React 19 • TypeScript 5.9</p>
                   </div>
                   <div className="p-3 bg-medical-subtle text-emerald-900 rounded-xl border border-emerald-200 flex items-center gap-2 font-semibold">
-                    <Check className="w-4 h-4 text-medical-primary" /> Application à jour
+                    <Check className="w-4 h-4 text-medical-primary" /> Base de données locale connectée & active
                   </div>
                 </div>
               )}

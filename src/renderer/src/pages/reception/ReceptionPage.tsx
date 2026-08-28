@@ -55,10 +55,10 @@ export const ReceptionPage: React.FC = () => {
       p.phone.includes(searchQuery)
   )
 
-  const handleRegisterPatient = (e: React.FormEvent) => {
+  const handleRegisterPatient = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newPatient.name || !newPatient.phone) return
-    const created = addPatient(newPatient)
+    const created = await addPatient(newPatient)
     setShowAddPatientModal(false)
     setNewPatient({
       name: '',
