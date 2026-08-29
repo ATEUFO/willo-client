@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { TitleBar } from './components/layout/TitleBar'
 import { SettingsModal } from './components/layout/SettingsModal'
+import WilloLogoAnimation from './pages/splashscreen/splashScreen'
 import { Sidebar } from './components/layout/Sidebar'
 import { StatusBar } from './components/layout/StatusBar'
 import { useHospitalStore } from './pages/store/hospitalStore'
@@ -9,8 +10,7 @@ import { SigninPage } from './pages/auth/signin'
 import { ConnectionsPage } from './pages/connections/ConnectionsPage'
 import { AdminPage } from './pages/admin/AdminPage'
 import { ReceptionPage } from './pages/reception/ReceptionPage'
-import { NursingPage } from './pages/nursing/NursingPage'
-import { ConsultationPage } from './pages/consultation/ConsultationPage'
+import { MedicalPage } from './pages/medical/MedicalPage'
 import { LaboratoryPage } from './pages/laboratory/LaboratoryPage'
 import { PharmacyPage } from './pages/pharmacy/PharmacyPage'
 import { BillingPage } from './pages/billing/BillingPage'
@@ -20,6 +20,16 @@ import { ShieldAlert } from 'lucide-react'
 import willoLogo from './assets/willo_logo1.png'
 
 function App(): React.JSX.Element {
+  const isSplash = window.location.search.includes('splash=true') || window.location.hash.includes('splash=true')
+
+  if (isSplash) {
+    return (
+      <div className="h-screen w-screen bg-[#07111E] flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-800/50 shadow-2xl">
+        <WilloLogoAnimation className="w-56 h-56 flex items-center justify-center" />
+      </div>
+    )
+  }
+
   const {
     isAuthenticated,
     isLoadingSession,
@@ -110,9 +120,9 @@ function App(): React.JSX.Element {
       case 'reception':
         return <ReceptionPage />
       case 'nursing':
-        return <NursingPage />
+        return <MedicalPage />
       case 'consultation':
-        return <ConsultationPage />
+        return <MedicalPage />
       case 'laboratory':
         return <LaboratoryPage />
       case 'pharmacy':
@@ -122,7 +132,7 @@ function App(): React.JSX.Element {
       case 'management':
         return <ManagementPage />
       default:
-        return <ConsultationPage />
+        return <MedicalPage />
     }
   }
 

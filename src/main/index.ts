@@ -15,7 +15,31 @@ function createWindow(): void {
   const preloadJs = join(__dirname, '../preload/index.js')
   const preloadPath = existsSync(preloadMjs) ? preloadMjs : preloadJs
 
-  // Create the browser window.
+  // Create the splash screen window.
+  const splashWindow = new BrowserWindow({
+    width: 400,
+    height: 400,
+    frame: false,
+    transparent: false, // disable transparency for Linux compatibility
+    backgroundColor: '#07111E', // match app theme background
+    alwaysOnTop: true,
+    resizable: false,
+    center: true,
+    show: false, // Hide initially to ensure it starts at 0s and avoids blank screen
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: preloadPath,
+      sandbox: false
+    }
+  })
+
+  splashWindow.center()
+
+  splashWindow.once('ready-to-show', () => {
+    splashWindow.show()
+  })
+
+  // Create the main browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -37,22 +61,26 @@ function createWindow(): void {
     mainWindow.webContents.send('window:maximized-state', false)
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
-
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  // Load URLs/Files
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    splashWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?splash=true`)
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    const indexPath = join(__dirname, '../renderer/index.html')
+    splashWindow.loadFile(indexPath, { search: 'splash=true', hash: 'splash=true' })
+    mainWindow.loadFile(indexPath)
   }
+
+  // Show main window after 6 seconds and close splash
+  setTimeout(() => {
+    splashWindow.destroy()
+    mainWindow.show()
+  }, 6000)
 }
 
 // Initialization when Electron is ready
