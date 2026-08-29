@@ -198,6 +198,7 @@ interface HospitalState {
   lastSyncedAt: string
   pendingCacheSync: number
   showConnectionsModal: boolean
+  showSettingsModal: boolean
 
   // Data State loaded from better-sqlite3 DB
   users: UserAccount[]
@@ -242,6 +243,7 @@ interface HospitalState {
   setRole: (role: Role) => void
   toggleOnline: () => void
   setShowConnectionsModal: (show: boolean) => void
+  setShowSettingsModal: (show: boolean) => void
   triggerBackup: () => Promise<void>
   addUser: (user: Omit<UserAccount, 'id' | 'lastLogin'> & { password?: string }) => Promise<void>
   updateUserStatus: (id: string, status: 'Active' | 'Inactive') => Promise<void>
@@ -269,6 +271,7 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   lastSyncedAt: new Date().toLocaleTimeString(),
   pendingCacheSync: 0,
   showConnectionsModal: false,
+  showSettingsModal: false,
 
   users: [],
   systemLogs: [],
@@ -474,6 +477,8 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   setRole: (role) => set({ currentRole: role }),
 
   setShowConnectionsModal: (show) => set({ showConnectionsModal: show }),
+
+  setShowSettingsModal: (show) => set({ showSettingsModal: show }),
 
   toggleOnline: async () => {
     const nextOnline = !get().isOnline

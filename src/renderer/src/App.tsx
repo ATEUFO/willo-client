@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { TitleBar } from './components/layout/TitleBar'
-import { Header } from './components/layout/Header'
+import { SettingsModal } from './components/layout/SettingsModal'
 import { Sidebar } from './components/layout/Sidebar'
 import { StatusBar } from './components/layout/StatusBar'
 import { useHospitalStore } from './pages/store/hospitalStore'
@@ -28,7 +28,8 @@ function App(): React.JSX.Element {
     setRole,
     checkAuthSession,
     showConnectionsModal,
-    setShowConnectionsModal
+    setShowConnectionsModal,
+    showSettingsModal
   } = useHospitalStore()
   const [authView, setAuthView] = useState<'login' | 'signin' | 'connections'>('login')
 
@@ -128,7 +129,6 @@ function App(): React.JSX.Element {
   return (
     <div className="h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white overflow-hidden relative">
       <TitleBar />
-      <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto pb-6">{renderActiveModule()}</main>
@@ -142,6 +142,8 @@ function App(): React.JSX.Element {
           </div>
         </div>
       )}
+
+      {showSettingsModal && <SettingsModal />}
     </div>
   )
 }
