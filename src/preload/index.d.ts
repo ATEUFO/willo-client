@@ -76,6 +76,14 @@ export interface WilloAPI {
     discover: (timeoutMs?: number) => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
     scanSubnet: () => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
   }
+  windowControls: {
+    isMac: boolean
+    minimize: () => Promise<void>
+    maximize: () => Promise<boolean>
+    close: () => Promise<void>
+    isMaximized: () => Promise<boolean>
+    onMaximizedStateChange: (callback: (maximized: boolean) => void) => () => void
+  }
 }
 
 declare global {

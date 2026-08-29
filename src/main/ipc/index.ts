@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, BrowserWindow } from 'electron'
 import {
   UserModel,
   PatientModel,
@@ -321,6 +321,35 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('discovery:scanSubnet', async () => {
     return scanSubnetForServer()
+  })
+
+  // Window Control Handlers
+  ipcMain.handle('window:minimize', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (win) win.minimize()
+  })
+
+  ipcMain.handle('window:maximize', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (win) {
+      if (win.isMaximized()) {
+        win.unmaximize()
+      } else {
+        win.maximize()
+      }
+      return win.isMaximized()
+    }
+    return false
+  })
+
+  ipcMain.handle('window:close', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (win) win.close()
+  })
+
+  ipcMain.handle('window:isMaximized', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    return win ? win.isMaximized() : false
   })
 }
 

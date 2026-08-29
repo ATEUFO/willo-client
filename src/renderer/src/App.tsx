@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { TitleBar } from './components/layout/TitleBar'
 import { Header } from './components/layout/Header'
 import { Sidebar } from './components/layout/Sidebar'
 import { StatusBar } from './components/layout/StatusBar'
@@ -60,17 +61,25 @@ function App(): React.JSX.Element {
   }
 
   if (!isAuthenticated) {
+    let content: React.ReactNode
     if (authView === 'signin') {
-      return <SigninPage onSwitchToLogin={() => setAuthView('login')} />
+      content = <SigninPage onSwitchToLogin={() => setAuthView('login')} />
+    } else if (authView === 'connections') {
+      content = <ConnectionsPage onBack={() => setAuthView('login')} />
+    } else {
+      content = (
+        <LoginPage
+          onSwitchToSignin={() => setAuthView('signin')}
+          onOpenConnections={() => setAuthView('connections')}
+        />
+      )
     }
-    if (authView === 'connections') {
-      return <ConnectionsPage onBack={() => setAuthView('login')} />
-    }
+
     return (
-      <LoginPage
-        onSwitchToSignin={() => setAuthView('signin')}
-        onOpenConnections={() => setAuthView('connections')}
-      />
+      <div className="h-screen flex flex-col overflow-hidden bg-medical-lightBg">
+        <TitleBar />
+        <div className="flex-1 overflow-y-auto">{content}</div>
+      </div>
     )
   }
 
@@ -118,6 +127,7 @@ function App(): React.JSX.Element {
 
   return (
     <div className="h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white overflow-hidden relative">
+      <TitleBar />
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />

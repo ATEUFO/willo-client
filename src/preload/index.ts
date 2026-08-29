@@ -78,6 +78,20 @@ const api = {
   discovery: {
     discover: (timeoutMs?: number) => ipcRenderer.invoke('discovery:discover', timeoutMs),
     scanSubnet: () => ipcRenderer.invoke('discovery:scanSubnet')
+  },
+  windowControls: {
+    isMac: process.platform === 'darwin',
+    minimize: () => ipcRenderer.invoke('window:minimize'),
+    maximize: () => ipcRenderer.invoke('window:maximize'),
+    close: () => ipcRenderer.invoke('window:close'),
+    isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+    onMaximizedStateChange: (callback: (maximized: boolean) => void) => {
+      const subscription = (_: any, state: boolean) => callback(state)
+      ipcRenderer.on('window:maximized-state', subscription)
+      return () => {
+        ipcRenderer.off('window:maximized-state', subscription)
+      }
+    }
   }
 }
 

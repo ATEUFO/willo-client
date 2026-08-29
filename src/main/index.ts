@@ -20,12 +20,21 @@ function createWindow(): void {
     width: 1200,
     height: 800,
     show: false,
+    frame: false, // frameless window for custom titlebar
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: preloadPath,
       sandbox: false
     }
+  })
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('window:maximized-state', true)
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('window:maximized-state', false)
   })
 
   mainWindow.on('ready-to-show', () => {
