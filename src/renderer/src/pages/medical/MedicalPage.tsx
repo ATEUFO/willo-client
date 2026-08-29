@@ -37,7 +37,7 @@ export const MedicalPage: React.FC = () => {
 
   // Layout & Filter States
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
-  const [layoutMode, setLayoutMode] = useState<'grid' | 'list'>('grid')
+  const [layoutMode, setLayoutMode] = useState<'grid' | 'list'>('list')
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   
@@ -265,31 +265,15 @@ export const MedicalPage: React.FC = () => {
                             onClick={() => setSelectedPatientId(p.id)}
                             className={`rounded-xl border p-2.5 cursor-pointer text-left transition-all ${
                               isActive
-                                ? 'bg-medical-subtle border-emerald-300 shadow-xs animate-pulse'
+                                ? 'bg-medical-subtle border-emerald-300 shadow-xs'
                                 : 'bg-white border-medical-border hover:border-slate-300 hover:bg-slate-50/50'
                             }`}
                           >
-                            <div className="flex items-center justify-between mb-1.5">
-                              <span className="font-mono text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200/50 font-bold">
-                                {p.queueNumber}
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono">
-                                {p.arrivalTime}
-                              </span>
-                            </div>
-                            <h4 className="font-bold text-xs text-slate-800 truncate mb-1" title={p.name}>
+                            <h4 className="font-bold text-xs text-slate-800 truncate" title={p.name}>
                               {p.name}
                             </h4>
-                            <div className="flex items-center justify-between text-[10px] text-slate-500">
-                              <span>
-                                {p.gender === 'M' ? 'Homme' : 'Femme'}, {p.age} ans
-                              </span>
-                            </div>
-                            <div className="mt-2 flex items-center justify-between border-t border-dashed border-slate-100 pt-1.5">
-                              {getStatusBadge(p.status)}
-                              <span className="text-[9px] text-slate-400 font-bold uppercase">
-                                {p.bloodType}
-                              </span>
+                            <div className="text-[10px] text-slate-500 mt-0.5">
+                              {p.gender === 'M' ? 'Homme' : 'Femme'}, {p.age} ans
                             </div>
                           </div>
                         )

@@ -3,7 +3,6 @@ import {
   ShieldAlert,
   UserCheck,
   Stethoscope,
-  Activity,
   TestTube,
   Pill,
   CreditCard,
@@ -23,7 +22,6 @@ interface RoleConfig {
 const allRoles: RoleConfig[] = [
   { id: 'admin', label: 'Admin Système', icon: ShieldAlert },
   { id: 'reception', label: 'Accueil & Triage', icon: UserCheck },
-  { id: 'nursing', label: 'Soins & Constantes', icon: Activity },
   { id: 'consultation', label: 'Médecin / Clinique', icon: Stethoscope },
   { id: 'laboratory', label: 'Laboratoire', icon: TestTube },
   { id: 'pharmacy', label: 'Pharmacie', icon: Pill },

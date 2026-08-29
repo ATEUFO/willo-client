@@ -26,7 +26,7 @@ export const ROLE_CONFIGS: Record<Role, { label: string; description: string; al
   nursing: {
     label: 'Infirmier(ère)',
     description: 'Accueil clinique, prise des constantes vitales, soins infirmiers, suivi des patients et mise à jour du dossier.',
-    allowedModules: ['nursing', 'reception']
+    allowedModules: ['consultation', 'reception']
   },
   laboratory: {
     label: 'Laborantin',
