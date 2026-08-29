@@ -68,6 +68,13 @@ export interface WilloAPI {
     getStatus: () => Promise<{ isOnline: boolean; lastSyncedAt: string; pendingCacheSync: number }>
     toggleOnline: (online: boolean) => Promise<boolean>
     triggerDeltas: () => Promise<boolean>
+    getServerConfig: () => Promise<{ host: string; port: string; posteId: string }>
+    updateServerConfig: (config: { host: string; port: string }) => Promise<boolean>
+    testConnection: (config: { host: string; port: string }) => Promise<{ success: boolean; siteName?: string; error?: string }>
+  }
+  discovery: {
+    discover: (timeoutMs?: number) => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
+    scanSubnet: () => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
   }
 }
 

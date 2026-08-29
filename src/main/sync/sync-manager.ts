@@ -30,10 +30,54 @@ let reconnectTimer: NodeJS.Timeout | null = null
 let reconnectDelay = 1000
 let flushTimer: NodeJS.Timeout | null = null
 
-// Server settings constructed from .env
-const serverHost = process.env.SERVER_HOST || '127.0.0.1'
-const serverPort = process.env.SERVER_PORT || '5030'
-const serverBaseUrl = `http://${serverHost}:${serverPort}` // In production, this can be https
+// Dynamic server settings loaded from electron-store, falling back to process.env or defaults
+let serverHost: string = (store.get('serverHost') as string) || process.env.SERVER_HOST || '127.0.0.1'
+let serverPort: string = (store.get('serverPort') as string) || process.env.SERVER_PORT || '5030'
+let serverBaseUrl = `http://${serverHost}:${serverPort}`
+
+// Generate or retrieve unique posteId for workstation identification/traceability
+let posteId: string = (store.get('posteId') as string) || ''
+if (!posteId) {
+  posteId = crypto.randomUUID()
+  store.set('posteId', posteId)
+}
+
+export function getServerConfig() {
+  return {
+    host: serverHost,
+    port: serverPort,
+    posteId
+  }
+}
+
+export function updateServerConfig(host: string, port: string): void {
+  serverHost = host
+  serverPort = port
+  serverBaseUrl = `http://${host}:${port}`
+  store.set('serverHost', host)
+  store.set('serverPort', port)
+
+  console.log(`⚙️ Server config updated dynamically to: ${serverBaseUrl}`)
+
+  // Reconnect WebSocket to the new address if we are online
+  if (isOnline) {
+    connectWebSocket()
+  }
+  broadcastSyncStatus()
+}
+
+export async function testServerConnection(host: string, port: string): Promise<{ success: boolean; siteName?: string; error?: string }> {
+  try {
+    const response = await axios.get(`http://${host}:${port}/discovery`, { timeout: 2000 })
+    if (response.data && response.data.service === 'willo-server') {
+      return { success: true, siteName: response.data.siteName || 'Willo Server' }
+    }
+    return { success: false, error: 'Réponse invalide du serveur (non-Willo)' }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return { success: false, error: `Erreur de connexion: ${msg}` }
+  }
+}
 
 // Map FHIR resource types to their Drizzle table schema objects
 const TABLE_MAPPING: Record<string, any> = {
@@ -149,7 +193,11 @@ function getPendingCount(): number {
 // Remote Authentication & Session refresh
 export async function authenticateRemote(email: string, password: string): Promise<any> {
   try {
-    const response = await axios.post(`${serverBaseUrl}/api/auth/login`, { email, password })
+    const response = await axios.post(
+      `${serverBaseUrl}/api/auth/login`,
+      { email, password, posteId },
+      { headers: { 'X-Poste-Id': posteId } }
+    )
     const { tokens, user } = response.data
     accessToken = tokens.accessToken
     refreshToken = tokens.refreshToken
@@ -193,7 +241,11 @@ export async function ensureFreshToken(): Promise<string | null> {
   if (!storedRefresh) return null
 
   try {
-    const response = await axios.post(`${serverBaseUrl}/api/auth/refresh`, { refreshToken: storedRefresh })
+    const response = await axios.post(
+      `${serverBaseUrl}/api/auth/refresh`,
+      { refreshToken: storedRefresh },
+      { headers: { 'X-Poste-Id': posteId } }
+    )
     accessToken = response.data.accessToken
     isOnline = true
     return accessToken
@@ -213,7 +265,10 @@ export async function bootstrapSync(): Promise<void> {
 
   try {
     const response = await axios.get(`${serverBaseUrl}/api/fhir/sync/bootstrap`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Poste-Id': posteId
+      }
     })
     const { timestamp, items } = response.data
 
@@ -268,7 +323,10 @@ export async function pullDeltas(): Promise<void> {
         : `${serverBaseUrl}/api/fhir/${type}`
 
       const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Poste-Id': posteId
+        }
       })
 
       const bundle = response.data
@@ -365,7 +423,8 @@ export async function flushOutbox(): Promise<void> {
       await axios.post(`${serverBaseUrl}/api/fhir/${mutation.resourceType}`, resourcePayload, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'X-Client-Mutation-Id': mutation.id
+          'X-Client-Mutation-Id': mutation.id,
+          'X-Poste-Id': posteId
         }
       })
 
@@ -425,7 +484,7 @@ export async function connectWebSocket(): Promise<void> {
   }
 
   const wsProtocol = serverBaseUrl.startsWith('https') ? 'wss:' : 'ws:'
-  const wsUrl = `${wsProtocol}//${serverHost}:${serverPort}/ws`
+  const wsUrl = `${wsProtocol}//${serverHost}:${serverPort}/ws/`
 
   console.log(`🔗 Connecting WebSocket to: ${wsUrl}`)
   const ws = new WebSocket(wsUrl)

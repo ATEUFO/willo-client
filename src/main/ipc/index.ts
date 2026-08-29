@@ -20,8 +20,13 @@ import {
   getOnlineStatus,
   getLastSyncedAt,
   toggleOnlineState,
-  pullDeltas
+  pullDeltas,
+  getServerConfig,
+  updateServerConfig,
+  testServerConnection
 } from '../sync/sync-manager'
+import { discoverServers } from '../discovery/find-server'
+import { scanSubnetForServer } from '../discovery/subnet-scan'
 
 export function registerIpcHandlers(): void {
   // Auth Handlers
@@ -295,6 +300,27 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('sync:triggerDeltas', async () => {
     await pullDeltas()
     return true
+  })
+
+  ipcMain.handle('sync:getServerConfig', () => {
+    return getServerConfig()
+  })
+
+  ipcMain.handle('sync:updateServerConfig', (_, { host, port }) => {
+    updateServerConfig(host, port)
+    return true
+  })
+
+  ipcMain.handle('sync:testConnection', async (_, { host, port }) => {
+    return testServerConnection(host, port)
+  })
+
+  ipcMain.handle('discovery:discover', async (_, timeoutMs?: number) => {
+    return discoverServers(timeoutMs)
+  })
+
+  ipcMain.handle('discovery:scanSubnet', async () => {
+    return scanSubnetForServer()
   })
 }
 

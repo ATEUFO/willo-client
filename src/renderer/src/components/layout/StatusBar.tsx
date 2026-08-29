@@ -3,7 +3,7 @@ import { Wifi, WifiOff, Database, Globe, Clock, Hospital } from 'lucide-react'
 import { useHospitalStore } from '../../pages/store/hospitalStore'
 
 export const StatusBar: React.FC = () => {
-  const { currentRole, isOnline, toggleOnline, hospitalSettings, pendingCacheSync, lastSyncedAt } = useHospitalStore()
+  const { currentRole, isOnline, hospitalSettings, pendingCacheSync, lastSyncedAt, setShowConnectionsModal } = useHospitalStore()
   const [timeStr, setTimeStr] = useState<string>('')
 
   useEffect(() => {
@@ -31,14 +31,14 @@ export const StatusBar: React.FC = () => {
     <footer className="h-7 bg-[#050D1A] border-t border-slate-800 text-slate-300 text-[11px] font-mono flex items-center justify-between px-3 select-none z-50 shrink-0 shadow-inner">
       {/* Left section */}
       <div className="flex items-center gap-3">
-        {/* Remote Server Connection Toggle */}
+        {/* Remote Server Connection Dashboard */}
         <button
-          onClick={toggleOnline}
+          onClick={() => setShowConnectionsModal(true)}
           className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-all cursor-pointer ${isOnline
               ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
               : 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30'
             }`}
-          title="Cliquer pour basculer le statut du serveur distant"
+          title="Cliquer pour configurer les connexions réseau"
         >
           {isOnline ? (
             <>

@@ -1,6 +1,8 @@
 import net from "node:net";
 import os from "node:os";
 import pLimit from "p-limit";
+import axios from "axios";
+import { ServerInfo } from "./find-server";
 
 function getLocalSubnetPrefix(): string {
   const nets = os.networkInterfaces();
@@ -22,18 +24,39 @@ function tryConnect(host: string, port = 5030, timeout = 300): Promise<boolean> 
   });
 }
 
-export async function scanSubnetForServer(): Promise<string[]> {
-  const prefix = getLocalSubnetPrefix();
-  const limit = pLimit(30)
-  const found: string[] = [];
+export async function scanSubnetForServer(): Promise<ServerInfo[]> {
+  let prefix: string;
+  try {
+    prefix = getLocalSubnetPrefix();
+  } catch (err) {
+    console.error("Local subnet prefix lookup failed:", err);
+    return [];
+  }
+  
+  const limit = pLimit(30);
+  const found: ServerInfo[] = [];
 
   await Promise.all(
     Array.from({ length: 254 }, (_, i) => i + 1).map((n) =>
       limit(async () => {
         const host = `${prefix}.${n}`;
-        if (await tryConnect(host)) found.push(host);
+        if (await tryConnect(host)) {
+          try {
+            const response = await axios.get(`http://${host}:5030/discovery`, { timeout: 1000 });
+            if (response.data && response.data.service === "willo-server") {
+              found.push({
+                name: response.data.siteName || "Centre de Santé Willo",
+                host,
+                port: response.data.ports?.proxy || 5030,
+                caFingerprint: response.data.caFingerprint || "",
+              });
+            }
+          } catch {
+            // Not a Willo server or request failed
+          }
+        }
       })
     )
   );
-  return found; // en pratique : 0 ou 1 résultat sur un LAN de centre de santé
+  return found;
 }

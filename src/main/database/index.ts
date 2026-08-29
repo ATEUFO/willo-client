@@ -62,22 +62,30 @@ export function getDrizzleDb(): BetterSQLite3Database<typeof schema> {
  */
 export function initDatabaseSchema(db: Database.Database): void {
   try {
-    // Baselining: if the database has tables but the migrations table is missing,
-    // we pre-record the initial migration as completed to avoid conflicts.
+    // Baselining: if the database has tables, we ensure the migrations table is populated
+    // to prevent Drizzle from attempting to recreate existing tables.
     const usersTableExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='users'").get()
-    const migrationsTableExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='__drizzle_migrations'").get()
+    const aiDiagnosesExists = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='ai_diagnoses'").get()
 
-    if (usersTableExists && !migrationsTableExists) {
+    if (usersTableExists || aiDiagnosesExists) {
       db.exec(`
         CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
-          id SERIAL PRIMARY KEY,
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
           hash text NOT NULL,
           created_at numeric
         );
-        INSERT INTO "__drizzle_migrations" (hash, created_at) 
-        VALUES ('e9d45d0aad9df9f16eb0722afa45bdf6ab1e9e395410263ff48a4de446f9c836', 1787967538883);
       `)
-      console.log('Database baselined: recorded initial migration as completed.')
+
+      const initialMigrationRecorded = db.prepare(
+        "SELECT id FROM __drizzle_migrations WHERE hash = 'e9d45d0aad9df9f16eb0722afa45bdf6ab1e9e395410263ff48a4de446f9c836'"
+      ).get()
+
+      if (!initialMigrationRecorded) {
+        db.prepare(
+          "INSERT INTO __drizzle_migrations (hash, created_at) VALUES (?, ?)"
+        ).run('e9d45d0aad9df9f16eb0722afa45bdf6ab1e9e395410263ff48a4de446f9c836', 1787967538883)
+        console.log('Database baselined: recorded initial migration as completed.')
+      }
     }
 
     const migrationsFolder = path.join(__dirname, 'migrations')

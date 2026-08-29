@@ -70,7 +70,14 @@ const api = {
   sync: {
     getStatus: () => ipcRenderer.invoke('sync:getStatus'),
     toggleOnline: (online: boolean) => ipcRenderer.invoke('sync:toggleOnline', online),
-    triggerDeltas: () => ipcRenderer.invoke('sync:triggerDeltas')
+    triggerDeltas: () => ipcRenderer.invoke('sync:triggerDeltas'),
+    getServerConfig: () => ipcRenderer.invoke('sync:getServerConfig'),
+    updateServerConfig: (config: { host: string; port: string }) => ipcRenderer.invoke('sync:updateServerConfig', config),
+    testConnection: (config: { host: string; port: string }) => ipcRenderer.invoke('sync:testConnection', config)
+  },
+  discovery: {
+    discover: (timeoutMs?: number) => ipcRenderer.invoke('discovery:discover', timeoutMs),
+    scanSubnet: () => ipcRenderer.invoke('discovery:scanSubnet')
   }
 }
 

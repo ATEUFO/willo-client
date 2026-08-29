@@ -5,6 +5,7 @@ import { StatusBar } from './components/layout/StatusBar'
 import { useHospitalStore } from './pages/store/hospitalStore'
 import { LoginPage } from './pages/auth/login'
 import { SigninPage } from './pages/auth/signin'
+import { ConnectionsPage } from './pages/connections/ConnectionsPage'
 import { AdminPage } from './pages/admin/AdminPage'
 import { ReceptionPage } from './pages/reception/ReceptionPage'
 import { NursingPage } from './pages/nursing/NursingPage'
@@ -18,8 +19,17 @@ import { ShieldAlert } from 'lucide-react'
 import willoLogo from './assets/willo_logo1.png'
 
 function App(): React.JSX.Element {
-  const { isAuthenticated, isLoadingSession, currentUser, currentRole, setRole, checkAuthSession } = useHospitalStore()
-  const [authView, setAuthView] = useState<'login' | 'signin'>('login')
+  const {
+    isAuthenticated,
+    isLoadingSession,
+    currentUser,
+    currentRole,
+    setRole,
+    checkAuthSession,
+    showConnectionsModal,
+    setShowConnectionsModal
+  } = useHospitalStore()
+  const [authView, setAuthView] = useState<'login' | 'signin' | 'connections'>('login')
 
   useEffect(() => {
     checkAuthSession()
@@ -53,7 +63,15 @@ function App(): React.JSX.Element {
     if (authView === 'signin') {
       return <SigninPage onSwitchToLogin={() => setAuthView('login')} />
     }
-    return <LoginPage onSwitchToSignin={() => setAuthView('signin')} />
+    if (authView === 'connections') {
+      return <ConnectionsPage onBack={() => setAuthView('login')} />
+    }
+    return (
+      <LoginPage
+        onSwitchToSignin={() => setAuthView('signin')}
+        onOpenConnections={() => setAuthView('connections')}
+      />
+    )
   }
 
   const renderActiveModule = () => {
@@ -99,13 +117,21 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <div className="h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white overflow-hidden">
+    <div className="h-screen bg-medical-lightBg text-slate-900 flex flex-col font-sans selection:bg-medical-primary selection:text-white overflow-hidden relative">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto pb-6">{renderActiveModule()}</main>
       </div>
       <StatusBar />
+
+      {showConnectionsModal && (
+        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <ConnectionsPage onClose={() => setShowConnectionsModal(false)} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

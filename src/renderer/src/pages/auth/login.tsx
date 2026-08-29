@@ -9,7 +9,8 @@ import {
   Stethoscope,
   UserCheck,
   ShieldAlert,
-  AlertCircle
+  AlertCircle,
+  Network
 } from 'lucide-react'
 import { useHospitalStore } from '../store/hospitalStore'
 import willoLogo from '../../assets/willo_logo1.png'
@@ -17,9 +18,10 @@ import willoLogo from '../../assets/willo_logo1.png'
 interface LoginPageProps {
   onSwitchToSignin?: () => void
   onLoginSuccess?: () => void
+  onOpenConnections?: () => void
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess, onOpenConnections }) => {
   const { login } = useHospitalStore()
 
   const [username, setUsername] = useState('')
@@ -96,9 +98,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
               <ShieldCheck className="w-5 h-5 text-medical-primary" />
               Connexion Utilisateur
             </h2>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-medical-subtle text-emerald-800 border border-emerald-200">
-              Database Auth
-            </span>
+            <div className="flex items-center gap-2">
+              {onOpenConnections && (
+                <button
+                  type="button"
+                  onClick={onOpenConnections}
+                  className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg border border-slate-200 hover:border-slate-300 transition-all cursor-pointer flex items-center justify-center"
+                  title="Configurer la connexion réseau"
+                >
+                  <Network className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-medical-subtle text-emerald-800 border border-emerald-200">
+                Database Auth
+              </span>
+            </div>
           </div>
 
           {errorMessage && (
