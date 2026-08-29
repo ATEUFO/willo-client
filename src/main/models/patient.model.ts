@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { patients } from '../database/schema'
+import { eq, desc, sql } from 'drizzle-orm'
 
 export interface Patient {
   id: string
@@ -13,7 +15,7 @@ export interface Patient {
   assignedDoctor: string
   queueNumber: string
   arrivalTime: string
-  status: 'Waiting' | 'Vitals Taken' | 'In Consultation' | 'Completed'
+  status: 'Waiting' | 'Vitals Taken' | 'In Consultation' | 'Completed' | 'Lab Pending' | 'Pharmacy Pending'
   createdAt?: string
   updatedAt?: string
 }
@@ -23,85 +25,67 @@ export class PatientModel {
    * Returns all patients from local SQLite database.
    */
   static getAll(): Patient[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_code as patientCode, name, age, gender, phone, 
-        address, blood_type as bloodType, emergency_contact as emergencyContact, 
-        assigned_doctor as assignedDoctor, queue_number as queueNumber, 
-        arrival_time as arrivalTime, status, created_at as createdAt, updated_at as updatedAt 
-      FROM patients 
-      ORDER BY arrival_time DESC
-    `)
-    return (stmt.all() as unknown[]) as Patient[]
+    const db = getDrizzleDb()
+    return db
+      .select()
+      .from(patients)
+      .orderBy(desc(patients.arrivalTime))
+      .all() as Patient[]
   }
 
   /**
    * Finds a patient by ID.
    */
   static getById(id: string): Patient | null {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_code as patientCode, name, age, gender, phone, 
-        address, blood_type as bloodType, emergency_contact as emergencyContact, 
-        assigned_doctor as assignedDoctor, queue_number as queueNumber, 
-        arrival_time as arrivalTime, status, created_at as createdAt, updated_at as updatedAt 
-      FROM patients 
-      WHERE id = ?
-    `)
-    const row = stmt.get(id) as Patient | undefined
-    return row || null
+    const db = getDrizzleDb()
+    const row = db.select().from(patients).where(eq(patients.id, id)).get()
+    return (row as Patient) || null
   }
 
   /**
    * Creates a new patient record in local SQLite database.
    */
   static create(patient: Omit<Patient, 'createdAt' | 'updatedAt'>): Patient {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO patients (
-        id, patient_code, name, age, gender, phone, address, 
-        blood_type, emergency_contact, assigned_doctor, queue_number, arrival_time, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      patient.id,
-      patient.patientCode,
-      patient.name,
-      patient.age,
-      patient.gender,
-      patient.phone,
-      patient.address,
-      patient.bloodType,
-      patient.emergencyContact,
-      patient.assignedDoctor,
-      patient.queueNumber,
-      patient.arrivalTime,
-      patient.status
-    )
+    const db = getDrizzleDb()
+    db.insert(patients)
+      .values({
+        id: patient.id,
+        patientCode: patient.patientCode,
+        name: patient.name,
+        age: patient.age,
+        gender: patient.gender,
+        phone: patient.phone,
+        address: patient.address,
+        bloodType: patient.bloodType,
+        emergencyContact: patient.emergencyContact,
+        assignedDoctor: patient.assignedDoctor,
+        queueNumber: patient.queueNumber,
+        arrivalTime: patient.arrivalTime,
+        status: patient.status
+      })
+      .run()
     return this.getById(patient.id)!
   }
 
   /**
-   * Updates patient status (e.g., Waiting -> Vitals Taken -> In Consultation -> Completed).
+   * Updates patient status.
    */
   static updateStatus(id: string, status: Patient['status']): void {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      UPDATE patients 
-      SET status = ?, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = ?
-    `)
-    stmt.run(status, id)
+    const db = getDrizzleDb()
+    db.update(patients)
+      .set({
+        status,
+        updatedAt: sql`CURRENT_TIMESTAMP`
+      })
+      .where(eq(patients.id, id))
+      .run()
   }
 
   /**
    * Deletes a patient record by ID.
    */
   static delete(id: string): void {
-    const db = getDatabase()
-    const stmt = db.prepare('DELETE FROM patients WHERE id = ?')
-    stmt.run(id)
+    const db = getDrizzleDb()
+    db.delete(patients).where(eq(patients.id, id)).run()
   }
 }

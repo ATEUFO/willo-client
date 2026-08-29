@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { inventory } from '../database/schema'
+import { eq } from 'drizzle-orm'
 
 export interface InventoryItem {
   id: string
@@ -19,60 +21,59 @@ export class InventoryModel {
    * Returns all pharmacy inventory items from local SQLite DB.
    */
   static getAll(): InventoryItem[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, code, name, category, stock_quantity as stockQuantity,
-        min_quantity as minQuantity, unit_price as unitPrice,
-        batch_number as batchNumber, expiry_date as expiryDate,
-        status, created_at as createdAt
-      FROM inventory 
-      ORDER BY name ASC
-    `)
-    return (stmt.all() as unknown[]) as InventoryItem[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(inventory)
+      .orderBy(inventory.name)
+      .all()
+    return rows.map((r) => ({
+      ...r,
+      status: r.status as InventoryItem['status'],
+      batchNumber: r.batchNumber || '',
+      expiryDate: r.expiryDate || ''
+    }))
   }
 
   /**
    * Gets inventory item by ID.
    */
   static getById(id: string): InventoryItem | null {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, code, name, category, stock_quantity as stockQuantity,
-        min_quantity as minQuantity, unit_price as unitPrice,
-        batch_number as batchNumber, expiry_date as expiryDate,
-        status, created_at as createdAt
-      FROM inventory 
-      WHERE id = ?
-    `)
-    const row = stmt.get(id) as InventoryItem | undefined
-    return row || null
+    const db = getDrizzleDb()
+    const row = db
+      .select()
+      .from(inventory)
+      .where(eq(inventory.id, id))
+      .get()
+    return row
+      ? {
+          ...row,
+          status: row.status as InventoryItem['status'],
+          batchNumber: row.batchNumber || '',
+          expiryDate: row.expiryDate || ''
+        }
+      : null
   }
 
   /**
    * Adds a new item to pharmacy inventory.
    */
   static create(item: Omit<InventoryItem, 'createdAt'>): InventoryItem {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO inventory (
-        id, code, name, category, stock_quantity, min_quantity,
-        unit_price, batch_number, expiry_date, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      item.id,
-      item.code,
-      item.name,
-      item.category,
-      item.stockQuantity,
-      item.minQuantity,
-      item.unitPrice,
-      item.batchNumber,
-      item.expiryDate,
-      item.status
-    )
+    const db = getDrizzleDb()
+    db.insert(inventory)
+      .values({
+        id: item.id,
+        code: item.code,
+        name: item.name,
+        category: item.category,
+        stockQuantity: item.stockQuantity,
+        minQuantity: item.minQuantity,
+        unitPrice: item.unitPrice,
+        batchNumber: item.batchNumber,
+        expiryDate: item.expiryDate,
+        status: item.status
+      })
+      .run()
     return item
   }
 
@@ -80,7 +81,7 @@ export class InventoryModel {
    * Updates stock quantity for a drug or consumable.
    */
   static updateStock(id: string, newQuantity: number): void {
-    const db = getDatabase()
+    const db = getDrizzleDb()
     const item = this.getById(id)
     if (!item) return
 
@@ -91,7 +92,12 @@ export class InventoryModel {
       status = 'Low Stock'
     }
 
-    const stmt = db.prepare('UPDATE inventory SET stock_quantity = ?, status = ? WHERE id = ?')
-    stmt.run(newQuantity, status, id)
+    db.update(inventory)
+      .set({
+        stockQuantity: newQuantity,
+        status
+      })
+      .where(eq(inventory.id, id))
+      .run()
   }
 }

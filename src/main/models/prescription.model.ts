@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { prescriptions } from '../database/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export interface PrescriptionItem {
   drugName: string
@@ -26,18 +28,15 @@ export class PrescriptionModel {
    * Gets all prescriptions from local SQLite DB.
    */
   static getAll(): Prescription[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, prescription_code as prescriptionCode, patient_id as patientId,
-        patient_name as patientName, doctor_name as doctorName, items,
-        status, total_amount as totalAmount, created_at as createdAt
-      FROM prescriptions 
-      ORDER BY created_at DESC
-    `)
-    const rows = stmt.all() as (Omit<Prescription, 'items'> & { items: string })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(prescriptions)
+      .orderBy(desc(prescriptions.createdAt))
+      .all()
     return rows.map((r) => ({
       ...r,
+      status: r.status as Prescription['status'],
       items: JSON.parse(r.items)
     }))
   }
@@ -46,19 +45,16 @@ export class PrescriptionModel {
    * Gets prescriptions by Patient ID.
    */
   static getByPatientId(patientId: string): Prescription[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, prescription_code as prescriptionCode, patient_id as patientId,
-        patient_name as patientName, doctor_name as doctorName, items,
-        status, total_amount as totalAmount, created_at as createdAt
-      FROM prescriptions 
-      WHERE patient_id = ?
-      ORDER BY created_at DESC
-    `)
-    const rows = stmt.all(patientId) as (Omit<Prescription, 'items'> & { items: string })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(prescriptions)
+      .where(eq(prescriptions.patientId, patientId))
+      .orderBy(desc(prescriptions.createdAt))
+      .all()
     return rows.map((r) => ({
       ...r,
+      status: r.status as Prescription['status'],
       items: JSON.parse(r.items)
     }))
   }
@@ -67,32 +63,30 @@ export class PrescriptionModel {
    * Creates a new electronic prescription.
    */
   static create(prescription: Omit<Prescription, 'createdAt'>): Prescription {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO prescriptions (
-        id, prescription_code, patient_id, patient_name, doctor_name,
-        items, status, total_amount
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      prescription.id,
-      prescription.prescriptionCode,
-      prescription.patientId,
-      prescription.patientName,
-      prescription.doctorName,
-      JSON.stringify(prescription.items),
-      prescription.status,
-      prescription.totalAmount
-    )
+    const db = getDrizzleDb()
+    db.insert(prescriptions)
+      .values({
+        id: prescription.id,
+        prescriptionCode: prescription.prescriptionCode,
+        patientId: prescription.patientId,
+        patientName: prescription.patientName,
+        doctorName: prescription.doctorName,
+        items: JSON.stringify(prescription.items),
+        status: prescription.status,
+        totalAmount: prescription.totalAmount
+      })
+      .run()
     return prescription
   }
 
   /**
-   * Updates prescription status (e.g. Pending -> Dispensed).
+   * Updates prescription status.
    */
   static updateStatus(id: string, status: Prescription['status']): void {
-    const db = getDatabase()
-    const stmt = db.prepare('UPDATE prescriptions SET status = ? WHERE id = ?')
-    stmt.run(status, id)
+    const db = getDrizzleDb()
+    db.update(prescriptions)
+      .set({ status })
+      .where(eq(prescriptions.id, id))
+      .run()
   }
 }

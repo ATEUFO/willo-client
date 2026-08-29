@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { backups } from '../database/schema'
+import { desc } from 'drizzle-orm'
 
 export interface BackupRecord {
   id: string
@@ -11,17 +13,29 @@ export interface BackupRecord {
 
 export class BackupModel {
   static getAll(): BackupRecord[] {
-    const db = getDatabase()
-    const stmt = db.prepare('SELECT id, filename, size, timestamp, type, status FROM backups ORDER BY timestamp DESC')
-    return stmt.all() as BackupRecord[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(backups)
+      .orderBy(desc(backups.timestamp))
+      .all()
+    return rows as BackupRecord[]
   }
 
   static create(backup: Omit<BackupRecord, 'id' | 'timestamp'>): BackupRecord {
-    const db = getDatabase()
+    const db = getDrizzleDb()
     const id = `bk-${Date.now()}`
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19)
-    const stmt = db.prepare('INSERT INTO backups (id, filename, size, timestamp, type, status) VALUES (?, ?, ?, ?, ?, ?)')
-    stmt.run(id, backup.filename, backup.size, timestamp, backup.type, backup.status)
+    db.insert(backups)
+      .values({
+        id,
+        filename: backup.filename,
+        size: backup.size,
+        timestamp,
+        type: backup.type,
+        status: backup.status
+      })
+      .run()
     return { id, ...backup, timestamp }
   }
 }

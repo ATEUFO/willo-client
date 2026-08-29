@@ -29,7 +29,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     setErrorMessage('')
 
@@ -56,13 +56,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
       } else {
         setErrorMessage(result.message || 'Échec de la connexion. Vérifiez vos identifiants.')
       }
-    } catch (err: any) {
+    } catch (err) {
       setIsLoading(false)
-      setErrorMessage(err.message || 'Une erreur est survenue lors de la connexion.')
+      const message =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message || 'Une erreur est survenue lors de la connexion.'
+      setErrorMessage(message)
     }
   }
 
-  const quickLogin = (demoUser: string) => {
+  const quickLogin = (demoUser: string): void => {
     setUsername(demoUser)
     setPassword('password123')
   }

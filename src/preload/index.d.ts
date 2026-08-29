@@ -64,6 +64,11 @@ export interface WilloAPI {
     getAll: () => Promise<any[]>
     trigger: () => Promise<any>
   }
+  sync: {
+    getStatus: () => Promise<{ isOnline: boolean; lastSyncedAt: string; pendingCacheSync: number }>
+    toggleOnline: (online: boolean) => Promise<boolean>
+    triggerDeltas: () => Promise<boolean>
+  }
 }
 
 declare global {

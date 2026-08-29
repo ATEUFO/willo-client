@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { systemLogs } from '../database/schema'
+import { desc } from 'drizzle-orm'
 
 export interface SystemLog {
   id: string
@@ -10,17 +12,28 @@ export interface SystemLog {
 
 export class SystemLogModel {
   static getAll(): SystemLog[] {
-    const db = getDatabase()
-    const stmt = db.prepare('SELECT id, level, service, message, timestamp FROM system_logs ORDER BY timestamp DESC')
-    return stmt.all() as SystemLog[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(systemLogs)
+      .orderBy(desc(systemLogs.timestamp))
+      .all()
+    return rows as SystemLog[]
   }
 
   static create(log: Omit<SystemLog, 'id' | 'timestamp'>): SystemLog {
-    const db = getDatabase()
+    const db = getDrizzleDb()
     const id = `log-${Date.now()}`
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19)
-    const stmt = db.prepare('INSERT INTO system_logs (id, level, service, message, timestamp) VALUES (?, ?, ?, ?, ?)')
-    stmt.run(id, log.level, log.service, log.message, timestamp)
+    db.insert(systemLogs)
+      .values({
+        id,
+        level: log.level,
+        service: log.service,
+        message: log.message,
+        timestamp
+      })
+      .run()
     return { id, ...log, timestamp }
   }
 }

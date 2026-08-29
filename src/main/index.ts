@@ -3,6 +3,8 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { getDatabase, closeDatabase } from './database'
 import { registerIpcHandlers } from './ipc'
+import { connectWebSocket } from './sync/sync-manager'
+import 'dotenv/config'
 import icon from '../../resources/icon.png?asset'
 
 import { existsSync } from 'fs'
@@ -51,6 +53,9 @@ app.whenReady().then(() => {
 
   // Register all IPC handlers for better-sqlite3 operations
   registerIpcHandlers()
+
+  // Start real-time sync WebSocket connection
+  connectWebSocket()
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')

@@ -36,7 +36,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     setErrorMessage('')
     setSuccessMessage('')
@@ -95,9 +95,13 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
         setIsLoading(false)
         setErrorMessage(regResult.message || 'Impossible de créer le compte.')
       }
-    } catch (err: any) {
+    } catch (err) {
       setIsLoading(false)
-      setErrorMessage(err.message || 'Une erreur est survenue lors de la création du compte.')
+      const message =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message || 'Une erreur est survenue lors de la création du compte.'
+      setErrorMessage(message)
     }
   }
 

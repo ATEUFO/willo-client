@@ -3,7 +3,7 @@ import { Wifi, WifiOff, Database, Globe, Clock, Hospital } from 'lucide-react'
 import { useHospitalStore } from '../../pages/store/hospitalStore'
 
 export const StatusBar: React.FC = () => {
-  const { currentRole, isOnline, toggleOnline, hospitalSettings } = useHospitalStore()
+  const { currentRole, isOnline, toggleOnline, hospitalSettings, pendingCacheSync, lastSyncedAt } = useHospitalStore()
   const [timeStr, setTimeStr] = useState<string>('')
 
   useEffect(() => {
@@ -58,11 +58,18 @@ export const StatusBar: React.FC = () => {
         {/* Local Cache Sync */}
         <div
           className="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors cursor-default"
-          title="Base de données SQLite / Dexie localement synchronisée"
+          title={`Base de données SQLite localement synchronisée. Dernière synchro : ${lastSyncedAt || 'Jamais'}`}
         >
           <Database className="w-3 h-3 text-medical-primary" />
-          <span>Cache Local Sync</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-medical-primary animate-ping" />
+          <span>
+            Cache Local Sync {pendingCacheSync > 0 ? `(${pendingCacheSync} en attente)` : '(À jour)'}
+          </span>
+          {pendingCacheSync > 0 && (
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+          )}
+          {pendingCacheSync === 0 && isOnline && (
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          )}
         </div>
 
         <span className="text-slate-700">|</span>

@@ -14,15 +14,58 @@ import {
   SystemLogModel,
   BackupModel
 } from '../models'
+import {
+  queueLocalMutation,
+  authenticateRemote,
+  getOnlineStatus,
+  getLastSyncedAt,
+  toggleOnlineState,
+  pullDeltas
+} from '../sync/sync-manager'
 
 export function registerIpcHandlers(): void {
   // Auth Handlers
   ipcMain.handle('auth:login', async (_, { username, password }) => {
-    return UserModel.authenticate(username, password)
+    try {
+      // Attempt remote login if online
+      const user = await authenticateRemote(username, password)
+      
+      // Save current user session
+      UserModel.setCurrentUser({
+        id: user.id,
+        name: `${user.prenom} ${user.nom}`,
+        username: user.email,
+        role: user.roles?.[0]?.nom || 'médecin',
+        department: user.department || 'Médecine',
+        token: user.token
+      })
+
+      // Add to local users table to allow offline login later
+      try {
+        UserModel.createUser({
+          name: `${user.prenom} ${user.nom}`,
+          username: user.email,
+          password: password,
+          role: user.roles?.[0]?.nom || 'médecin',
+          department: user.department || 'Médecine',
+          status: 'Active'
+        })
+      } catch {
+        // Ignored if user already exists
+      }
+
+      return UserModel.getCurrentUser()
+    } catch (err) {
+      console.warn('Remote authentication failed, checking local database:', err)
+      return UserModel.authenticate(username, password)
+    }
   })
 
   ipcMain.handle('auth:register', async (_, userData) => {
-    return UserModel.createUser(userData)
+    const res = UserModel.createUser(userData)
+    // Register is local-first, sync will push if desired
+    queueLocalMutation('Practitioner', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('auth:getCurrentUser', async () => {
@@ -41,6 +84,10 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('users:updateStatus', async (_, { id, status }) => {
     UserModel.updateUserStatus(id, status)
+    const updated = UserModel.getAllUsers().find((u) => u.id === id)
+    if (updated) {
+      queueLocalMutation('Practitioner', id, 'update', updated)
+    }
     return true
   })
 
@@ -50,11 +97,17 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('patients:create', async (_, patientData) => {
-    return PatientModel.create(patientData)
+    const res = PatientModel.create(patientData)
+    queueLocalMutation('Patient', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('patients:updateStatus', async (_, { id, status }) => {
     PatientModel.updateStatus(id, status)
+    const updated = PatientModel.getById(id)
+    if (updated) {
+      queueLocalMutation('Patient', id, 'update', updated)
+    }
     return true
   })
 
@@ -64,7 +117,9 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('vitals:create', async (_, vitalsData) => {
-    return VitalModel.create(vitalsData)
+    const res = VitalModel.create(vitalsData)
+    queueLocalMutation('Observation', res.id, 'create', res)
+    return res
   })
 
   // Care Tasks Handlers
@@ -73,7 +128,11 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('careTasks:toggleStatus', async (_, id) => {
-    return CareTaskModel.toggleStatus(id)
+    const res = CareTaskModel.toggleStatus(id)
+    if (res) {
+      queueLocalMutation('CarePlan', id, 'update', res)
+    }
+    return res
   })
 
   // Consultations Handlers
@@ -82,7 +141,9 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('consultations:create', async (_, consData) => {
-    return ConsultationModel.create(consData)
+    const res = ConsultationModel.create(consData)
+    queueLocalMutation('Encounter', res.id, 'create', res)
+    return res
   })
 
   // Lab Requests Handlers
@@ -91,11 +152,17 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('lab:create', async (_, labData) => {
-    return LabModel.create(labData)
+    const res = LabModel.create(labData)
+    queueLocalMutation('DiagnosticReport', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('lab:updateStatus', async (_, { id, status, results, validatedBy }) => {
     LabModel.updateResults(id, status, results, validatedBy)
+    const updated = LabModel.getAll().find((l) => l.id === id)
+    if (updated) {
+      queueLocalMutation('DiagnosticReport', id, 'update', updated)
+    }
     return true
   })
 
@@ -105,11 +172,17 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('prescriptions:create', async (_, prescData) => {
-    return PrescriptionModel.create(prescData)
+    const res = PrescriptionModel.create(prescData)
+    queueLocalMutation('MedicationRequest', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('prescriptions:updateStatus', async (_, { id, status }) => {
     PrescriptionModel.updateStatus(id, status)
+    const updated = PrescriptionModel.getAll().find((p) => p.id === id)
+    if (updated) {
+      queueLocalMutation('MedicationRequest', id, 'update', updated)
+    }
     return true
   })
 
@@ -119,12 +192,9 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('inventory:create', async (_, itemData) => {
-    return InventoryModel.create(itemData)
-  })
-
-  ipcMain.handle('inventory:updateStock', async (_, { id, newQuantity }) => {
-    InventoryModel.updateStock(id, newQuantity)
-    return true
+    const res = InventoryModel.create(itemData)
+    queueLocalMutation('Medication', res.id, 'create', res)
+    return res
   })
 
   // Purchase Orders Handlers
@@ -133,7 +203,9 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('purchaseOrders:create', async (_, poData) => {
-    return PurchaseOrderModel.create(poData)
+    const res = PurchaseOrderModel.create(poData)
+    queueLocalMutation('SupplyRequest', res.id, 'create', res)
+    return res
   })
 
   // Appointments Handlers
@@ -142,11 +214,17 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('appointments:create', async (_, appData) => {
-    return AppointmentModel.create(appData)
+    const res = AppointmentModel.create(appData)
+    queueLocalMutation('Appointment', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('appointments:updateStatus', async (_, { id, status }) => {
     AppointmentModel.updateStatus(id, status)
+    const updated = AppointmentModel.getAll().find((a) => a.id === id)
+    if (updated) {
+      queueLocalMutation('Appointment', id, 'update', updated)
+    }
     return true
   })
 
@@ -156,11 +234,17 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('invoices:create', async (_, invoiceData) => {
-    return InvoiceModel.create(invoiceData)
+    const res = InvoiceModel.create(invoiceData)
+    queueLocalMutation('Invoice', res.id, 'create', res)
+    return res
   })
 
   ipcMain.handle('invoices:pay', async (_, { id, paymentMethod }) => {
     InvoiceModel.markAsPaid(id, paymentMethod)
+    const updated = InvoiceModel.getAll().find((inv) => inv.id === id)
+    if (updated) {
+      queueLocalMutation('Invoice', id, 'update', updated)
+    }
     return true
   })
 
@@ -193,4 +277,37 @@ export function registerIpcHandlers(): void {
     })
     return backup
   })
+
+  // Sync Handlers exposed to Renderer
+  ipcMain.handle('sync:getStatus', () => {
+    return {
+      isOnline: getOnlineStatus(),
+      lastSyncedAt: getLastSyncedAt(),
+      pendingCacheSync: getPendingCount()
+    }
+  })
+
+  ipcMain.handle('sync:toggleOnline', (_, online: boolean) => {
+    toggleOnlineState(online)
+    return true
+  })
+
+  ipcMain.handle('sync:triggerDeltas', async () => {
+    await pullDeltas()
+    return true
+  })
+}
+
+// Helper to count pending outbox items
+function getPendingCount(): number {
+  try {
+    const { getDrizzleDb } = require('../database')
+    const { outbox } = require('../database/schema')
+    const { eq } = require('drizzle-orm')
+    const db = getDrizzleDb()
+    const rows = db.select().from(outbox).where(eq(outbox.status, 'pending')).all()
+    return rows.length
+  } catch {
+    return 0
+  }
 }

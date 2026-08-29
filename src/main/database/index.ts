@@ -2,8 +2,11 @@ import Database from 'better-sqlite3'
 import path from 'node:path'
 import fs from 'node:fs'
 import { app } from 'electron'
+import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
+import * as schema from './schema'
 
 let dbInstance: Database.Database | null = null
+let drizzleDbInstance: BetterSQLite3Database<typeof schema> | null = null
 
 /**
  * Resolves the SQLite database file path.
@@ -39,6 +42,17 @@ export function getDatabase(): Database.Database {
     seedDatabaseIfEmpty(dbInstance)
   }
   return dbInstance
+}
+
+/**
+ * Returns the singleton Drizzle ORM Database instance.
+ */
+export function getDrizzleDb(): BetterSQLite3Database<typeof schema> {
+  getDatabase() // Ensure SQLite connection is initialized
+  if (!drizzleDbInstance) {
+    drizzleDbInstance = drizzle(dbInstance!, { schema })
+  }
+  return drizzleDbInstance
 }
 
 /**
@@ -246,6 +260,30 @@ export function initDatabaseSchema(db: Database.Database): void {
       timestamp TEXT NOT NULL,
       type TEXT NOT NULL,
       status TEXT NOT NULL
+    );
+
+    -- Outbox for tracking offline mutations
+    CREATE TABLE IF NOT EXISTS outbox (
+      id TEXT PRIMARY KEY,
+      resource_type TEXT NOT NULL,
+      resource_id TEXT NOT NULL,
+      action TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      error_message TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- AI Diagnoses
+    CREATE TABLE IF NOT EXISTS ai_diagnoses (
+      id TEXT PRIMARY KEY,
+      patient_id TEXT NOT NULL,
+      symptoms TEXT NOT NULL,
+      suggestions TEXT NOT NULL,
+      alerts TEXT,
+      model_version TEXT NOT NULL DEFAULT '1.0.0-onnx',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
     );
   `)
 }
@@ -515,5 +553,6 @@ export function closeDatabase(): void {
   if (dbInstance) {
     dbInstance.close()
     dbInstance = null
+    drizzleDbInstance = null
   }
 }

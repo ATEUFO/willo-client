@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { users, currentUser } from '../database/schema'
+import { eq, sql } from 'drizzle-orm'
 
 export interface UserAccount {
   id: string
@@ -26,27 +28,34 @@ export class UserModel {
    * Returns all user accounts from local SQLite DB.
    */
   static getAllUsers(): UserAccount[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT id, name, username, role, department, status, last_login as lastLogin
-      FROM users
-      ORDER BY name ASC
-    `)
-    return stmt.all() as UserAccount[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select({
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        role: users.role,
+        department: users.department,
+        status: users.status,
+        lastLogin: users.lastLogin
+      })
+      .from(users)
+      .orderBy(users.name)
+      .all()
+    return rows.map((r) => ({ ...r, lastLogin: r.lastLogin || '' })) as UserAccount[]
   }
 
   /**
    * Finds user by username.
    */
   static getUserByUsername(username: string): (UserAccount & { password?: string }) | null {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT id, name, username, password, role, department, status, last_login as lastLogin
-      FROM users
-      WHERE LOWER(username) = LOWER(?)
-    `)
-    const row = stmt.get(username) as (UserAccount & { password?: string }) | undefined
-    return row || null
+    const db = getDrizzleDb()
+    const row = db
+      .select()
+      .from(users)
+      .where(sql`LOWER(${users.username}) = LOWER(${username})`)
+      .get()
+    return (row as (UserAccount & { password?: string })) || null
   }
 
   /**
@@ -60,8 +69,11 @@ export class UserModel {
 
     // Update last_login
     const now = new Date().toISOString().replace('T', ' ').substring(0, 16)
-    const db = getDatabase()
-    db.prepare('UPDATE users SET last_login = ? WHERE id = ?').run(now, user.id)
+    const db = getDrizzleDb()
+    db.update(users)
+      .set({ lastLogin: now })
+      .where(eq(users.id, user.id))
+      .run()
 
     const authenticatedUser: UserAccount = {
       id: user.id,
@@ -69,7 +81,7 @@ export class UserModel {
       username: user.username,
       role: user.role,
       department: user.department,
-      status: user.status,
+      status: user.status as 'Active' | 'Inactive',
       lastLogin: now
     }
 
@@ -90,15 +102,23 @@ export class UserModel {
    * Creates a new user account.
    */
   static createUser(user: Omit<UserAccount, 'id' | 'lastLogin'> & { password?: string }): UserAccount {
-    const db = getDatabase()
+    const db = getDrizzleDb()
     const id = `usr-${Date.now()}`
     const lastLogin = 'Jamais'
     const password = user.password || 'password123'
-    const stmt = db.prepare(`
-      INSERT INTO users (id, name, username, password, role, department, status, last_login)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(id, user.name, user.username, password, user.role, user.department, user.status || 'Active', lastLogin)
+
+    db.insert(users)
+      .values({
+        id,
+        name: user.name,
+        username: user.username,
+        password,
+        role: user.role,
+        department: user.department,
+        status: user.status || 'Active',
+        lastLogin
+      })
+      .run()
 
     return {
       id,
@@ -106,7 +126,7 @@ export class UserModel {
       username: user.username,
       role: user.role,
       department: user.department,
-      status: user.status || 'Active',
+      status: (user.status || 'Active') as 'Active' | 'Inactive',
       lastLogin
     }
   }
@@ -115,46 +135,57 @@ export class UserModel {
    * Updates user status.
    */
   static updateUserStatus(id: string, status: 'Active' | 'Inactive'): void {
-    const db = getDatabase()
-    db.prepare('UPDATE users SET status = ? WHERE id = ?').run(status, id)
+    const db = getDrizzleDb()
+    db.update(users)
+      .set({ status })
+      .where(eq(users.id, id))
+      .run()
   }
 
   /**
    * Retrieves current logged-in user session profile.
    */
   static getCurrentUser(): CurrentUser | null {
-    const db = getDatabase()
-    const stmt = db.prepare('SELECT id, name, username, role, department, token, last_login as lastLogin FROM current_user LIMIT 1')
-    const row = stmt.get() as CurrentUser | undefined
-    return row || null
+    const db = getDrizzleDb()
+    const row = db
+      .select({
+        id: currentUser.id,
+        name: currentUser.name,
+        username: currentUser.username,
+        role: currentUser.role,
+        department: currentUser.department,
+        token: currentUser.token,
+        lastLogin: currentUser.lastLogin
+      })
+      .from(currentUser)
+      .get()
+    return (row as CurrentUser) || null
   }
 
   /**
    * Sets current logged-in user profile in local SQLite session.
    */
   static setCurrentUser(user: CurrentUser): void {
-    const db = getDatabase()
-    db.prepare('DELETE FROM current_user;').run()
-    const stmt = db.prepare(`
-      INSERT INTO current_user (id, name, username, role, department, token, last_login)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      user.id,
-      user.name,
-      user.username,
-      user.role,
-      user.department,
-      user.token || null,
-      user.lastLogin || new Date().toISOString()
-    )
+    const db = getDrizzleDb()
+    db.delete(currentUser).run()
+    db.insert(currentUser)
+      .values({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        role: user.role,
+        department: user.department,
+        token: user.token || null,
+        lastLogin: user.lastLogin || new Date().toISOString()
+      })
+      .run()
   }
 
   /**
    * Clears active logged-in user session.
    */
   static clearCurrentUser(): void {
-    const db = getDatabase()
-    db.prepare('DELETE FROM current_user;').run()
+    const db = getDrizzleDb()
+    db.delete(currentUser).run()
   }
 }

@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { careTasks } from '../database/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export interface CareTask {
   id: string
@@ -15,44 +17,64 @@ export interface CareTask {
 
 export class CareTaskModel {
   static getAll(): CareTask[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_id as patientId, patient_name as patientName,
-        bed_number as bedNumber, type, description, prescribed_by as prescribedBy,
-        time_scheduled as timeScheduled, status, administered_at as administeredAt
-      FROM care_tasks 
-      ORDER BY created_at DESC
-    `)
-    return stmt.all() as CareTask[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(careTasks)
+      .orderBy(desc(careTasks.createdAt))
+      .all()
+    return rows.map((r) => ({
+      ...r,
+      administeredAt: r.administeredAt || undefined,
+      type: r.type as CareTask['type'],
+      status: r.status as CareTask['status']
+    }))
   }
 
   static create(task: Omit<CareTask, 'id' | 'status'>): CareTask {
-    const db = getDatabase()
+    const db = getDrizzleDb()
     const id = `task-${Date.now()}`
-    const stmt = db.prepare(`
-      INSERT INTO care_tasks (id, patient_id, patient_name, bed_number, type, description, prescribed_by, time_scheduled, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(id, task.patientId, task.patientName, task.bedNumber, task.type, task.description, task.prescribedBy, task.timeScheduled, 'Pending')
+    db.insert(careTasks)
+      .values({
+        id,
+        patientId: task.patientId,
+        patientName: task.patientName,
+        bedNumber: task.bedNumber,
+        type: task.type,
+        description: task.description,
+        prescribedBy: task.prescribedBy,
+        timeScheduled: task.timeScheduled,
+        status: 'Pending'
+      })
+      .run()
     return { id, ...task, status: 'Pending' }
   }
 
   static toggleStatus(id: string): CareTask | null {
-    const db = getDatabase()
-    const stmtSelect = db.prepare(`
-      SELECT id, patient_id as patientId, patient_name as patientName,
-             bed_number as bedNumber, type, description, prescribed_by as prescribedBy,
-             time_scheduled as timeScheduled, status, administered_at as administeredAt
-      FROM care_tasks WHERE id = ?
-    `)
-    const task = stmtSelect.get(id) as CareTask | undefined
+    const db = getDrizzleDb()
+    const task = db
+      .select()
+      .from(careTasks)
+      .where(eq(careTasks.id, id))
+      .get()
     if (!task) return null
 
     const newStatus = task.status === 'Pending' ? 'Administered' : 'Pending'
     const administeredAt = newStatus === 'Administered' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null
 
-    db.prepare('UPDATE care_tasks SET status = ?, administered_at = ? WHERE id = ?').run(newStatus, administeredAt, id)
-    return { ...task, status: newStatus, administeredAt: administeredAt || undefined }
+    db.update(careTasks)
+      .set({
+        status: newStatus,
+        administeredAt
+      })
+      .where(eq(careTasks.id, id))
+      .run()
+
+    return {
+      ...task,
+      type: task.type as CareTask['type'],
+      status: newStatus,
+      administeredAt: administeredAt || undefined
+    }
   }
 }

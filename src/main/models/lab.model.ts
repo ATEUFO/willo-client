@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { labRequests } from '../database/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export interface LabResultItem {
   parameter: string
@@ -17,7 +19,7 @@ export interface LabRequest {
   category: string
   requestedBy: string
   dateRequested: string
-  status: 'To Do' | 'In Progress' | 'Validated'
+  status: 'To Do' | 'In Progress' | 'Validated' | 'Completed' | 'Pending Validation'
   validatedBy?: string
   results?: LabResultItem[]
   createdAt?: string
@@ -28,69 +30,59 @@ export class LabModel {
    * Gets all laboratory requests from local SQLite DB.
    */
   static getAll(): LabRequest[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, request_code as requestCode, patient_id as patientId,
-        patient_name as patientName, test_name as testName, category,
-        requested_by as requestedBy, date_requested as dateRequested,
-        status, validated_by as validatedBy, results, created_at as createdAt
-      FROM lab_requests 
-      ORDER BY date_requested DESC
-    `)
-    const rows = stmt.all() as (Omit<LabRequest, 'results'> & { results: string | null })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(labRequests)
+      .orderBy(desc(labRequests.dateRequested))
+      .all()
     return rows.map((r) => ({
       ...r,
-      results: r.results ? JSON.parse(r.results) : undefined
-    }))
+      status: r.status as LabRequest['status'],
+      results: r.results ? JSON.parse(r.results) : undefined,
+      validatedBy: r.validatedBy || undefined
+    })) as LabRequest[]
   }
 
   /**
    * Gets lab requests by Patient ID.
    */
   static getByPatientId(patientId: string): LabRequest[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, request_code as requestCode, patient_id as patientId,
-        patient_name as patientName, test_name as testName, category,
-        requested_by as requestedBy, date_requested as dateRequested,
-        status, validated_by as validatedBy, results, created_at as createdAt
-      FROM lab_requests 
-      WHERE patient_id = ?
-      ORDER BY date_requested DESC
-    `)
-    const rows = stmt.all(patientId) as (Omit<LabRequest, 'results'> & { results: string | null })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(labRequests)
+      .where(eq(labRequests.patientId, patientId))
+      .orderBy(desc(labRequests.dateRequested))
+      .all()
     return rows.map((r) => ({
       ...r,
-      results: r.results ? JSON.parse(r.results) : undefined
-    }))
+      status: r.status as LabRequest['status'],
+      results: r.results ? JSON.parse(r.results) : undefined,
+      validatedBy: r.validatedBy || undefined
+    })) as LabRequest[]
   }
 
   /**
    * Creates a new lab request order.
    */
   static create(request: Omit<LabRequest, 'createdAt'>): LabRequest {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO lab_requests (
-        id, request_code, patient_id, patient_name, test_name,
-        category, requested_by, date_requested, status, validated_by, results
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      request.id,
-      request.requestCode,
-      request.patientId,
-      request.patientName,
-      request.testName,
-      request.category,
-      request.requestedBy,
-      request.dateRequested,
-      request.status,
-      request.validatedBy || null,
-      request.results ? JSON.stringify(request.results) : null
-    )
+    const db = getDrizzleDb()
+    db.insert(labRequests)
+      .values({
+        id: request.id,
+        requestCode: request.requestCode,
+        patientId: request.patientId,
+        patientName: request.patientName,
+        testName: request.testName,
+        category: request.category,
+        requestedBy: request.requestedBy,
+        dateRequested: request.dateRequested,
+        status: request.status,
+        validatedBy: request.validatedBy || null,
+        results: request.results ? JSON.stringify(request.results) : null
+      })
+      .run()
     return request
   }
 
@@ -103,12 +95,14 @@ export class LabModel {
     results: LabResultItem[],
     validatedBy: string
   ): void {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      UPDATE lab_requests 
-      SET status = ?, results = ?, validated_by = ? 
-      WHERE id = ?
-    `)
-    stmt.run(status, JSON.stringify(results), validatedBy, id)
+    const db = getDrizzleDb()
+    db.update(labRequests)
+      .set({
+        status,
+        results: JSON.stringify(results),
+        validatedBy
+      })
+      .where(eq(labRequests.id, id))
+      .run()
   }
 }

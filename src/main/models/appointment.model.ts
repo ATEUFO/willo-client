@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { appointments } from '../database/schema'
+import { eq, asc } from 'drizzle-orm'
 
 export interface Appointment {
   id: string
@@ -18,56 +20,53 @@ export class AppointmentModel {
    * Gets all scheduled appointments from local SQLite DB.
    */
   static getAll(): Appointment[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_id as patientId, patient_name as patientName,
-        doctor_name as doctorName, department, date, time, type, status,
-        created_at as createdAt
-      FROM appointments 
-      ORDER BY date ASC, time ASC
-    `)
-    return (stmt.all() as unknown[]) as Appointment[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(appointments)
+      .orderBy(asc(appointments.date), asc(appointments.time))
+      .all()
+    return rows.map((r) => ({
+      ...r,
+      status: r.status as Appointment['status']
+    }))
   }
 
   /**
    * Gets appointments by Patient ID.
    */
   static getByPatientId(patientId: string): Appointment[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_id as patientId, patient_name as patientName,
-        doctor_name as doctorName, department, date, time, type, status,
-        created_at as createdAt
-      FROM appointments 
-      WHERE patient_id = ?
-      ORDER BY date ASC, time ASC
-    `)
-    return (stmt.all(patientId) as unknown[]) as Appointment[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.patientId, patientId))
+      .orderBy(asc(appointments.date), asc(appointments.time))
+      .all()
+    return rows.map((r) => ({
+      ...r,
+      status: r.status as Appointment['status']
+    }))
   }
 
   /**
    * Creates a new appointment.
    */
   static create(app: Omit<Appointment, 'createdAt'>): Appointment {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO appointments (
-        id, patient_id, patient_name, doctor_name, department, date, time, type, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      app.id,
-      app.patientId,
-      app.patientName,
-      app.doctorName,
-      app.department,
-      app.date,
-      app.time,
-      app.type,
-      app.status
-    )
+    const db = getDrizzleDb()
+    db.insert(appointments)
+      .values({
+        id: app.id,
+        patientId: app.patientId,
+        patientName: app.patientName,
+        doctorName: app.doctorName,
+        department: app.department,
+        date: app.date,
+        time: app.time,
+        type: app.type,
+        status: app.status
+      })
+      .run()
     return app
   }
 
@@ -75,8 +74,10 @@ export class AppointmentModel {
    * Updates appointment status (Scheduled -> Completed / Cancelled).
    */
   static updateStatus(id: string, status: Appointment['status']): void {
-    const db = getDatabase()
-    const stmt = db.prepare('UPDATE appointments SET status = ? WHERE id = ?')
-    stmt.run(status, id)
+    const db = getDrizzleDb()
+    db.update(appointments)
+      .set({ status })
+      .where(eq(appointments.id, id))
+      .run()
   }
 }

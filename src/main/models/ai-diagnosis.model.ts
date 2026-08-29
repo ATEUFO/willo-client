@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { aiDiagnoses } from '../database/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export interface AISuggestionItem {
   diseaseName: string
@@ -22,44 +24,36 @@ export class AIDiagnosisModel {
    * Gets AI diagnosis history by Patient ID.
    */
   static getByPatientId(patientId: string): AIDiagnosis[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, patient_id as patientId, symptoms, suggestions, alerts,
-        model_version as modelVersion, created_at as createdAt
-      FROM ai_diagnoses 
-      WHERE patient_id = ?
-      ORDER BY created_at DESC
-    `)
-    const rows = stmt.all(patientId) as (Omit<AIDiagnosis, 'suggestions' | 'alerts'> & {
-      suggestions: string
-      alerts: string | null
-    })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(aiDiagnoses)
+      .where(eq(aiDiagnoses.patientId, patientId))
+      .orderBy(desc(aiDiagnoses.createdAt))
+      .all()
     return rows.map((r) => ({
       ...r,
       suggestions: JSON.parse(r.suggestions),
-      alerts: r.alerts ? JSON.parse(r.alerts) : []
-    }))
+      alerts: r.alerts ? JSON.parse(r.alerts) : [],
+      modelVersion: r.modelVersion || undefined
+    })) as AIDiagnosis[]
   }
 
   /**
    * Saves an AI diagnostic inference result (ONNX Runtime trace / RiskAssessment).
    */
   static save(record: Omit<AIDiagnosis, 'createdAt'>): AIDiagnosis {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO ai_diagnoses (
-        id, patient_id, symptoms, suggestions, alerts, model_version
-      ) VALUES (?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      record.id,
-      record.patientId,
-      record.symptoms,
-      JSON.stringify(record.suggestions),
-      record.alerts ? JSON.stringify(record.alerts) : null,
-      record.modelVersion || '1.0.0-onnx'
-    )
+    const db = getDrizzleDb()
+    db.insert(aiDiagnoses)
+      .values({
+        id: record.id,
+        patientId: record.patientId,
+        symptoms: record.symptoms,
+        suggestions: JSON.stringify(record.suggestions),
+        alerts: record.alerts ? JSON.stringify(record.alerts) : null,
+        modelVersion: record.modelVersion || '1.0.0-onnx'
+      })
+      .run()
     return record
   }
 }

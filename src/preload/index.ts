@@ -66,6 +66,11 @@ const api = {
   backups: {
     getAll: () => ipcRenderer.invoke('backups:getAll'),
     trigger: () => ipcRenderer.invoke('backups:trigger')
+  },
+  sync: {
+    getStatus: () => ipcRenderer.invoke('sync:getStatus'),
+    toggleOnline: (online: boolean) => ipcRenderer.invoke('sync:toggleOnline', online),
+    triggerDeltas: () => ipcRenderer.invoke('sync:triggerDeltas')
   }
 }
 

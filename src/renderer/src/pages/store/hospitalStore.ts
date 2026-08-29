@@ -340,8 +340,12 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
       } else {
         return { success: false, message: 'Identifiant ou mot de passe incorrect' }
       }
-    } catch (err: any) {
-      return { success: false, message: err.message || 'Erreur lors de la connexion' }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message || 'Erreur lors de la connexion'
+      return { success: false, message }
     }
   },
 
@@ -370,8 +374,12 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
         return { success: true }
       }
       return { success: false, message: 'Impossible de créer le compte' }
-    } catch (err: any) {
-      return { success: false, message: err.message || "Erreur lors de la création du compte" }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message || 'Erreur lors de la création du compte'
+      return { success: false, message }
     }
   },
 
@@ -410,7 +418,7 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
       ])
 
       // Map prescriptions to dispenses format for pharmacy page compatibility
-      const dispensesData: PrescriptionDispense[] = (prescriptionsData || []).map((p: any) => ({
+      const dispensesData: PrescriptionDispense[] = (prescriptionsData || []).map((p) => ({
         id: p.id,
         prescriptionCode: p.prescriptionCode || p.prescription_code,
         patientName: p.patientName || p.patient_name,
@@ -421,6 +429,21 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
         status: (p.status === 'Dispensed' ? 'Dispensed' : 'Pending') as 'Pending' | 'Dispensed',
         dispensedAt: p.dispensedAt
       }))
+
+      let isOnlineState = get().isOnline
+      let syncTime = get().lastSyncedAt
+      let pendingCount = get().pendingCacheSync
+
+      if (window.api && window.api.sync) {
+        try {
+          const status = await window.api.sync.getStatus()
+          isOnlineState = status.isOnline
+          syncTime = status.lastSyncedAt || syncTime
+          pendingCount = status.pendingCacheSync
+        } catch (err) {
+          console.warn('Failed to query sync status:', err)
+        }
+      }
 
       set({
         users: usersData || [],
@@ -436,7 +459,9 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
         invoices: invoicesData || [],
         systemLogs: logsData || [],
         backups: backupsData || [],
-        lastSyncedAt: new Date().toLocaleTimeString()
+        isOnline: isOnlineState,
+        lastSyncedAt: syncTime,
+        pendingCacheSync: pendingCount
       })
     } catch (err) {
       console.error('Failed to load all data from SQLite:', err)
@@ -445,7 +470,17 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
 
   setRole: (role) => set({ currentRole: role }),
 
-  toggleOnline: () => set((state) => ({ isOnline: !state.isOnline })),
+  toggleOnline: async () => {
+    const nextOnline = !get().isOnline
+    set({ isOnline: nextOnline })
+    if (window.api && window.api.sync) {
+      try {
+        await window.api.sync.toggleOnline(nextOnline)
+      } catch (err) {
+        console.warn('Failed to toggle sync status:', err)
+      }
+    }
+  },
 
   triggerBackup: async () => {
     if (window.api && window.api.backups) {
@@ -594,3 +629,27 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
     }))
   }
 }))
+
+if (window.electron && window.electron.ipcRenderer) {
+  window.electron.ipcRenderer.on(
+    'sync:status-changed',
+    (
+      _,
+      status: {
+        isOnline: boolean
+        lastSyncedAt: string
+        pendingCacheSync: number
+      }
+    ) => {
+      useHospitalStore.setState({
+        isOnline: status.isOnline,
+        lastSyncedAt: status.lastSyncedAt,
+        pendingCacheSync: status.pendingCacheSync
+      })
+    }
+  )
+
+  window.electron.ipcRenderer.on('sync:data-updated', () => {
+    useHospitalStore.getState().loadAllData()
+  })
+}

@@ -1,4 +1,6 @@
-import { getDatabase } from '../database'
+import { getDrizzleDb } from '../database'
+import { invoices } from '../database/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export interface InvoiceItem {
   description: string
@@ -29,21 +31,18 @@ export class InvoiceModel {
    * Gets all billing invoices from local SQLite DB.
    */
   static getAll(): Invoice[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, invoice_code as invoiceCode, patient_id as patientId,
-        patient_name as patientName, insurance_name as insuranceName,
-        insurance_coverage_percent as insuranceCoveragePercent, subtotal,
-        insurance_amount as insuranceAmount, patient_share as patientShare,
-        payment_method as paymentMethod, status, paid_at as paidAt, items,
-        date, created_at as createdAt
-      FROM invoices 
-      ORDER BY date DESC
-    `)
-    const rows = stmt.all() as (Omit<Invoice, 'items'> & { items: string })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(invoices)
+      .orderBy(desc(invoices.date))
+      .all()
     return rows.map((r) => ({
       ...r,
+      insuranceName: r.insuranceName || undefined,
+      paymentMethod: (r.paymentMethod || undefined) as Invoice['paymentMethod'],
+      status: r.status as Invoice['status'],
+      paidAt: r.paidAt || undefined,
       items: JSON.parse(r.items)
     }))
   }
@@ -52,22 +51,19 @@ export class InvoiceModel {
    * Gets invoices by Patient ID.
    */
   static getByPatientId(patientId: string): Invoice[] {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      SELECT 
-        id, invoice_code as invoiceCode, patient_id as patientId,
-        patient_name as patientName, insurance_name as insuranceName,
-        insurance_coverage_percent as insuranceCoveragePercent, subtotal,
-        insurance_amount as insuranceAmount, patient_share as patientShare,
-        payment_method as paymentMethod, status, paid_at as paidAt, items,
-        date, created_at as createdAt
-      FROM invoices 
-      WHERE patient_id = ?
-      ORDER BY date DESC
-    `)
-    const rows = stmt.all(patientId) as (Omit<Invoice, 'items'> & { items: string })[]
+    const db = getDrizzleDb()
+    const rows = db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.patientId, patientId))
+      .orderBy(desc(invoices.date))
+      .all()
     return rows.map((r) => ({
       ...r,
+      insuranceName: r.insuranceName || undefined,
+      paymentMethod: (r.paymentMethod || undefined) as Invoice['paymentMethod'],
+      status: r.status as Invoice['status'],
+      paidAt: r.paidAt || undefined,
       items: JSON.parse(r.items)
     }))
   }
@@ -76,30 +72,25 @@ export class InvoiceModel {
    * Creates a new billing invoice.
    */
   static create(invoice: Omit<Invoice, 'createdAt'>): Invoice {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      INSERT INTO invoices (
-        id, invoice_code, patient_id, patient_name, insurance_name,
-        insurance_coverage_percent, subtotal, insurance_amount, patient_share,
-        payment_method, status, paid_at, items, date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
-      invoice.id,
-      invoice.invoiceCode,
-      invoice.patientId,
-      invoice.patientName,
-      invoice.insuranceName || null,
-      invoice.insuranceCoveragePercent,
-      invoice.subtotal,
-      invoice.insuranceAmount,
-      invoice.patientShare,
-      invoice.paymentMethod || null,
-      invoice.status,
-      invoice.paidAt || null,
-      JSON.stringify(invoice.items),
-      invoice.date
-    )
+    const db = getDrizzleDb()
+    db.insert(invoices)
+      .values({
+        id: invoice.id,
+        invoiceCode: invoice.invoiceCode,
+        patientId: invoice.patientId,
+        patientName: invoice.patientName,
+        insuranceName: invoice.insuranceName || null,
+        insuranceCoveragePercent: invoice.insuranceCoveragePercent,
+        subtotal: invoice.subtotal,
+        insuranceAmount: invoice.insuranceAmount,
+        patientShare: invoice.patientShare,
+        paymentMethod: invoice.paymentMethod || null,
+        status: invoice.status,
+        paidAt: invoice.paidAt || null,
+        items: JSON.stringify(invoice.items),
+        date: invoice.date
+      })
+      .run()
     return invoice
   }
 
@@ -107,12 +98,14 @@ export class InvoiceModel {
    * Registers a payment for an invoice.
    */
   static markAsPaid(id: string, paymentMethod: Invoice['paymentMethod']): void {
-    const db = getDatabase()
-    const stmt = db.prepare(`
-      UPDATE invoices 
-      SET status = 'Paid', payment_method = ?, paid_at = ? 
-      WHERE id = ?
-    `)
-    stmt.run(paymentMethod || null, new Date().toISOString(), id)
+    const db = getDrizzleDb()
+    db.update(invoices)
+      .set({
+        status: 'Paid',
+        paymentMethod: paymentMethod || null,
+        paidAt: new Date().toISOString()
+      })
+      .where(eq(invoices.id, id))
+      .run()
   }
 }
