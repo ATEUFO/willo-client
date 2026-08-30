@@ -258,6 +258,7 @@ interface HospitalState {
   dispensePrescription: (id: string) => Promise<void>
   addStockItem: (item: Omit<StockItem, 'id' | 'status'>) => Promise<void>
   createPurchaseOrder: (po: Omit<PurchaseOrder, 'id' | 'orderCode' | 'dateCreated' | 'status'>) => Promise<void>
+  addInvoice: (invoice: Omit<Invoice, 'id' | 'invoiceCode' | 'status' | 'date'>) => Promise<void>
   payInvoice: (id: string, method: 'Espèces' | 'Carte Bancaire' | 'Mobile Money') => Promise<void>
   closeDailyRegister: () => void
 }
@@ -622,6 +623,20 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   createPurchaseOrder: async (poData) => {
     if (window.api && window.api.purchaseOrders) {
       await window.api.purchaseOrders.create(poData)
+      await get().loadAllData()
+    }
+  },
+
+  addInvoice: async (invoiceData) => {
+    const newInv: Invoice = {
+      ...invoiceData,
+      id: `inv-${Date.now()}`,
+      invoiceCode: `FAC-2026-${String(Math.floor(1000 + Math.random() * 9000))}`,
+      status: 'Unpaid',
+      date: new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 5)
+    }
+    if (window.api && window.api.invoices) {
+      await window.api.invoices.create(newInv)
       await get().loadAllData()
     }
   },
