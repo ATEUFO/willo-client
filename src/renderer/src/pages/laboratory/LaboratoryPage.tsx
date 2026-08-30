@@ -1,286 +1,366 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   TestTube,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
   FileCheck,
-  ArrowRight
+  TrendingUp,
+  Search,
+  Clock,
+  FileText
 } from 'lucide-react'
 import { useHospitalStore, LabRequest, LabResultItem } from '../store/hospitalStore'
+import { PrintReportModal } from './components/PrintReportModal'
+import { ResultsEntryForm } from './components/ResultsEntryForm'
+import { LaboratoryKanban } from './components/LaboratoryKanban'
 
 export const LaboratoryPage: React.FC = () => {
-  const { labRequests, updateLabRequestStatus } = useHospitalStore()
+  const { labRequests, updateLabRequestStatus, currentUser } = useHospitalStore()
 
+  // Navigation & Search Views
   const [activeView, setActiveView] = useState<'kanban' | 'results_entry'>('kanban')
-  const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(labRequests[0] || null)
+  const [selectedRequest, setSelectedRequest] = useState<LabRequest | null>(null)
+  
+  // Filtering & Scan States
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [barcodeInput, setBarcodeInput] = useState('')
+  
+  // Report Modal state
+  const [viewingReportRequest, setViewingReportRequest] = useState<LabRequest | null>(null)
 
-  // Results form state
-  const [resultItems, setResultItems] = useState<LabResultItem[]>([
-    { param: 'Glycémie à jeun', value: '1.45', unit: 'g/L', refRange: '0.70 - 1.10', isAbnormal: true },
-    { param: 'Cholestérol Total', value: '2.40', unit: 'g/L', refRange: '< 2.00', isAbnormal: true },
-    { param: 'Triglycérides', value: '1.30', unit: 'g/L', refRange: '0.40 - 1.50', isAbnormal: false }
-  ])
-
-  const handleResultValueChange = (index: number, val: string) => {
-    const updated = [...resultItems]
-    updated[index].value = val
-
-    // Demo auto-check reference range
-    const num = parseFloat(val)
-    if (updated[index].param.includes('Glycémie')) {
-      updated[index].isAbnormal = num < 0.70 || num > 1.10
-    } else if (updated[index].param.includes('Cholestérol')) {
-      updated[index].isAbnormal = num > 2.00
+  // Auto select a request if results_entry is loaded without selection
+  useEffect(() => {
+    if (activeView === 'results_entry' && !selectedRequest && labRequests.length > 0) {
+      const pendingRequests = labRequests.filter(r => r.status === 'In Progress' || r.status === 'To Do')
+      if (pendingRequests.length > 0) {
+        handleSelectRequest(pendingRequests[0])
+      } else {
+        handleSelectRequest(labRequests[0])
+      }
     }
-    setResultItems(updated)
+  }, [activeView, selectedRequest, labRequests])
+
+  // Select request helper
+  const handleSelectRequest = (req: LabRequest) => {
+    setSelectedRequest(req)
   }
 
-  const handleSaveResults = (e: React.FormEvent) => {
-    e.preventDefault()
+  // Save current entries as draft (Status: 'In Progress')
+  const handleSaveDraft = (results: LabResultItem[], notes: string) => {
     if (!selectedRequest) return
 
-    updateLabRequestStatus(selectedRequest.id, 'Pending Validation', resultItems)
-    alert(`Résultats enregistrés pour ${selectedRequest.patientName}. Transmis pour validation biologiste!`)
+    const dataToSave: LabResultItem[] = [
+      ...results,
+      {
+        param: 'Observations Cliniques',
+        value: notes,
+        unit: '',
+        refRange: '',
+        isAbnormal: false
+      }
+    ]
+
+    updateLabRequestStatus(selectedRequest.id, 'In Progress', dataToSave)
+    
+    setSelectedRequest({
+      ...selectedRequest,
+      status: 'In Progress',
+      results: dataToSave
+    })
+
+    alert(`Brouillon enregistré localement pour ${selectedRequest.patientName}.`)
   }
 
-  const handleValidateLab = (id: string) => {
-    updateLabRequestStatus(id, 'Completed')
-    alert('Analyse validée et disponible dans le dossier du médecin!')
+  // Final validation and transmission to the doctor (Status: 'Completed')
+  const handleValidateAndTransmit = (results: LabResultItem[], notes: string) => {
+    if (!selectedRequest) return
+
+    const dataToSave: LabResultItem[] = [
+      ...results,
+      {
+        param: 'Observations Cliniques',
+        value: notes,
+        unit: '',
+        refRange: '',
+        isAbnormal: false
+      }
+    ]
+
+    updateLabRequestStatus(selectedRequest.id, 'Completed', dataToSave)
+
+    alert(`Bilan d'analyses validé avec succès. Transmis au médecin traitant!`)
+    setActiveView('kanban')
+    setSelectedRequest(null)
   }
 
-  const todoList = labRequests.filter((r) => r.status === 'To Do')
-  const inProgressList = labRequests.filter((r) => r.status === 'In Progress')
-  const pendingValList = labRequests.filter((r) => r.status === 'Pending Validation')
-  const completedList = labRequests.filter((r) => r.status === 'Completed')
+  // Barcode / Sample Code Scan simulator handler
+  const handleBarcodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!barcodeInput.trim()) return
+
+    const matched = labRequests.find(
+      (r) =>
+        r.requestCode.toLowerCase() === barcodeInput.trim().toLowerCase() ||
+        r.id.toLowerCase() === barcodeInput.trim().toLowerCase()
+    )
+
+    if (matched) {
+      handleSelectRequest(matched)
+      setActiveView('results_entry')
+      setBarcodeInput('')
+    } else {
+      alert(`Aucun échantillon ne correspond au code : "${barcodeInput}"`)
+    }
+  }
+
+  // Urgency dynamic configuration mapper
+  const getUrgencyLevel = (req: LabRequest): { label: string; bg: string; text: string; glow?: string } => {
+    const codeNum = parseInt(req.requestCode.replace(/\D/g, '')) || 0
+    if (codeNum % 3 === 0) {
+      return {
+        label: 'Urgent',
+        bg: 'bg-red-50 text-red-700 border-red-200',
+        text: 'text-red-600',
+        glow: 'shadow-[0_0_10px_rgba(239,68,68,0.25)] border-red-300 animate-pulse'
+      }
+    }
+    if (codeNum % 3 === 1) {
+      return {
+        label: 'Prioritaire',
+        bg: 'bg-amber-50 text-amber-800 border-amber-200',
+        text: 'text-amber-600'
+      }
+    }
+    return {
+      label: 'Normal',
+      bg: 'bg-slate-50 text-slate-600 border-slate-200',
+      text: 'text-slate-500'
+    }
+  }
+
+  // Filter list of requests
+  const filteredRequests = useMemo(() => {
+    return labRequests.filter((r) => {
+      const query = searchQuery.toLowerCase().trim()
+      const matchesSearch =
+        r.patientName.toLowerCase().includes(query) ||
+        r.requestCode.toLowerCase().includes(query) ||
+        r.patientId.toLowerCase().includes(query) ||
+        r.testName.toLowerCase().includes(query)
+
+      if (!matchesSearch) return false
+
+      if (categoryFilter !== 'all') {
+        return r.category.toLowerCase() === categoryFilter.toLowerCase()
+      }
+
+      return true
+    })
+  }, [labRequests, searchQuery, categoryFilter])
+
+  // Kanban column splits
+  const todoList = filteredRequests.filter((r) => r.status === 'To Do')
+  const inProgressList = filteredRequests.filter((r) => r.status === 'In Progress')
+  const pendingValList = filteredRequests.filter((r) => r.status === 'Pending Validation')
+  const completedList = filteredRequests.filter((r) => r.status === 'Completed')
+
+  // Sidebar list items
+  const sidebarPendingRequests = useMemo(() => {
+    return [...inProgressList, ...todoList]
+  }, [inProgressList, todoList])
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-medical-border pb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
-            <TestTube className="w-7 h-7 text-medical-primary" />
-            Espace Laboratoire & Biologie Clinique
-          </h2>
-          <p className="text-sm text-slate-500">
-            Pipeline des prélèvements, grilles de saisie des résultats et repérage des valeurs hors normes
-          </p>
+    <div className="p-6 max-w-7xl mx-auto space-y-6 print:p-0 print:m-0 select-none">
+      {/* Top Header Controls (Hidden during physical printing) */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-medical-border pb-5 print:hidden">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-medical-subtle rounded-2xl flex items-center justify-center border border-emerald-200 shadow-2xs">
+            <TestTube className="w-6 h-6 text-medical-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              Espace Laboratoire & Biologie Clinique
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Pipeline des prélèvements, saisie biologique instantanée et validation de comptes-rendus.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
+        {/* View Toggle */}
+        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
           <button
             onClick={() => setActiveView('kanban')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${activeView === 'kanban' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-              }`}
+            className={`px-4 py-2 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-2 ${
+              activeView === 'kanban'
+                ? 'bg-white text-slate-800 shadow-xs'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
           >
-            <Clock className="w-3.5 h-3.5" />
-            Vue Kanban Demandes ({labRequests.length})
+            <TrendingUp className="w-3.5 h-3.5" />
+            Pipeline Kanban ({labRequests.length})
           </button>
           <button
-            onClick={() => setActiveView('results_entry')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${activeView === 'results_entry' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
-              }`}
+            onClick={() => {
+              if (inProgressList.length > 0) {
+                handleSelectRequest(inProgressList[0])
+              } else if (todoList.length > 0) {
+                handleSelectRequest(todoList[0])
+              }
+              setActiveView('results_entry')
+            }}
+            className={`px-4 py-2 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-2 ${
+              activeView === 'results_entry'
+                ? 'bg-white text-slate-800 shadow-xs'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
-            Grille de Saisie des Résultats
+            Saisie de Résultats
           </button>
         </div>
       </div>
 
-      {/* View 1: Kanban Pipeline */}
+      {/* Filter and Scan Bar (Hidden during printing) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white border border-medical-border p-4 rounded-2xl shadow-2xs print:hidden">
+        {/* Search input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par patient, ID ou analyse..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-800 focus:outline-none focus:border-medical-primary focus:ring-1 focus:ring-medical-primary transition-all"
+          />
+        </div>
+
+        {/* Category filter */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-500 font-semibold whitespace-nowrap">Catégorie :</span>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="w-full bg-slate-50 border border-medical-border rounded-xl p-2 text-slate-700 focus:outline-none focus:border-medical-primary font-semibold"
+          >
+            <option value="all">Toutes les disciplines</option>
+            <option value="Biochimie">Biochimie</option>
+            <option value="Hématologie">Hématologie</option>
+            <option value="Microbiologie">Microbiologie</option>
+            <option value="Immunologie">Immunologie</option>
+          </select>
+        </div>
+
+        {/* Scanner Simulation bar */}
+        <form onSubmit={handleBarcodeSubmit} className="relative">
+          <input
+            type="text"
+            placeholder="Scanner ou saisir code échantillon (Ex: LAB-2026-088)..."
+            value={barcodeInput}
+            onChange={(e) => setBarcodeInput(e.target.value)}
+            className="w-full pl-4 pr-16 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs font-mono font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+          />
+          <button
+            type="submit"
+            className="absolute right-1 top-1/2 -translate-y-1/2 bg-slate-800 text-white font-bold text-[10px] uppercase px-2.5 py-1.5 rounded-lg hover:bg-slate-900 transition-all cursor-pointer"
+          >
+            Scan
+          </button>
+        </form>
+      </div>
+
+      {/* VIEW 1: KANBAN BOARD */}
       {activeView === 'kanban' && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Column 1: À faire */}
-          <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
-            <div className="flex items-center justify-between border-b border-medical-border pb-2">
-              <span className="font-bold text-slate-700 text-xs flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-400" /> À Faire ({todoList.length})
-              </span>
-            </div>
-            <div className="space-y-3">
-              {todoList.map((req) => (
-                <div key={req.id} className="bg-white border border-medical-border p-3.5 rounded-xl space-y-2 shadow-xs">
-                  <div className="flex justify-between items-start">
-                    <span className="font-mono text-[10px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 font-semibold">
-                      {req.requestCode}
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-medium">{req.category}</span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 text-xs">{req.testName}</h4>
-                  <p className="text-xs text-slate-600">Patient : {req.patientName}</p>
-                  <p className="text-[11px] text-slate-400">Prescrit par {req.requestedBy}</p>
-                  <button
-                    onClick={() => updateLabRequestStatus(req.id, 'In Progress')}
-                    className="w-full mt-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold py-1.5 rounded-lg flex items-center justify-center gap-1 border border-slate-200 transition-colors"
+        <LaboratoryKanban
+          todoList={todoList}
+          inProgressList={inProgressList}
+          pendingValList={pendingValList}
+          completedList={completedList}
+          onSelectRequest={(req) => {
+            handleSelectRequest(req)
+            setActiveView('results_entry')
+          }}
+          onStartAnalysis={(id) => updateLabRequestStatus(id, 'In Progress')}
+          onPrintReport={(req) => setViewingReportRequest(req)}
+          getUrgencyLevel={getUrgencyLevel}
+        />
+      )}
+
+      {/* VIEW 2: RESULTS ENTRY GRID */}
+      {activeView === 'results_entry' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start print:hidden">
+          {/* LEFT SIDE: Selection List */}
+          <div className="bg-white border border-medical-border rounded-2xl p-4 space-y-4 shadow-2xs lg:col-span-1">
+            <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              Dossiers en attente de saisie
+            </h3>
+            
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+              {sidebarPendingRequests.map((req) => {
+                const isSelected = selectedRequest?.id === req.id
+                return (
+                  <div
+                    key={req.id}
+                    onClick={() => handleSelectRequest(req)}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                      isSelected
+                        ? 'bg-medical-subtle border-emerald-300 shadow-2xs'
+                        : 'bg-slate-50/50 border-medical-border hover:bg-slate-50 hover:border-slate-300'
+                    }`}
                   >
-                    Démarrer l'Analyse <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-              {todoList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">Aucune demande en attente</p>}
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="font-mono text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 font-bold">
+                        {req.requestCode}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                        req.status === 'In Progress'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                          : 'bg-slate-50 text-slate-600 border border-slate-200'
+                      }`}>
+                        {req.status === 'In Progress' ? 'Brouillon' : 'À prélever'}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-800 truncate">{req.testName}</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Patient : {req.patientName}</p>
+                  </div>
+                )
+              })}
+              {sidebarPendingRequests.length === 0 && (
+                <p className="text-xs text-slate-400 text-center py-6">Aucune saisie en attente</p>
+              )}
             </div>
           </div>
 
-          {/* Column 2: En cours */}
-          <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
-            <div className="flex items-center justify-between border-b border-medical-border pb-2">
-              <span className="font-bold text-amber-700 text-xs flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" /> En Cours ({inProgressList.length})
-              </span>
-            </div>
-            <div className="space-y-3">
-              {inProgressList.map((req) => (
-                <div key={req.id} className="bg-amber-50/50 border border-amber-200 p-3.5 rounded-xl space-y-2 shadow-xs">
-                  <div className="flex justify-between items-start">
-                    <span className="font-mono text-[10px] text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 font-semibold">
-                      {req.requestCode}
-                    </span>
-                    <span className="text-[10px] text-amber-800 font-semibold">{req.category}</span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 text-xs">{req.testName}</h4>
-                  <p className="text-xs text-slate-700">Patient : {req.patientName}</p>
-                  <button
-                    onClick={() => {
-                      setSelectedRequest(req)
-                      if (req.results.length > 0) setResultItems(req.results)
-                      setActiveView('results_entry')
-                    }}
-                    className="w-full mt-2 bg-medical-primary hover:bg-medical-hover text-white text-xs font-semibold py-1.5 rounded-lg flex items-center justify-center gap-1 shadow-xs transition-colors"
-                  >
-                    Saisir les Résultats <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-              {inProgressList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">Aucune analyse en cours</p>}
-            </div>
-          </div>
-
-          {/* Column 3: En attente de validation */}
-          <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
-            <div className="flex items-center justify-between border-b border-medical-border pb-2">
-              <span className="font-bold text-blue-700 text-xs flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Validation Biologiste ({pendingValList.length})
-              </span>
-            </div>
-            <div className="space-y-3">
-              {pendingValList.map((req) => (
-                <div key={req.id} className="bg-white border border-medical-border p-3.5 rounded-xl space-y-2 shadow-xs">
-                  <div className="flex justify-between items-start">
-                    <span className="font-mono text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 font-semibold">
-                      {req.requestCode}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 text-xs">{req.testName}</h4>
-                  <p className="text-xs text-slate-600">Patient : {req.patientName}</p>
-                  <button
-                    onClick={() => handleValidateLab(req.id)}
-                    className="w-full mt-2 bg-medical-primary hover:bg-medical-hover text-white text-xs font-semibold py-1.5 rounded-lg flex items-center justify-center gap-1 shadow-xs transition-colors"
-                  >
-                    Valider le Bilan <CheckCircle className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-              {pendingValList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">Aucune validation en attente</p>}
-            </div>
-          </div>
-
-          {/* Column 4: Completed */}
-          <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
-            <div className="flex items-center justify-between border-b border-medical-border pb-2">
-              <span className="font-bold text-emerald-800 text-xs flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-medical-primary" /> Terminés & Validés ({completedList.length})
-              </span>
-            </div>
-            <div className="space-y-3">
-              {completedList.map((req) => (
-                <div key={req.id} className="bg-slate-50 border border-medical-border p-3.5 rounded-xl space-y-1 opacity-80">
-                  <span className="font-mono text-[10px] text-emerald-800 bg-medical-subtle px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">
-                    {req.requestCode}
-                  </span>
-                  <h4 className="font-bold text-slate-800 text-xs">{req.testName}</h4>
-                  <p className="text-[11px] text-slate-500">Patient : {req.patientName}</p>
-                  <p className="text-[10px] text-emerald-800 font-semibold">Validé par {req.validatedBy}</p>
-                </div>
-              ))}
-            </div>
+          {/* RIGHT SIDE: Dynamic Grid Form */}
+          <div className="bg-white border border-medical-border rounded-2xl p-5 space-y-5 shadow-2xs lg:col-span-2">
+            {selectedRequest ? (
+              <ResultsEntryForm
+                request={selectedRequest}
+                onSaveDraft={handleSaveDraft}
+                onValidate={handleValidateAndTransmit}
+                onBack={() => setActiveView('kanban')}
+                getUrgencyLevel={getUrgencyLevel}
+              />
+            ) : (
+              <div className="py-20 text-center text-slate-400 space-y-3">
+                <FileText className="w-12 h-12 mx-auto stroke-1" />
+                <h4 className="font-bold text-slate-700 text-sm">Aucun échantillon sélectionné</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Sélectionnez une demande dans la barre latérale gauche ou scannez un code d'analyse pour ouvrir sa grille de saisie biologique.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* View 2: Results Entry Grid */}
-      {activeView === 'results_entry' && (
-        <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-5 shadow-sm">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-medical-border pb-3">
-            <div>
-              <h3 className="font-bold text-medical-dark text-base">
-                Grille de Saisie des Valeurs Biologiques pour : <span className="text-medical-primary">{selectedRequest?.patientName}</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                Code Demande : {selectedRequest?.requestCode} • Examen : {selectedRequest?.testName}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setActiveView('kanban')}
-              className="text-xs text-slate-600 hover:text-slate-900 underline font-medium"
-            >
-              Retour à la vue Kanban
-            </button>
-          </div>
-
-          <form onSubmit={handleSaveResults} className="space-y-5">
-            <div className="overflow-x-auto rounded-xl border border-medical-border">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
-                  <tr>
-                    <th className="p-3">Paramètre / Recherche</th>
-                    <th className="p-3">Valeur Mesurée</th>
-                    <th className="p-3">Unité</th>
-                    <th className="p-3">Valeurs de Référence (Norme)</th>
-                    <th className="p-3">Indicateur d'Alerte</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-medical-border text-slate-700">
-                  {resultItems.map((item, idx) => (
-                    <tr key={idx} className={item.isAbnormal ? 'bg-red-50/50' : 'hover:bg-slate-50/80'}>
-                      <td className="p-3 font-bold text-slate-900">{item.param}</td>
-                      <td className="p-3">
-                        <input
-                          type="text"
-                          value={item.value}
-                          onChange={(e) => handleResultValueChange(idx, e.target.value)}
-                          className={`w-32 bg-white border rounded-xl p-2 font-mono font-bold text-xs text-slate-800 focus:outline-none ${item.isAbnormal ? 'border-red-300 text-medical-danger' : 'border-medical-border focus:border-medical-primary'
-                            }`}
-                        />
-                      </td>
-                      <td className="p-3 text-slate-500 font-mono">{item.unit}</td>
-                      <td className="p-3 text-slate-600 font-mono">{item.refRange}</td>
-                      <td className="p-3">
-                        {item.isAbnormal ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-medical-danger border border-red-200 flex items-center gap-1 w-fit">
-                            <AlertTriangle className="w-3 h-3" /> Hors Norme (Alerte)
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-medical-subtle text-emerald-800 border border-emerald-200 flex items-center gap-1 w-fit">
-                            <CheckCircle className="w-3 h-3 text-medical-primary" /> Conforme
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-medical-primary hover:bg-medical-hover text-white font-semibold py-3 rounded-xl transition-all shadow-sm"
-            >
-              Enregistrer les Résultats & Transmettre au Biologiste
-            </button>
-          </form>
-        </div>
+      {/* PRINT DIALOG / REPORT MODAL */}
+      {viewingReportRequest && (
+        <PrintReportModal
+          request={viewingReportRequest}
+          onClose={() => setViewingReportRequest(null)}
+          currentUser={currentUser}
+        />
       )}
     </div>
   )
