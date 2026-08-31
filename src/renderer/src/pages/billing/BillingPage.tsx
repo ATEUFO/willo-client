@@ -7,16 +7,19 @@ import {
   Lock,
   Wallet,
   Receipt,
-  Building2
+  Building2,
+  Plus
 } from 'lucide-react'
 import { useHospitalStore, Invoice } from '../store/hospitalStore'
+import { CreateInvoiceModal } from './components/CreateInvoiceModal'
 
 export const BillingPage: React.FC = () => {
-  const { invoices, dailyClosure, payInvoice, closeDailyRegister } = useHospitalStore()
+  const { invoices, dailyClosure, payInvoice, closeDailyRegister, patients, addInvoice } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'pos' | 'invoices' | 'closure'>('pos')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(invoices[0] || null)
   const [paymentMethod, setPaymentMethod] = useState<'Espèces' | 'Carte Bancaire' | 'Mobile Money'>('Espèces')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   useEffect(() => {
     if (!selectedInvoice && invoices.length > 0) {
@@ -86,9 +89,17 @@ export const BillingPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Unpaid invoices list */}
           <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
-            <h3 className="font-bold text-medical-dark text-sm border-b border-medical-border pb-2">
-              Actes Non Payés en Attente ({unpaidInvoices.length})
-            </h3>
+            <div className="flex justify-between items-center border-b border-medical-border pb-2">
+              <h3 className="font-bold text-medical-dark text-sm">
+                Actes Non Payés en Attente ({unpaidInvoices.length})
+              </h3>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="bg-medical-primary hover:bg-medical-hover text-white text-[11px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-3xs"
+              >
+                <Plus className="w-3 h-3" /> Facture
+              </button>
+            </div>
 
             <div className="space-y-2">
               {unpaidInvoices.map((inv) => (
@@ -324,6 +335,18 @@ export const BillingPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* CREATE INVOICE MODAL */}
+      {isCreateModalOpen && (
+        <CreateInvoiceModal
+          patients={patients}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSave={async (invoiceData) => {
+            await addInvoice(invoiceData)
+            setIsCreateModalOpen(false)
+          }}
+        />
       )}
     </div>
   )
