@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<mxfile host="Electron" modified="2026-09-01T00:36:00.000Z" agent="Antigravity UML 2.5.1 Suite Generator" version="21.0.0" type="device">
+  <diagram id="willo-activity-diag" name="Diagramme Activite Authentification">
+    <mxGraphModel dx="2200" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="lane_user" parent="1" value="Utilisateur" style="swimlane;html=1;startSize=30;horizontal=1;startSize=35;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;rounded=1;" vertex="1">
+          <mxGeometry x="100" y="100" width="360" height="1100" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_react" parent="1" value="Interface Client React" style="swimlane;html=1;startSize=30;horizontal=1;startSize=35;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;rounded=1;" vertex="1">
+          <mxGeometry x="460" y="100" width="380" height="1100" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_electron" parent="1" value="Processus Main Electron" style="swimlane;html=1;startSize=30;horizontal=1;startSize=35;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;rounded=1;" vertex="1">
+          <mxGeometry x="840" y="100" width="420" height="1100" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_sqlite" parent="1" value="Base Données Locale SQLite" style="swimlane;html=1;startSize=30;horizontal=1;startSize=35;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;rounded=1;" vertex="1">
+          <mxGeometry x="1260" y="100" width="380" height="1100" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_srv" parent="1" value="Serveur Sync Central" style="swimlane;html=1;startSize=30;horizontal=1;startSize=35;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;rounded=1;" vertex="1">
+          <mxGeometry x="1640" y="100" width="380" height="1100" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_start" parent="lane_user" style="ellipse;fillColor=#0F172A;strokeColor=none;html=1;" vertex="1">
+          <mxGeometry x="165" y="50" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_input" parent="lane_user" value="Saisir identifiants connexion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="70" y="110" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_val_form" parent="lane_react" value="Valider format formulaire" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="110" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_format" parent="lane_react" value="Format valide ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#78350F;shadow=1;" vertex="1">
+          <mxGeometry x="120" y="190" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_err_form" parent="lane_react" value="Afficher erreur format" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="280" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_send_ipc" parent="lane_electron" value="Transmettre données via IPC" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="190" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_query_db" parent="lane_electron" value="Rechercher utilisateur local" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="280" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_db_read" parent="lane_sqlite" value="Interroger table utilisateurs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="280" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_found" parent="lane_electron" value="Utilisateur existant ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#78350F;shadow=1;" vertex="1">
+          <mxGeometry x="140" y="360" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_chk_pwd" parent="lane_electron" value="Vérifier empreinte mot de passe" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="450" width="230" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_pwd" parent="lane_electron" value="Mot de passe correct ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#78350F;shadow=1;" vertex="1">
+          <mxGeometry x="145" y="530" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_err_pwd" parent="lane_react" value="Afficher erreur identifiants" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="535" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_chk_net" parent="lane_electron" value="Vérifier connectivité réseau" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="620" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_net" parent="lane_electron" value="Réseau disponible ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#78350F;shadow=1;" vertex="1">
+          <mxGeometry x="145" y="700" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_req_srv" parent="lane_electron" value="Transmettre requête au serveur" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="790" width="230" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_gen_tok" parent="lane_srv" value="Générer jeton session" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="790" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_init_sess" parent="lane_electron" value="Initialiser session utilisateur" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="890" width="230" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_sync_ws" parent="lane_electron" value="Ouvrir canal synchronisation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="100" y="970" width="230" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_show_dash" parent="lane_react" value="Afficher tableau bord" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="970" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_end" parent="lane_user" style="ellipse;html=1;shape=endState;fillColor=#0F172A;strokeColor=#0F172A;strokeWidth=2;" vertex="1">
+          <mxGeometry x="165" y="980" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_1" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_start" target="act_input">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_2" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_input" target="act_val_form">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_3" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_val_form" target="dec_format">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_4" parent="1" value="[non]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_format" target="act_err_form">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_5" parent="1" value="[oui]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_format" target="act_send_ipc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_6" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_send_ipc" target="act_query_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_7" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_query_db" target="act_db_read">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_8" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_db_read" target="dec_found">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_9" parent="1" value="[non]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_found" target="act_err_pwd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_10" parent="1" value="[oui]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_found" target="act_chk_pwd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_11" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_chk_pwd" target="dec_pwd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_12" parent="1" value="[non]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_pwd" target="act_err_pwd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_13" parent="1" value="[oui]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_pwd" target="act_chk_net">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_14" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_chk_net" target="dec_net">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_15" parent="1" value="[oui]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_net" target="act_req_srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_16" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_req_srv" target="act_gen_tok">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_17" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_gen_tok" target="act_init_sess">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_18" parent="1" value="[non]" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="dec_net" target="act_init_sess">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_19" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_init_sess" target="act_sync_ws">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_20" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_sync_ws" target="act_show_dash">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="fl_21" parent="1" style="endArrow=open;endSize=8;html=1;strokeColor=#0F172A;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="act_show_dash" target="act_end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

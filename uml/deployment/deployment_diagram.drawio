@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<mxfile host="Electron" modified="2026-09-01T00:36:00.000Z" agent="Antigravity UML 2.5.1 Suite Generator" version="21.0.0" type="device">
+  <diagram id="willo-deployment-diag" name="Diagramme Deploiement System">
+    <mxGraphModel dx="2200" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="node_client" parent="1" value="Node: Poste Client Desktop
+(Windows Linux macOS)" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#F8FAFC;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=15;spacingTop=10;size=15;" vertex="1">
+          <mxGeometry x="100" y="100" width="680" height="680" as="geometry"/>
+        </mxCell>
+        <mxCell id="exec_electron" parent="node_client" value="«execution environment»
+Runtime Electron Node.js" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=1.5;dashed=1;fontStyle=1;fontSize=12;fontColor=#0369A1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;rounded=1;" vertex="1">
+          <mxGeometry x="40" y="80" width="600" height="540" as="geometry"/>
+        </mxCell>
+        <mxCell id="art_app" parent="exec_electron" value="«artifact»
+Application Willo Client.exe" style="shape=component;align=left;spacingLeft=30;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#334155;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="40" y="80" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="art_sqlite_db" parent="exec_electron" value="«artifact»
+Base Locale SQLite (willo.db)" style="shape=component;align=left;spacingLeft=30;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#334155;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="40" y="180" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_printer" parent="1" value="Device: Imprimante Ticket" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#78350F;verticalAlign=top;align=left;spacingLeft=12;spacingTop=10;size=12;" vertex="1">
+          <mxGeometry x="100" y="860" width="300" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_scanner" parent="1" value="Device: Lecteur Code-Barres" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#78350F;verticalAlign=top;align=left;spacingLeft=12;spacingTop=10;size=12;" vertex="1">
+          <mxGeometry x="480" y="860" width="300" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="node_server" parent="1" value="Node: Serveur Central Hopital
+(Serveur On-Premise Cloud)" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#F8FAFC;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=15;spacingTop=10;size=15;" vertex="1">
+          <mxGeometry x="1200" y="100" width="750" height="680" as="geometry"/>
+        </mxCell>
+        <mxCell id="exec_docker_backend" parent="node_server" value="«execution environment»
+Conteneur Docker Backend Node.js" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=1.5;dashed=1;fontStyle=1;fontSize=12;fontColor=#0369A1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;rounded=1;" vertex="1">
+          <mxGeometry x="40" y="80" width="660" height="260" as="geometry"/>
+        </mxCell>
+        <mxCell id="art_api_srv" parent="exec_docker_backend" value="«artifact»
+Service API Backend Fastify" style="shape=component;align=left;spacingLeft=30;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#334155;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="40" y="80" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="art_ws_srv" parent="exec_docker_backend" value="«artifact»
+Service Sync WebSocket" style="shape=component;align=left;spacingLeft=30;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#334155;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="340" y="80" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="exec_docker_db" parent="node_server" value="«execution environment»
+Conteneur Docker PostgreSQL" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=1.5;dashed=1;fontStyle=1;fontSize=12;fontColor=#0369A1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;rounded=1;" vertex="1">
+          <mxGeometry x="40" y="380" width="660" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="art_pg_db" parent="exec_docker_db" value="«artifact»
+Base PostgreSQL Centralized" style="shape=component;align=left;spacingLeft=30;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#334155;strokeWidth=1.5;fontStyle=1;fontSize=11;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="40" y="80" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="link_client_srv" parent="1" value="Réseau LAN WSS HTTPS" style="endArrow=none;html=1;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#0F172A;" edge="1" source="node_client" target="node_server">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="link_client_print" parent="1" value="Câble USB Driver IP" style="endArrow=none;html=1;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#0F172A;" edge="1" source="node_client" target="node_printer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="link_client_scan" parent="1" value="Interface USB HID" style="endArrow=none;html=1;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=11;fontColor=#0F172A;" edge="1" source="node_client" target="node_scanner">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

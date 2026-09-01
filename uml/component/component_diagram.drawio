@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<mxfile host="Electron" modified="2026-09-01T00:36:00.000Z" agent="Antigravity UML 2.5.1 Suite Generator" version="21.0.0" type="device">
+  <diagram id="willo-component-diag" name="Diagramme Composant System">
+    <mxGraphModel dx="2200" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="pkg_client_sys" parent="1" value="Package Client Desktop (Electron)" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=20;spacingTop=15;rounded=1;" vertex="1">
+          <mxGeometry x="100" y="100" width="1050" height="780" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_ui" parent="1" value="Module UI React
+(Vite Zustand)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="150" y="180" width="240" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_bridge" parent="1" value="Pont IPC Preload
+(ContextBridge)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="180" width="240" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_main" parent="1" value="Processus Main Electron
+(IPC Handlers)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="340" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_db_eng" parent="1" value="Moteur Base Locale
+(SQLite Drizzle)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="150" y="520" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_sync" parent="1" value="Gestionnaire Sync
+(Offline Delta)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="520" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_ws_client" parent="1" value="Client WebSocket Realtime
+(Events Sync)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="850" y="520" width="260" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="pkg_srv_sys" parent="1" value="Package Serveur Central (Backend)" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=20;spacingTop=15;rounded=1;" vertex="1">
+          <mxGeometry x="1280" y="100" width="650" height="780" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_api_gw" parent="1" value="Serveur API Gateway
+(Fastify Node.js)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1340" y="260" width="250" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_ws_srv" parent="1" value="Service Sync WebSocket
+(Channel Broker)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1640" y="260" width="240" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="comp_pg_db" parent="1" value="Stockage Central
+(PostgreSQL Centralized)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1480" y="520" width="270" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="if_ipc" parent="1" value="«interface»
+IPC Bridge" style="ellipse;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=2;html=1;" vertex="1">
+          <mxGeometry x="420" y="205" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_0" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_ui" target="comp_bridge">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_1" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_bridge" target="comp_main">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_2" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_main" target="comp_db_eng">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_3" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_main" target="comp_sync">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_4" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_sync" target="comp_ws_client">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_5" parent="1" value="«WSS Protocol»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_ws_client" target="comp_ws_srv">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_6" parent="1" value="«HTTPS REST»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_sync" target="comp_api_gw">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_7" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_api_gw" target="comp_pg_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="dep_8" parent="1" value="«use»" style="endArrow=open;endSize=10;dashed=1;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=11;fontStyle=2;" edge="1" source="comp_ws_srv" target="comp_pg_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
