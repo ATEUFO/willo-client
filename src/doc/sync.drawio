@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2026-09-03T00:00:00.000Z" agent="Antigravity Draw.io Generator" version="21.0.0" type="device">
+  <diagram id="willo-sync-diag" name="Schéma de Synchronisation Willo">
+    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2800" pageHeight="2000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ==================== CONTAINER CLIENT ELECTRON ==================== -->
+        <mxCell id="container_client" parent="1" value="POSTE CLIENT ELECTRON (Local-First Architecture)" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#334155;strokeWidth=2;fontStyle=1;fontSize=16;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=20;spacingTop=15;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="80" width="1150" height="1100" as="geometry"/>
+        </mxCell>
+
+        <!-- Renderer React -->
+        <mxCell id="comp_react_ui" parent="1" value="Interface UI React (Renderer)&#10;• Zustand Store / Fastify Client&#10;• Vues Médicales, Labo, Pharmacie" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0369A1;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="130" y="160" width="300" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- IPC Bridge -->
+        <mxCell id="comp_ipc" parent="1" value="Pont IPC Electron (contextBridge)&#10;• sync:getStatus / status-changed&#10;• sync:data-updated" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#64748B;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#334155;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="160" width="270" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Main Process / SyncManager -->
+        <mxCell id="comp_sync_mgr" parent="1" value="Processus Main : SyncManager (sync-manager.ts)&#10;• Realtime WS Client &amp; Reconnect Backoff&#10;• Outbox Flusher &amp; Delta Pull Engine&#10;• Conversion FHIR ↔ SQLite Drizzle" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#78350F;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="320" width="360" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Base SQLite Locale -->
+        <mxCell id="comp_sqlite_db" parent="1" value="Base Locale SQLite (Drizzle ORM)&#10;• patients, vitals, consultations&#10;• labRequests, prescriptions, etc.&#10;• Lecture Instantanée Hors-Ligne" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#14532D;shadow=1;" vertex="1">
+          <mxGeometry x="130" y="320" width="300" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Table Outbox Locale -->
+        <mxCell id="comp_outbox" parent="1" value="Table Outbox (Files d'Attente Écritures)&#10;• status: pending | sent | failed&#10;• clientMutationId (UUID Idempotent)&#10;• payload JSON &amp; action (CREATE/UPDATE)" style="shape=rect;whiteSpace=wrap;html=1;fillColor=#FFE4E6;strokeColor=#E11D48;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#881337;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="500" y="490" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Machine à états Outbox -->
+        <mxCell id="outbox_states" parent="1" value="Cycle de Vie Outbox :&#10;[Nouvelle Action] ──► status = 'pending'&#10;[HTTP 200/201]    ──► status = 'sent'&#10;[HTTP 409/400]    ──► status = 'failed'&#10;[Network Error]   ──► Retry auto (10s)" style="shape=note;whiteSpace=wrap;html=1;size=15;fillColor=#FFFBEB;strokeColor=#F59E0B;strokeWidth=1.5;fontStyle=0;fontSize=11;fontColor=#78350F;" vertex="1">
+          <mxGeometry x="900" y="490" width="280" height="100" as="geometry"/>
+        </mxCell>
+
+
+        <!-- ==================== CONTAINER SERVEUR CENTRAL ==================== -->
+        <mxCell id="container_server" parent="1" value="SERVEUR CENTRAL WILLO (Backend Microservices)" style="shape=rect;html=1;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#334155;strokeWidth=2;fontStyle=1;fontSize=16;fontColor=#0F172A;verticalAlign=top;align=left;spacingLeft=20;spacingTop=15;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1450" y="80" width="1200" height="1100" as="geometry"/>
+        </mxCell>
+
+        <!-- Nginx Reverse Proxy -->
+        <mxCell id="comp_nginx" parent="1" value="Nginx Reverse Proxy &amp; TLS Termination&#10;• TLS HTTPS &amp; WSS (Port 5030)&#10;• Routing REST &amp; Upgrade WebSocket" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#E2E8F0;strokeColor=#475569;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#1E293B;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1500" y="160" width="300" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Fastify API Gateway / FHIR Services -->
+        <mxCell id="comp_fastify" parent="1" value="API Gateway FHIR (Fastify REST)&#10;• Validation JWT &amp; Role-based Scopes&#10;• Contrôle Idempotence (clientMutationId)&#10;• Bootstrap &amp; Delta Filter (_lastUpdated)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#1E40AF;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1500" y="320" width="340" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- WebSocket Realtime Gateway -->
+        <mxCell id="comp_ws_gateway" parent="1" value="Realtime Gateway (WebSocket Server)&#10;• Authentification Post-Handshake ({ type: 'auth' })&#10;• Abonnements Canaux (user, role, site)&#10;• Heartbeat Ping/Pong (25s)" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#9333EA;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#581C87;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1920" y="320" width="350" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Redis Streams Event Bus -->
+        <mxCell id="comp_redis" parent="1" value="Redis Streams (Bus d'Événements Pub/Sub)&#10;• Publication : resource.updated&#10;• Fan-out distribution vers Realtime Gateway" style="shape=module;align=left;spacingLeft=35;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#991B1B;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="1920" y="500" width="350" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- PostgreSQL Base Centrale -->
+        <mxCell id="comp_postgres" parent="1" value="PostgreSQL (Source de Vérité)&#10;• Tables FHIR Centralisées&#10;• Table client_mutations (Historique Idempotence)" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#1E3A8A;shadow=1;" vertex="1">
+          <mxGeometry x="1500" y="500" width="340" height="110" as="geometry"/>
+        </mxCell>
+
+
+        <!-- ==================== FLUX ET CONNEXIONS ==================== -->
+
+        <!-- React UI <-> SQLite (Lecture/Écriture optimiste) -->
+        <mxCell id="flow_1" value="1. Read/Write local" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontSize=12;fontColor=#15803D;fontStyle=1;" edge="1" parent="1" source="comp_react_ui" target="comp_sqlite_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- React UI <-> IPC Bridge -->
+        <mxCell id="flow_2" value="IPC Invocation" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="comp_react_ui" target="comp_ipc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- IPC Bridge <-> SyncManager -->
+        <mxCell id="flow_3" value="Events Status &amp; Data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="comp_ipc" target="comp_sync_mgr">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- SyncManager -> Outbox -->
+        <mxCell id="flow_4" value="2. Queue Mutation (pending)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E11D48;strokeWidth=2;fontSize=12;fontColor=#BE123C;fontStyle=1;" edge="1" parent="1" source="comp_sync_mgr" target="comp_outbox">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- SyncManager -> SQLite (Save synced resource) -->
+        <mxCell id="flow_5" value="Save Remote Resource" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="comp_sync_mgr" target="comp_sqlite_db">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="380"/>
+              <mxPoint x="460" y="380"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Outbox Flush -> Nginx REST -->
+        <mxCell id="flow_outbox_push" value="3. Outbox Flush (POST /api/fhir/{type})&#10;Headers: Bearer JWT, X-Client-Mutation-Id, X-Poste-Id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E11D48;strokeWidth=2.5;fontSize=12;fontColor=#9F1239;fontStyle=1;" edge="1" parent="1" source="comp_outbox" target="comp_nginx">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="680" y="680"/>
+              <mxPoint x="1410" y="680"/>
+              <mxPoint x="1410" y="205"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- SyncManager Delta Pull / Bootstrap -> Nginx REST -->
+        <mxCell id="flow_pull_delta" value="4. Delta Pull (GET /api/fhir/{type}?_lastUpdated=gt...)&#10;&amp; Bootstrap Sync (GET /api/fhir/sync/bootstrap)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=2.5;fontSize=12;fontColor=#1E40AF;fontStyle=1;" edge="1" parent="1" source="comp_sync_mgr" target="comp_nginx">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1100" y="350"/>
+              <mxPoint x="1100" y="180"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- SyncManager <-> WebSocket (Nginx WSS Proxy) -->
+        <mxCell id="flow_ws_conn" value="5. WebSocket Real-time (wss://host:5030/ws/)&#10;• Auth 2-Step ({ type: 'auth' })&#10;• Notification Push (resource.updated)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9333EA;strokeWidth=2.5;fontSize=12;fontColor=#6B21A8;fontStyle=1;" edge="1" parent="1" source="comp_sync_mgr" target="comp_ws_gateway">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="390"/>
+              <mxPoint x="1000" y="270"/>
+              <mxPoint x="2095" y="270"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Nginx -> Fastify -->
+        <mxCell id="flow_nginx_fastify" value="REST Proxied" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=1.5;" edge="1" parent="1" source="comp_nginx" target="comp_fastify">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Fastify -> Postgres -->
+        <mxCell id="flow_fastify_pg" value="Read/Write Postgres" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1D4ED8;strokeWidth=1.5;" edge="1" parent="1" source="comp_fastify" target="comp_postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Fastify -> Redis Streams -->
+        <mxCell id="flow_fastify_redis" value="Publish resource.updated" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="comp_fastify" target="comp_redis">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1780" y="545"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Redis Streams -> WS Gateway -->
+        <mxCell id="flow_redis_ws" value="Read Event Stream" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9333EA;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="comp_redis" target="comp_ws_gateway">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+
+        <!-- ==================== LÉGENDE DE SYNCHRONISATION ==================== -->
+        <mxCell id="legend_box" parent="1" value="LÉGENDE DES FLUX DE SYNCHRONISATION WILLO&#10;───► Vert   : Accès Base Locale (SQLite) - Instantané (Local-First)&#10;───► Rouge  : Synchronisation Montante Outbox (Push REST HTTPS avec Idempotence)&#10;───► Bleu   : Synchronisation Descendante Incrémentale (Pull REST Deltas _lastUpdated &amp; Bootstrap)&#10;───► Violet : Canal WebSocket Temps Réel (WSS Push Events resource.updated)" style="shape=rect;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0F172A;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0F172A;align=left;spacingLeft=15;rounded=1;shadow=1;" vertex="1">
+          <mxGeometry x="80" y="1220" width="850" height="110" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
