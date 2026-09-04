@@ -7,6 +7,7 @@ Ce document constitue la référence technique détaillée du système de synchr
 ## 1. Principes Fondamentaux & Architecture Local-First
 
 L'application **Willo Client** s'appuie sur un paradigme **Local-First (Offline-First)** :
+
 - **Réactivité Instantanée** : Toutes les lectures et écritures s'effectuent prioritairement sur la base de données locale **SQLite** (via Drizzle ORM). L'interface utilisateur ne bloque jamais en attendant une réponse réseau.
 - **Fonctionnement Déconnecté** : L'utilisateur peut créer, modifier ou consulter des dossiers médicaux même sans connexion internet ou réseau local.
 - **Synchronisation Asynchrone Hybride** : Les modifications locales sont empilées dans une file d'attente (**Outbox**) puis poussées vers le serveur central en arrière-plan dès que le réseau est disponible.
@@ -14,7 +15,7 @@ L'application **Willo Client** s'appuie sur un paradigme **Local-First (Offline-
 ### Canaux de Communication Complémentaires
 
 | Canal | Protocole | Rôle | Sens & Déclenchement |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **REST / HTTPS** | HTTP/TLS (Port 5030) | Bootstrap initial, Pull incrémental (Deltas), Push des écritures (Outbox) | **Client ➔ Serveur** (À la demande / Intervalle) |
 | **WebSocket** | `wss://` (Port 5030) | Notification de modifications distantes en temps réel (`resource.updated`) | **Serveur ➔ Client** (Poussée continue) |
 
@@ -83,7 +84,8 @@ Lors du premier appairage ou du login initial d'un poste, le client exécute une
 
 Toute création ou modification de donnée sur le poste client suit la démarche d'écriture optimiste via la table `outbox`.
 
-#### Étapes d'Écriture :
+#### Étapes d'Écriture
+
 1. **Création Locale** : La mutation est immédiatement appliquée dans la table SQLite correspondante.
 2. **Empilement Outbox** : Une entrée est insérée dans la table `outbox` (`queueLocalMutation`) avec :
    - `id` : UUID unique de la mutation (`clientMutationId`).
@@ -99,10 +101,10 @@ Toute création ou modification de donnée sur le poste client suit la démarche
      - `X-Client-Mutation-Id: <mutation.id>` (garantie d'idempotence)
      - `X-Poste-Id: <posteId>` (traçabilité de la station)
 
-#### Traitement des Réponses Serveur :
+#### Traitement des Réponses Serveur
 
 | Code HTTP / Résultat | Action Client | Statut Outbox |
-|---|---|---|
+| --- | --- | --- |
 | **200 OK / 201 Created** | Mutation acceptée par le serveur. | `status = 'sent'` |
 | **409 Conflict** | Conflit de version (la ressource a été modifiée entre-temps sur le serveur). | `status = 'failed'`, `errorMessage = 'Version Conflict (409)'` |
 | **400 Bad Request** | Erreur de validation des données FHIR. | `status = 'failed'`, `errorMessage = 'Validation Error'` |
@@ -152,12 +154,16 @@ Le canal WebSocket assure la propagation instantanée des modifications à trave
 ### 4.1 Connexion & Authentification Séquentielle
 
 Pour éviter d'exposer les jetons JWT dans les URLs des journaux d'accès HTTP/Nginx, l'authentification WebSocket se fait en deux temps :
+
 1. Établissement de la connexion WebSocket vers `wss://<host>:<port>/ws/`.
 2. Envoi immédiat du premier message applicatif :
+
    ```json
    { "type": "auth", "token": "<JWT_ACCESS_TOKEN>" }
    ```
+
 3. Le serveur valide le jeton et répond avec :
+
    ```json
    { "type": "auth.ok", "channels": ["role:doctor", "site:main"] }
    ```
@@ -165,6 +171,7 @@ Pour éviter d'exposer les jetons JWT dans les URLs des journaux d'accès HTTP/N
 ### 4.2 Traitement des Notifications Distantes
 
 Lorsqu'un autre utilisateur modifie un enregistrement :
+
 1. Le serveur publie un événement `resource.updated` sur Redis Streams.
 2. La Gateway WebSocket diffuse le message à tous les postes abonnés au canal concerné.
 3. Le processus Main du client reçoit le message `{ type: 'resource.updated', payload: { resourceType, resource } }`.
@@ -174,6 +181,7 @@ Lorsqu'un autre utilisateur modifie un enregistrement :
 ### 4.3 Gestion des Coupures & Reconnexion Auto
 
 En cas de perte de connexion WebSocket :
+
 - Le statut passe à `isOnline = false` et l'IHM est notifiée via `sync:status-changed`.
 - Un algorithme de **Reconnexion avec Backoff Exponentiel & Jitter** est enclenché :
   - Délai initial : `1000 ms`.
@@ -202,7 +210,7 @@ Pour garantir qu'une coupure réseau lors de l'envoi d'une requête ne crée pas
 Les ressources médicales au format FHIR (JSON) sont cartographiées vers les tables SQLite du client via des fonctions de conversion dédiées (`mapRowToResource` et `mapResourceToRow`).
 
 | Ressource FHIR | Table SQLite Drizzle | Description |
-|---|---|---|
+| --- | --- | --- |
 | `Patient` | `patients` | Dossiers administratifs et démographiques des patients |
 | `Observation` | `vitals` | Signes vitaux (Tension, Pouls, Température, SpO2) |
 | `CarePlan` | `careTasks` | Plan d'injections, soins et tâches infirmières |
@@ -232,3 +240,5 @@ Le processus Renderer (React) communique avec le module de synchronisation via l
 
 - **`sync:status-changed`** : Diffusé dès que le nombre d'éléments en outbox ou le statut réseau change.
 - **`sync:data-updated`** : Diffusé lorsqu'une ressource est mise à jour localement suite à une notification WebSocket, déclenchant l'actualisation des stores Zustand et des composants UI.
+
+check 1
