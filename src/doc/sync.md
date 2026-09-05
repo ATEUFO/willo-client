@@ -240,3 +240,5 @@ Le processus Renderer (React) communique avec le module de synchronisation via l
 
 - **`sync:status-changed`** : Diffusé dès que le nombre d'éléments en outbox ou le statut réseau change.
 - **`sync:data-updated`** : Diffusé lorsqu'une ressource est mise à jour localement suite à une notification WebSocket, déclenchant l'actualisation des stores Zustand et des composants UI.
+
+check 3
