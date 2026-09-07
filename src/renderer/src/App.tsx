@@ -15,6 +15,7 @@ import { LaboratoryPage } from './pages/laboratory/LaboratoryPage'
 import { PharmacyPage } from './pages/pharmacy/PharmacyPage'
 import { BillingPage } from './pages/billing/BillingPage'
 import { ManagementPage } from './pages/management/ManagementPage'
+import { AIDiagnosticPage } from './pages/medical/AIDiagnosticPage'
 import { hasModuleAccess, getAllowedModules } from './config/permissions'
 import { ShieldAlert } from 'lucide-react'
 import willoLogo from './assets/willo_logo1.png'
@@ -123,6 +124,8 @@ function App(): React.JSX.Element {
         return <MedicalPage />
       case 'consultation':
         return <MedicalPage />
+      case 'ai-diagnostic':
+        return <AIDiagnosticPage />
       case 'laboratory':
         return <LaboratoryPage />
       case 'pharmacy':

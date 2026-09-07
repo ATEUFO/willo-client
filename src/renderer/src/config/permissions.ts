@@ -11,7 +11,7 @@ export const ROLE_CONFIGS: Record<Role, { label: string; description: string; al
   admin: {
     label: 'Administrateur Système',
     description: "Administration générale du système, gestion des utilisateurs, des paramètres, des sauvegardes et des droits d'accès.",
-    allowedModules: ['admin', 'reception', 'nursing', 'consultation', 'laboratory', 'pharmacy', 'billing', 'management']
+    allowedModules: ['admin', 'reception', 'nursing', 'consultation', 'laboratory', 'pharmacy', 'billing', 'management', 'ai-diagnostic']
   },
   reception: {
     label: 'Réceptionniste / Accueil',
@@ -21,7 +21,7 @@ export const ROLE_CONFIGS: Record<Role, { label: string; description: string; al
   consultation: {
     label: 'Médecin / Practicien',
     description: "Consultation des patients, diagnostic, prescriptions médicales, demandes d'examens et suivi médical.",
-    allowedModules: ['consultation', 'laboratory', 'pharmacy']
+    allowedModules: ['consultation', 'ai-diagnostic', 'laboratory', 'pharmacy']
   },
   nursing: {
     label: 'Infirmier(ère)',
@@ -47,6 +47,11 @@ export const ROLE_CONFIGS: Record<Role, { label: string; description: string; al
     label: 'Gestionnaire / Directeur',
     description: 'Consultation des tableaux de bord, statistiques, indicateurs de performance et rapports de gestion.',
     allowedModules: ['management']
+  },
+  'ai-diagnostic': {
+    label: 'Diagnostic Médical IA',
+    description: "Assistant d'aide au diagnostic clinique basé sur l'IA, analyse différentielle et recommandations pharmacologiques.",
+    allowedModules: ['consultation', 'ai-diagnostic']
   }
 }
 

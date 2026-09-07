@@ -32,7 +32,8 @@ export const MedicalPage: React.FC = () => {
     labRequests,
     addVitals,
     addConsultation,
-    currentUser
+    currentUser,
+    setRole
   } = useHospitalStore()
 
   // Layout & Filter States
@@ -327,6 +328,13 @@ export const MedicalPage: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2 shrink-0 w-full md:w-auto border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 justify-end">
+                <button
+                  onClick={() => setRole('ai-diagnostic')}
+                  className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                >
+                  <Brain className="w-4 h-4 text-emerald-200" />
+                  Diagnostic IA
+                </button>
                 <button
                   onClick={() => setIsVitalsModalOpen(true)}
                   className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 hover:text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"

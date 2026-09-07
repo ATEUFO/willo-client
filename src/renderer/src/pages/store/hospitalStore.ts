@@ -9,6 +9,7 @@ export type Role =
   | 'pharmacy'
   | 'billing'
   | 'management'
+  | 'ai-diagnostic'
 
 export interface UserAccount {
   id: string
