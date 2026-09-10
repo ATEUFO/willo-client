@@ -30,6 +30,7 @@ Vérifie que le service IA est fonctionnel et indique le nombre de modèles char
 - **URL** : `/api/diagnosis/health` (ou `/health`)
 
 #### Exemple de Réponse (200 OK)
+
 ```json
 {
   "status": "OK",
@@ -49,6 +50,7 @@ Retourne la liste des 5 modèles de prédiction chargés, leurs versions, leurs 
 - **URL** : `/api/diagnosis/models` (ou `/models`)
 
 #### Exemple de Réponse (200 OK)
+
 ```json
 {
   "success": true,
@@ -209,6 +211,7 @@ Ré-entraîne automatiquement l'ensemble des 5 modèles à partir des générate
 - **URL** : `/api/diagnosis/train` (ou `/train`)
 
 #### Exemple de Réponse (200 OK)
+
 ```json
 {
   "success": true,
@@ -257,6 +260,7 @@ En fournissant `observationIds`, l'IA résout automatiquement les ressources `Ob
 ## 💻 5. Exemples d'Intégration (Code)
 
 ### Exemple cURL
+
 ```bash
 curl -X POST http://localhost:5030/api/diagnosis/predict \
   -H "Content-Type: application/json" \
@@ -273,6 +277,7 @@ curl -X POST http://localhost:5030/api/diagnosis/predict \
 ```
 
 ### Exemple TypeScript / Axios (Client React / Electron)
+
 ```typescript
 import axios from 'axios';
 
@@ -296,6 +301,7 @@ export async function evaluerRisqueSepsis(patientId: string, constantes: Record<
 ```
 
 ### Exemple Python (`requests`)
+
 ```python
 import requests
 
@@ -314,3 +320,5 @@ payload = {
 response = requests.post(url, json=payload)
 print(response.json())
 ```
+
+check 5
