@@ -98,7 +98,7 @@ export const AIDiagnosticPage: React.FC = () => {
   // Pre-fill features when patient or vitals change
   useEffect(() => {
     if (selectedPatient) {
-      const sexeVal = selectedPatient.gender === 'F' || selectedPatient.gender === 'Femme' ? 0.0 : 1.0
+      const sexeVal = selectedPatient.gender === 'F' ? 0.0 : 1.0
       setFeatures((prev) => ({
         ...prev,
         age: selectedPatient.age || 45,

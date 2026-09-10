@@ -99,11 +99,28 @@ export const AI_MODELS_CATALOG: { id: AIModelId; title: string; subtitle: string
   }
 ]
 
+function formatErrorForLog(err: any): string {
+  if (!err) return 'Erreur inconnue'
+  if (typeof err === 'string') return err
+  if (err.message) return err.message
+  if (err.response?.data?.detail) return String(err.response.data.detail)
+  if (err.code) return `Code d'erreur: ${err.code}`
+  try {
+    return JSON.stringify(err)
+  } catch {
+    return String(err)
+  }
+}
+
 function logAI(msg: string, data?: any) {
-  console.log(msg, data !== undefined ? data : '')
+  const formattedData = data instanceof Error || (data && typeof data === 'object' && ('message' in data || 'code' in data))
+    ? formatErrorForLog(data)
+    : data
+
+  console.log(msg, formattedData !== undefined ? formattedData : '')
   try {
     if (typeof window !== 'undefined' && (window as any).api?.terminalLog) {
-      ;(window as any).api.terminalLog(msg, data)
+      ;(window as any).api.terminalLog(msg, formattedData)
     }
   } catch {
     // Ignore non-electron fallback
@@ -111,13 +128,15 @@ function logAI(msg: string, data?: any) {
 }
 
 class AIDiagnosticService {
-  private axiosGatewayClient: AxiosInstance
   private gatewayUrl: string
   private directUrl: string
+  private directIpUrl: string
+  private axiosGatewayClient: AxiosInstance
 
   constructor() {
-    const envUrl = import.meta.env.VITE_API_URL || 'http://localhost:5030'
+    const envUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5030'
     this.gatewayUrl = `${envUrl.replace(/\/$/, '')}/api/diagnosis`
+    this.directIpUrl = 'http://127.0.0.1:3007'
     this.directUrl = 'http://localhost:3007'
 
     this.axiosGatewayClient = axios.create({
@@ -128,6 +147,21 @@ class AIDiagnosticService {
         'Accept': 'application/json'
       }
     })
+
+    this.initDynamicConfig()
+  }
+
+  private async initDynamicConfig() {
+    try {
+      if (typeof window !== 'undefined' && (window as any).api?.sync?.getServerConfig) {
+        const config = await (window as any).api.sync.getServerConfig()
+        if (config?.host && config?.port) {
+          this.updateBaseUrl(config.host, config.port)
+        }
+      }
+    } catch {
+      // Ignore fallback
+    }
   }
 
   public updateBaseUrl(host: string, port: string | number): void {
@@ -137,99 +171,126 @@ class AIDiagnosticService {
   }
 
   /**
-   * Health check attempting Gateway proxy (5030) or Direct service (3007)
+   * Health check attempting Gateway proxy (5030) first, then Direct service (3007)
    */
   public async checkHealth(): Promise<HealthStatusResponse> {
     const startTime = performance.now()
 
-    // 1. Try Direct port 3007 first
+    // 1. Primary Attempt: API Gateway Proxy (/api/diagnosis/health)
     try {
-      logAI('📡 [AI HEALTH REQUEST] Checking http://localhost:3007/health')
-      const resp = await axios.get(`${this.directUrl}/health`, { timeout: 3000 })
+      logAI(`📡 [AI HEALTH REQUEST] Checking Gateway Proxy: ${this.gatewayUrl}/health`)
+      const respProxy = await this.axiosGatewayClient.get('/health')
       const latencyMs = Math.round(performance.now() - startTime)
-      logAI('✅ [AI HEALTH RESPONSE]', resp.data)
+      logAI('✅ [AI HEALTH RESPONSE (GATEWAY)]', respProxy.data)
 
       return {
         online: true,
         latencyMs,
-        serverUrl: this.directUrl,
-        version: resp.data?.service || 'ai-diagnosis-service',
-        modelsLoaded: resp.data?.models_loaded || 5,
+        serverUrl: this.gatewayUrl,
+        version: respProxy.data?.service || 'ai-diagnosis-service',
+        modelsLoaded: respProxy.data?.models_loaded || 5,
         modelStatus: 'Ready'
       }
-    } catch (errDirect) {
-      logAI('⚠️ Direct port 3007 check failed, checking gateway proxy...', errDirect)
+    } catch (errProxy) {
+      logAI('⚠️ Gateway proxy health check failed, checking direct AI service...', formatErrorForLog(errProxy))
 
-      // 2. Try Nginx Gateway Proxy (/api/diagnosis/health)
+      // 2. Secondary Attempt: Direct IPv4 port 3007 (http://127.0.0.1:3007/health)
       try {
-        logAI(`📡 [AI HEALTH REQUEST] Checking ${this.gatewayUrl}/health`)
-        const respProxy = await this.axiosGatewayClient.get('/health')
+        logAI(`📡 [AI HEALTH REQUEST] Checking Direct AI Service: ${this.directIpUrl}/health`)
+        const resp = await axios.get(`${this.directIpUrl}/health`, { timeout: 3000 })
         const latencyMs = Math.round(performance.now() - startTime)
-        logAI('✅ [AI HEALTH RESPONSE]', respProxy.data)
+        logAI('✅ [AI HEALTH RESPONSE (DIRECT)]', resp.data)
 
         return {
           online: true,
           latencyMs,
-          serverUrl: this.gatewayUrl,
-          version: respProxy.data?.service || 'ai-diagnosis-service',
-          modelsLoaded: respProxy.data?.models_loaded || 5,
+          serverUrl: this.directIpUrl,
+          version: resp.data?.service || 'ai-diagnosis-service',
+          modelsLoaded: resp.data?.models_loaded || 5,
           modelStatus: 'Ready'
         }
-      } catch (errProxy) {
-        logAI('❌ [AI HEALTH ERROR] Both direct port 3007 and gateway offline', errProxy)
-        const latencyMs = Math.round(performance.now() - startTime)
+      } catch (errDirectIp) {
+        logAI('⚠️ Direct IPv4 check failed, trying localhost...', formatErrorForLog(errDirectIp))
 
-        return {
-          online: false,
-          latencyMs,
-          serverUrl: this.directUrl,
-          version: 'Offline',
-          modelsLoaded: 0,
-          modelStatus: 'Offline'
+        // 3. Fallback Attempt: Direct localhost port 3007
+        try {
+          const respLocal = await axios.get(`${this.directUrl}/health`, { timeout: 3000 })
+          const latencyMs = Math.round(performance.now() - startTime)
+          logAI('✅ [AI HEALTH RESPONSE (DIRECT LOCALHOST)]', respLocal.data)
+
+          return {
+            online: true,
+            latencyMs,
+            serverUrl: this.directUrl,
+            version: respLocal.data?.service || 'ai-diagnosis-service',
+            modelsLoaded: respLocal.data?.models_loaded || 5,
+            modelStatus: 'Ready'
+          }
+        } catch (errDirect) {
+          logAI('❌ [AI HEALTH ERROR] Both Gateway proxy and direct AI service offline', formatErrorForLog(errDirect))
+          const latencyMs = Math.round(performance.now() - startTime)
+
+          return {
+            online: false,
+            latencyMs,
+            serverUrl: this.gatewayUrl,
+            version: 'Offline',
+            modelsLoaded: 0,
+            modelStatus: 'Offline'
+          }
         }
       }
     }
   }
 
   /**
-   * Fetch available models list from API
+   * Fetch available models list from API Gateway or Direct service
    */
   public async getModels(): Promise<AIModelMeta[]> {
     logAI('📡 [AI MODELS REQUEST] Fetching available models list')
+
+    // 1. Try API Gateway first
     try {
-      const res = await axios.get(`${this.directUrl}/models`, { timeout: 3000 })
-      logAI('✅ [AI MODELS RESPONSE]', res.data)
-      return res.data?.models || []
-    } catch {
+      const resProxy = await this.axiosGatewayClient.get('/models')
+      logAI('✅ [AI MODELS RESPONSE (GATEWAY)]', resProxy.data)
+      return resProxy.data?.models || []
+    } catch (errProxy) {
+      logAI('⚠️ Gateway models fetch failed, trying direct AI service...', formatErrorForLog(errProxy))
+
+      // 2. Try Direct IPv4 port 3007
       try {
-        const resProxy = await this.axiosGatewayClient.get('/models')
-        logAI('✅ [AI MODELS RESPONSE]', resProxy.data)
-        return resProxy.data?.models || []
-      } catch (err) {
-        logAI('❌ [AI MODELS ERROR]', err)
-        throw err
+        const resIp = await axios.get(`${this.directIpUrl}/models`, { timeout: 3000 })
+        logAI('✅ [AI MODELS RESPONSE (DIRECT)]', resIp.data)
+        return resIp.data?.models || []
+      } catch (errDirectIp) {
+        // 3. Try Direct localhost port 3007
+        try {
+          const res = await axios.get(`${this.directUrl}/models`, { timeout: 3000 })
+          logAI('✅ [AI MODELS RESPONSE (DIRECT LOCALHOST)]', res.data)
+          return res.data?.models || []
+        } catch (err) {
+          logAI('❌ [AI MODELS ERROR] Failed to load models list:', formatErrorForLog(err))
+          throw err
+        }
       }
     }
   }
 
   /**
-   * Send real prediction request to API (Port 3007 / Gateway 5030) with strict logging
+   * Send prediction request: API Gateway FIRST, then Direct AI Service fallbacks
    */
   public async predict(req: AIPredictionRequest): Promise<AIPredictionResponse> {
     const startTime = performance.now()
 
-    // 1. Try Direct Python FastAPI port 3007: POST http://localhost:3007/predict
+    // 1. PRIMARY: Send request to API Gateway: POST http://127.0.0.1:5030/api/diagnosis/predict (or configured Gateway)
     try {
-      const targetUrl = `${this.directUrl}/predict`
-      logAI('📡 [AI API REQUEST]', { url: targetUrl, method: 'POST', payload: req })
+      const targetUrl = `${this.gatewayUrl}/predict`
+      logAI('📡 [AI API REQUEST (GATEWAY)]', { url: targetUrl, method: 'POST', payload: req })
 
-      const response = await axios.post<AIPredictionResponse>(targetUrl, req, {
-        timeout: 8000,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      const response = await this.axiosGatewayClient.post<AIPredictionResponse>('/predict', req)
       const latencyMs = Math.round(performance.now() - startTime)
 
-      logAI('✅ [AI API RESPONSE]', { status: response.status, latencyMs, data: response.data })
+      logAI('✅ [AI API RESPONSE (GATEWAY)]', { status: response.status, latencyMs, data: response.data })
 
       return {
         ...response.data,
@@ -237,18 +298,21 @@ class AIDiagnosticService {
         latencyMs,
         apiUrl: targetUrl
       }
-    } catch (errDirect) {
-      logAI('⚠️ Direct call to port 3007 failed, attempting gateway proxy...', errDirect)
+    } catch (errGateway) {
+      logAI('⚠️ API Gateway request failed, attempting Direct AI Microservice (127.0.0.1:3007)...', formatErrorForLog(errGateway))
 
-      // 2. Try Gateway Proxy: POST /api/diagnosis/predict (Port 5030)
+      // 2. FALLBACK 1: Try Direct Python FastAPI on http://127.0.0.1:3007/predict (IPv4 explicit)
       try {
-        const targetUrl = `${this.gatewayUrl}/predict`
-        logAI('📡 [AI API REQUEST (PROXY)]', { url: targetUrl, method: 'POST', payload: req })
+        const targetUrl = `${this.directIpUrl}/predict`
+        logAI('📡 [AI API REQUEST (DIRECT IP)]', { url: targetUrl, method: 'POST', payload: req })
 
-        const response = await this.axiosGatewayClient.post<AIPredictionResponse>('/predict', req)
+        const response = await axios.post<AIPredictionResponse>(targetUrl, req, {
+          timeout: 8000,
+          headers: { 'Content-Type': 'application/json' }
+        })
         const latencyMs = Math.round(performance.now() - startTime)
 
-        logAI('✅ [AI API RESPONSE (PROXY)]', { status: response.status, latencyMs, data: response.data })
+        logAI('✅ [AI API RESPONSE (DIRECT IP)]', { status: response.status, latencyMs, data: response.data })
 
         return {
           ...response.data,
@@ -256,9 +320,33 @@ class AIDiagnosticService {
           latencyMs,
           apiUrl: targetUrl
         }
-      } catch (errProxy) {
-        logAI('❌ [AI API ERROR] Inferences failed on port 3007 and proxy:', errProxy)
-        throw errProxy
+      } catch (errDirectIp) {
+        logAI('⚠️ Direct IPv4 call to port 3007 failed, attempting localhost fallback...', formatErrorForLog(errDirectIp))
+
+        // 3. FALLBACK 2: Try Direct Python FastAPI on http://localhost:3007/predict
+        try {
+          const targetUrl = `${this.directUrl}/predict`
+          logAI('📡 [AI API REQUEST (DIRECT LOCALHOST)]', { url: targetUrl, method: 'POST', payload: req })
+
+          const response = await axios.post<AIPredictionResponse>(targetUrl, req, {
+            timeout: 8000,
+            headers: { 'Content-Type': 'application/json' }
+          })
+          const latencyMs = Math.round(performance.now() - startTime)
+
+          logAI('✅ [AI API RESPONSE (DIRECT LOCALHOST)]', { status: response.status, latencyMs, data: response.data })
+
+          return {
+            ...response.data,
+            httpStatus: response.status,
+            latencyMs,
+            apiUrl: targetUrl
+          }
+        } catch (errDirect) {
+          const detailedErr = formatErrorForLog(errDirect)
+          logAI('❌ [AI API ERROR] All inference endpoints failed (Gateway & Direct 3007):', detailedErr)
+          throw new Error(`Échec d'analyse IA sur la passerelle et le service direct : ${detailedErr}`)
+        }
       }
     }
   }
