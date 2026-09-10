@@ -29,6 +29,15 @@ import { discoverServers } from '../discovery/find-server'
 import { scanSubnetForServer } from '../discovery/subnet-scan'
 
 export function registerIpcHandlers(): void {
+  // Terminal Logger handler for forwarding renderer logs to main process terminal
+  ipcMain.on('terminal:log', (_, message: string, data?: any) => {
+    if (data !== undefined) {
+      console.log(message, typeof data === 'object' ? JSON.stringify(data, null, 2) : data)
+    } else {
+      console.log(message)
+    }
+  })
+
   // Auth Handlers
   ipcMain.handle('auth:login', async (_, { username, password }) => {
     try {

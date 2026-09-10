@@ -79,6 +79,7 @@ const api = {
     discover: (timeoutMs?: number) => ipcRenderer.invoke('discovery:discover', timeoutMs),
     scanSubnet: () => ipcRenderer.invoke('discovery:scanSubnet')
   },
+  terminalLog: (message: string, data?: any) => ipcRenderer.send('terminal:log', message, data),
   windowControls: {
     isMac: process.platform === 'darwin',
     minimize: () => ipcRenderer.invoke('window:minimize'),

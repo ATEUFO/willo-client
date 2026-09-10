@@ -76,6 +76,7 @@ export interface WilloAPI {
     discover: (timeoutMs?: number) => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
     scanSubnet: () => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
   }
+  terminalLog: (message: string, data?: any) => void
   windowControls: {
     isMac: boolean
     minimize: () => Promise<void>
