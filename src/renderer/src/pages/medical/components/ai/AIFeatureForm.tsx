@@ -313,7 +313,7 @@ export const AIFeatureForm: React.FC<AIFeatureFormProps> = ({
 
       <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-3 flex items-center gap-2 text-xs font-semibold text-emerald-900">
         <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-        <span>Données synchronisées avec la passerelle API Gateway (port 5030)</span>
+        <span>Données synchronisées avec le serveur d'analyse Willo connecté</span>
       </div>
 
       <button

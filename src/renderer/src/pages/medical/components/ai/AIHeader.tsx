@@ -43,17 +43,17 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
           <div className="px-3 py-2 bg-slate-900/80 rounded-xl border border-slate-700/80 flex items-center gap-3 text-xs">
             <div className="flex items-center gap-2">
               <span
-                className={`w-2.5 h-2.5 rounded-full animate-ping ${
-                  healthStatus?.online ? 'bg-emerald-400' : 'bg-amber-400'
+                className={`w-2.5 h-2.5 rounded-full ${
+                  healthStatus?.online ? 'bg-emerald-400 animate-ping' : 'bg-rose-500'
                 }`}
               />
-              <span className="font-semibold text-slate-200">Moteur d'Analyse</span>
+              <span className="font-semibold text-slate-200">Serveur Backend IA</span>
             </div>
             <div className="h-4 w-px bg-slate-700" />
-            <span className="text-[11px] font-medium text-emerald-400">
+            <span className={`text-[11px] font-medium ${healthStatus?.online ? 'text-emerald-400' : 'text-rose-400'}`}>
               {healthStatus?.online
-                ? 'Opérationnel - Modèles Prêts'
-                : 'Service d\'Analyse Prêt'}
+                ? `En Ligne (${healthStatus.serverUrl.replace(/^https?:\/\//, '')})`
+                : 'Hors Ligne - Requetes Directes Backend'}
             </span>
           </div>
 
