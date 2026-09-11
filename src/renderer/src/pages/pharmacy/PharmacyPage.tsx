@@ -21,7 +21,7 @@ export const PharmacyPage: React.FC = () => {
   } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'dispense' | 'inventory' | 'orders'>('dispense')
-  const [rxSearchCode, setRxSearchCode] = useState('ORD-2026-042')
+  const [rxSearchCode, setRxSearchCode] = useState('')
   const [stockFilter, setStockFilter] = useState<'ALL' | 'Expiring Soon' | 'Low Stock' | 'Out of Stock'>('ALL')
   const [showAddStockModal, setShowAddStockModal] = useState(false)
   const [showAddPOModal, setShowAddPOModal] = useState(false)
@@ -31,22 +31,24 @@ export const PharmacyPage: React.FC = () => {
     code: '',
     name: '',
     category: 'Antibiotique' as StockItem['category'],
-    stockQuantity: 100,
-    minQuantity: 20,
-    unitPrice: 1500,
-    expiryDate: '2027-12-31',
-    batchNumber: 'LOT-2026-N01'
+    stockQuantity: 0,
+    minQuantity: 10,
+    unitPrice: 0,
+    expiryDate: '',
+    batchNumber: ''
   })
 
   // Add PO form
   const [newPO, setNewPO] = useState({
-    supplier: 'Pharmacie Centrale de Distribution',
-    drugName: 'Amoxicilline 1g',
-    quantity: 200,
-    estimatedCost: 640000
+    supplier: '',
+    drugName: '',
+    quantity: 100,
+    estimatedCost: 0
   })
 
-  const currentDispense = dispenses.find((d) => d.prescriptionCode === rxSearchCode) || dispenses[0]
+  const currentDispense = rxSearchCode.trim()
+    ? dispenses.find((d) => d.prescriptionCode.toLowerCase() === rxSearchCode.trim().toLowerCase()) || null
+    : dispenses[0] || null
 
   const filteredInventory = inventory.filter((item) => {
     if (stockFilter === 'ALL') return true
@@ -67,11 +69,11 @@ export const PharmacyPage: React.FC = () => {
       code: '',
       name: '',
       category: 'Antibiotique',
-      stockQuantity: 100,
-      minQuantity: 20,
-      unitPrice: 1500,
-      expiryDate: '2027-12-31',
-      batchNumber: 'LOT-2026-N01'
+      stockQuantity: 0,
+      minQuantity: 10,
+      unitPrice: 0,
+      expiryDate: '',
+      batchNumber: ''
     })
     alert('Nouveau produit ajouté à l\'inventaire de la pharmacie!')
   }
@@ -84,7 +86,7 @@ export const PharmacyPage: React.FC = () => {
       totalCost: newPO.estimatedCost
     })
     setShowAddPOModal(false)
-    alert('Bon de commande généré et transmitted au fournisseur!')
+    alert('Bon de commande généré et transmis!')
   }
 
   return (
@@ -142,7 +144,7 @@ export const PharmacyPage: React.FC = () => {
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Ex: ORD-2026-042..."
+                placeholder="Saisir le code d'ordonnance (ex: ORD-2026-001)..."
                 value={rxSearchCode}
                 onChange={(e) => setRxSearchCode(e.target.value)}
                 className="w-full bg-white border border-medical-border rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-medical-primary"
@@ -218,7 +220,7 @@ export const PharmacyPage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="p-8 text-center text-slate-400">Aucune ordonnance trouvée avec ce code</div>
+            <div className="p-12 text-center text-slate-400">Aucune ordonnance en attente de délivrance. Saisissez un code d'ordonnance ci-dessus.</div>
           )}
         </div>
       )}
@@ -248,7 +250,7 @@ export const PharmacyPage: React.FC = () => {
 
               <button
                 onClick={() => setShowAddStockModal(true)}
-                className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer"
               >
                 <Plus className="w-4 h-4" /> Ajouter Produit
               </button>
@@ -295,6 +297,13 @@ export const PharmacyPage: React.FC = () => {
                     </td>
                   </tr>
                 ))}
+                {filteredInventory.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
+                      Aucun produit enregistré dans l'inventaire de la pharmacie.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -312,7 +321,7 @@ export const PharmacyPage: React.FC = () => {
 
             <button
               onClick={() => setShowAddPOModal(true)}
-              className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
               <Plus className="w-4 h-4" /> Générer un Bon de Commande
             </button>
@@ -349,6 +358,13 @@ export const PharmacyPage: React.FC = () => {
                     </td>
                   </tr>
                 ))}
+                {purchaseOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-400 font-sans">
+                      Aucun bon de commande enregistré pour le moment.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
