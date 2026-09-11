@@ -9,7 +9,9 @@ import {
   DollarSign,
   Clock,
   HeartPulse,
-  Activity
+  Activity,
+  AlertTriangle,
+  CheckCircle2
 } from 'lucide-react'
 import {
   AreaChart,
@@ -30,15 +32,19 @@ import { useHospitalStore } from '../store/hospitalStore'
 
 export const ManagementPage: React.FC = () => {
   const {
+    users,
     patients,
     invoices,
     consultations,
     appointments,
+    inventory,
     hospitalSettings
   } = useHospitalStore()
 
-  // Default to June 2026 as in the original mock
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('2026-06')
+  // Default to current month (YYYY-MM) dynamically
+  const [selectedPeriod, setSelectedPeriod] = useState<string>(() => {
+    return new Date().toISOString().substring(0, 7)
+  })
 
   // Helper to parse period (YYYY-MM) from invoice/consultation date strings (supports "YYYY-MM-DD" and "DD/MM/YYYY")
   const getPeriodFromDate = (dateStr: string) => {
@@ -74,7 +80,7 @@ export const ManagementPage: React.FC = () => {
 
   const prevPeriod = useMemo(() => getPreviousPeriod(selectedPeriod), [selectedPeriod])
 
-  // --- KPI calculations ---
+  // --- Real Database KPI Calculations ---
 
   // KPI 1: Revenu Mensuel Cumulé
   const currentMonthRevenue = useMemo(() => {
@@ -90,70 +96,103 @@ export const ManagementPage: React.FC = () => {
   }, [invoices, prevPeriod])
 
   const revenueEvolutionPercent = useMemo(() => {
-    const baselineCurrent = currentMonthRevenue || 19800000 // default mock fallback if DB empty
-    const baselinePrev = prevMonthRevenue || 17500000 // default mock fallback if DB empty
-    return ((baselineCurrent - baselinePrev) / baselinePrev) * 100
+    if (prevMonthRevenue === 0) {
+      return currentMonthRevenue > 0 ? 100 : 0
+    }
+    return ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100
   }, [currentMonthRevenue, prevMonthRevenue])
 
   // KPI 2: Fréquentation Mensuelle
   const currentMonthAttendance = useMemo(() => {
-    return consultations.filter((c) => getPeriodFromDate(c.date) === selectedPeriod).length
-  }, [consultations, selectedPeriod])
+    const monthConsultations = consultations.filter((c) => getPeriodFromDate(c.date) === selectedPeriod).length
+    const monthAppointments = appointments.filter((a) => getPeriodFromDate(a.date) === selectedPeriod).length
+    return monthConsultations + monthAppointments
+  }, [consultations, appointments, selectedPeriod])
 
   const prevMonthAttendance = useMemo(() => {
-    return consultations.filter((c) => getPeriodFromDate(c.date) === prevPeriod).length
-  }, [consultations, prevPeriod])
+    const prevConsultations = consultations.filter((c) => getPeriodFromDate(c.date) === prevPeriod).length
+    const prevAppointments = appointments.filter((a) => getPeriodFromDate(a.date) === prevPeriod).length
+    return prevConsultations + prevAppointments
+  }, [consultations, appointments, prevPeriod])
 
   const attendanceEvolutionPercent = useMemo(() => {
-    const baselineCurrent = currentMonthAttendance || 640
-    const baselinePrev = prevMonthAttendance || 590
-    return ((baselineCurrent - baselinePrev) / baselinePrev) * 100
+    if (prevMonthAttendance === 0) {
+      return currentMonthAttendance > 0 ? 100 : 0
+    }
+    return ((currentMonthAttendance - prevMonthAttendance) / prevMonthAttendance) * 100
   }, [currentMonthAttendance, prevMonthAttendance])
 
-  // KPI 3: Taux de Guérison & Issues
+  // KPI 3: Taux de Guérison & Issues des Patients (Chart 3 PieChart)
   const recoveryMortalityData = useMemo(() => {
+    const total = patients.length
+    if (total === 0) {
+      return [
+        { name: 'Guéris / Sorties', value: 0, color: '#00C853' },
+        { name: 'En Traitement', value: 0, color: '#3B82F6' },
+        { name: 'En Attente', value: 0, color: '#F59E0B' }
+      ]
+    }
+
     const completedCount = patients.filter((p) => p.status === 'Completed').length
-    const totalCompleted = completedCount || 120 // baseline default mock if DB has no completed folders
-
-    const estimatedTransferts = Math.max(1, Math.round(patients.length * 0.045)) || 6
-    const estimatedDeces = Math.max(1, Math.round(patients.length * 0.015)) || 2
-    const totalOutcomes = totalCompleted + estimatedTransferts + estimatedDeces
-
-    const recoveryPercent = parseFloat(((totalCompleted / totalOutcomes) * 100).toFixed(1))
-    const transfertPercent = parseFloat(((estimatedTransferts / totalOutcomes) * 100).toFixed(1))
-    const decesPercent = parseFloat((100 - recoveryPercent - transfertPercent).toFixed(1))
+    const inProgressCount = patients.filter(
+      (p) =>
+        p.status === 'In Consultation' ||
+        p.status === 'Vitals Taken' ||
+        p.status === 'Lab Pending' ||
+        p.status === 'Pharmacy Pending'
+    ).length
+    const waitingCount = patients.filter((p) => p.status === 'Waiting').length
 
     return [
-      { name: 'Guéris / Sorties', value: recoveryPercent, color: '#00C853' },
-      { name: 'Transferts', value: transfertPercent, color: '#F59E0B' },
-      { name: 'Décès', value: decesPercent, color: '#EF4444' }
+      { name: 'Guéris / Sorties', value: completedCount, color: '#00C853' },
+      { name: 'En Traitement', value: inProgressCount, color: '#3B82F6' },
+      { name: 'En Attente', value: waitingCount, color: '#F59E0B' }
     ]
   }, [patients])
 
   const recoveryRate = useMemo(() => {
-    return recoveryMortalityData[0].value
-  }, [recoveryMortalityData])
-
-  const mortalityRate = useMemo(() => {
-    return recoveryMortalityData[2].value
-  }, [recoveryMortalityData])
+    if (patients.length === 0) return '0.0'
+    const completedCount = patients.filter((p) => p.status === 'Completed').length
+    return ((completedCount / patients.length) * 100).toFixed(1)
+  }, [patients])
 
   // KPI 4: Temps d'Attente Moyen
-  const waitingCount = useMemo(() => {
-    return patients.filter((p) => p.status === 'Waiting').length
+  const waitingPatients = useMemo(() => {
+    return patients.filter((p) => p.status === 'Waiting' || p.status === 'Vitals Taken')
   }, [patients])
 
   const averageWaitingTime = useMemo(() => {
-    // 10 mins baseline + 2 mins per waiting patient, capped between 8 and 45 mins
-    return Math.min(45, Math.max(8, 10 + waitingCount * 2))
-  }, [waitingCount])
+    if (waitingPatients.length === 0) return 0
 
-  const waitingTimeDiff = useMemo(() => {
-    // compared to an average baseline of 18 min
-    return averageWaitingTime - 18
-  }, [averageWaitingTime])
+    let totalMinutes = 0
+    let validCount = 0
+    const now = new Date()
 
-  // --- Chart 1: Revenue Evolution Curve (AreaChart) ---
+    waitingPatients.forEach((p) => {
+      if (p.arrivalTime) {
+        try {
+          const [h, m] = p.arrivalTime.split(':').map(Number)
+          if (!isNaN(h) && !isNaN(m)) {
+            const arrivalDate = new Date()
+            arrivalDate.setHours(h, m, 0, 0)
+            const diffMs = now.getTime() - arrivalDate.getTime()
+            if (diffMs > 0) {
+              totalMinutes += Math.floor(diffMs / 60000)
+              validCount++
+            }
+          }
+        } catch {}
+      }
+    })
+
+    if (validCount > 0) {
+      return Math.round(totalMinutes / validCount)
+    }
+
+    return waitingPatients.length * 5
+  }, [waitingPatients])
+
+  // --- Chart 1: Évolution des Revenus Hospitaliers sur 6 Mois ---
   const monthlyRevenueData = useMemo(() => {
     const getPastMonths = (period: string, count: number) => {
       const list: string[] = []
@@ -177,71 +216,114 @@ export const ManagementPage: React.FC = () => {
       return MONTH_NAMES[m - 1]
     }
 
-    const pastPeriods = getPastMonths(selectedPeriod, 8)
+    const pastPeriods = getPastMonths(selectedPeriod, 6)
     return pastPeriods.map((period) => {
-      // Revenue
       const periodInvoices = invoices.filter(
         (inv) => getPeriodFromDate(inv.date) === period && inv.status === 'Paid'
       )
       const actualRevenue = periodInvoices.reduce((sum, inv) => sum + inv.subtotal, 0)
-      
-      // Consultations
+
       const periodConsultationsCount = consultations.filter(
         (c) => getPeriodFromDate(c.date) === period
       ).length
 
-      // Dynamic baseline mock default to keep charts pretty when database has few elements
-      const monthNum = parseInt(period.split('-')[1])
-      const mockRevenueBase = 12000000 + (monthNum * 1200000)
-      const mockConsultationsBase = 400 + (monthNum * 40)
-
       return {
         month: formatPeriodToMonthName(period),
-        revenue: actualRevenue || mockRevenueBase,
-        consultations: periodConsultationsCount || mockConsultationsBase
+        revenue: actualRevenue,
+        consultations: periodConsultationsCount
       }
     })
   }, [invoices, consultations, selectedPeriod])
 
-  // --- Chart 2: Attendance per Department (BarChart) ---
+  // --- Chart 2: Fréquentation par Service Médical ---
   const departmentAttendanceData = useMemo(() => {
-    const departments = ['Urgences', 'Médecine Générale', 'Cardiologie', 'Pédiatrie', 'Gynécologie']
+    const departments =
+      hospitalSettings.departments && hospitalSettings.departments.length > 0
+        ? hospitalSettings.departments
+        : ['Médecine Générale', 'Urgences & Réanimation', 'Cardiologie', 'Pédiatrie & Maternité', 'Laboratoire & Biologie']
+
     const departmentColors: Record<string, string> = {
-      'Urgences': '#EF4444',
+      'Urgences & Réanimation': '#EF4444',
       'Médecine Générale': '#00C853',
       'Cardiologie': '#0A192F',
-      'Pédiatrie': '#10B981',
-      'Gynécologie': '#8B5CF6'
+      'Pédiatrie & Maternité': '#10B981',
+      'Laboratoire & Biologie': '#8B5CF6',
+      'Pharmacie Centale': '#F59E0B',
+      'Caisse & Admissions': '#3B82F6'
     }
 
     return departments.map((dept) => {
-      // Find appointments matching the department and selected month
-      const count = appointments.filter(
-        (app) => app.department === dept && getPeriodFromDate(app.date) === selectedPeriod
-      ).length
-
-      // Baseline fallback for nice visuals if database is small
-      let mockCountBase = 150
-      if (dept === 'Urgences') mockCountBase = 320
-      else if (dept === 'Médecine Générale') mockCountBase = 540
-      else if (dept === 'Cardiologie') mockCountBase = 210
-      else if (dept === 'Pédiatrie') mockCountBase = 380
-      else if (dept === 'Gynécologie') mockCountBase = 190
+      const appCount = appointments.filter((app) => app.department === dept).length
+      const consCount = consultations.filter((c) => {
+        const doctorUser = users.find((u) => u.name === c.doctorName)
+        return doctorUser?.department === dept
+      }).length
+      const totalCount = appCount + consCount
 
       return {
         name: dept,
-        count: count || mockCountBase,
+        count: totalCount,
         color: departmentColors[dept] || '#10B981'
       }
     })
-  }, [appointments, selectedPeriod])
+  }, [appointments, consultations, users, hospitalSettings.departments])
 
+  // Executive Summary Dynamic Metrics
+  const activePatientsCount = useMemo(() => {
+    return patients.filter((p) => p.status !== 'Completed').length
+  }, [patients])
+
+  const bedOccupancyPercent = useMemo(() => {
+    const total = hospitalSettings.totalBeds || 100
+    return Math.min(100, Math.round((activePatientsCount / total) * 100))
+  }, [activePatientsCount, hospitalSettings.totalBeds])
+
+  const pharmLabRevenueShare = useMemo(() => {
+    let totalRev = 0
+    let pharmLabRev = 0
+
+    invoices.forEach((inv) => {
+      if (inv.status === 'Paid') {
+        totalRev += inv.subtotal
+        if (Array.isArray(inv.items)) {
+          inv.items.forEach((item) => {
+            if (item.category === 'Pharmacie' || item.category === 'Laboratoire') {
+              pharmLabRev += item.amount
+            }
+          })
+        }
+      }
+    })
+
+    if (totalRev === 0) return 0
+    return Math.round((pharmLabRev / totalRev) * 100)
+  }, [invoices])
+
+  const lowStockItems = useMemo(() => {
+    return inventory.filter(
+      (item) => item.stockQuantity <= item.minQuantity || item.status === 'Low Stock' || item.status === 'Out of Stock'
+    )
+  }, [inventory])
+
+  // Export PDF & Excel handlers
   const handleExportPDF = () => {
-    alert(`Génération du rapport exécutif PDF pour la période ${selectedPeriod} en cours...`)
+    window.print()
   }
 
   const handleExportExcel = () => {
-    alert(`Exportation des données statistiques brutes en fichier Excel (.xlsx) terminée!`)
+    let csvContent = 'data:text/csv;charset=utf-8,'
+    csvContent += 'Période;Mois;Revenu (FCFA);Consultations\n'
+    monthlyRevenueData.forEach((row) => {
+      csvContent += `${selectedPeriod};${row.month};${row.revenue};${row.consultations}\n`
+    })
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `Rapport_Statistique_${selectedPeriod}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return (
@@ -296,13 +378,18 @@ export const ManagementPage: React.FC = () => {
             <DollarSign className="w-4 h-4 text-medical-primary" />
           </div>
           <p className="text-2xl font-bold text-slate-900 font-mono">
-            {(currentMonthRevenue || 19800000).toLocaleString('fr-FR')} F
+            {currentMonthRevenue.toLocaleString('fr-FR')} F
           </p>
-          <span className={`text-[11px] flex items-center gap-1 font-semibold ${
-            revenueEvolutionPercent >= 0 ? 'text-emerald-800' : 'text-red-800'
-          }`}>
-            <TrendingUp className={`w-3 h-3 ${revenueEvolutionPercent >= 0 ? 'text-medical-primary' : 'text-red-500'}`} />
-            {revenueEvolutionPercent >= 0 ? '+' : ''}{revenueEvolutionPercent.toFixed(1)}% vs mois précédent
+          <span
+            className={`text-[11px] flex items-center gap-1 font-semibold ${
+              revenueEvolutionPercent >= 0 ? 'text-emerald-800' : 'text-red-800'
+            }`}
+          >
+            <TrendingUp
+              className={`w-3 h-3 ${revenueEvolutionPercent >= 0 ? 'text-medical-primary' : 'text-red-500'}`}
+            />
+            {revenueEvolutionPercent >= 0 ? '+' : ''}
+            {revenueEvolutionPercent.toFixed(1)}% vs mois précédent
           </span>
         </div>
 
@@ -312,13 +399,14 @@ export const ManagementPage: React.FC = () => {
             <span>Fréquentation Mensuelle</span>
             <Users className="w-4 h-4 text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-slate-900 font-mono">
-            {currentMonthAttendance || 640} Patients
-          </p>
-          <span className={`text-[11px] font-semibold ${
-            attendanceEvolutionPercent >= 0 ? 'text-blue-700' : 'text-red-700'
-          }`}>
-            {attendanceEvolutionPercent >= 0 ? '+' : ''}{attendanceEvolutionPercent.toFixed(1)}% de nouvelles admissions
+          <p className="text-2xl font-bold text-slate-900 font-mono">{currentMonthAttendance} Patients</p>
+          <span
+            className={`text-[11px] font-semibold ${
+              attendanceEvolutionPercent >= 0 ? 'text-blue-700' : 'text-red-700'
+            }`}
+          >
+            {attendanceEvolutionPercent >= 0 ? '+' : ''}
+            {attendanceEvolutionPercent.toFixed(1)}% vs mois précédent
           </span>
         </div>
 
@@ -329,7 +417,9 @@ export const ManagementPage: React.FC = () => {
             <HeartPulse className="w-4 h-4 text-medical-primary" />
           </div>
           <p className="text-2xl font-bold text-emerald-800 font-mono">{recoveryRate}%</p>
-          <span className="text-[11px] text-slate-500">Mortalité hospitalière : {mortalityRate}%</span>
+          <span className="text-[11px] text-slate-500">
+            Dossiers clôturés sur {patients.length} patient(s)
+          </span>
         </div>
 
         {/* Card 4: Wait Time */}
@@ -339,10 +429,8 @@ export const ManagementPage: React.FC = () => {
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
           <p className="text-2xl font-bold text-amber-700 font-mono">{averageWaitingTime} min</p>
-          <span className={`text-[11px] font-semibold ${
-            waitingTimeDiff <= 0 ? 'text-emerald-800' : 'text-amber-800'
-          }`}>
-            {waitingTimeDiff <= 0 ? '' : '+'}{waitingTimeDiff} min par rapport à la normale
+          <span className="text-[11px] font-semibold text-slate-600">
+            {waitingPatients.length} patient(s) en attente
           </span>
         </div>
       </div>
@@ -353,7 +441,7 @@ export const ManagementPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
             <h3 className="font-bold text-medical-dark text-base">Évolution des Revenus Hospitaliers (F CFA)</h3>
-            <p className="text-xs text-slate-500">Progression mensuelle des encaissements globaux</p>
+            <p className="text-xs text-slate-500">Progression mensuelle des encaissements réels</p>
           </div>
 
           <div className="h-64 w-full">
@@ -369,9 +457,23 @@ export const ManagementPage: React.FC = () => {
                 <XAxis dataKey="month" stroke="#64748B" fontSize={11} />
                 <YAxis stroke="#64748B" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
+                  contentStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E2E8F0',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    color: '#0F172A'
+                  }}
+                  formatter={(value: any) => [`${Number(value).toLocaleString('fr-FR')} F CFA`, 'Revenu']}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#00C853" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#00C853"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorRev)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -391,7 +493,13 @@ export const ManagementPage: React.FC = () => {
                 <XAxis dataKey="name" stroke="#64748B" fontSize={11} />
                 <YAxis stroke="#64748B" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
+                  contentStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E2E8F0',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    color: '#0F172A'
+                  }}
                 />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                   {departmentAttendanceData.map((entry, index) => (
@@ -406,8 +514,8 @@ export const ManagementPage: React.FC = () => {
         {/* Chart 3: Recovery vs Mortality PieChart */}
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-bold text-medical-dark text-base">Issue des Patients (Guérisons vs Mortalité)</h3>
-            <p className="text-xs text-slate-500">Répartition en pourcentage des fins de séjour</p>
+            <h3 className="font-bold text-medical-dark text-base">Issue des Patients (Statut des Dossiers)</h3>
+            <p className="text-xs text-slate-500">Répartition réelle des séjours hospitaliers</p>
           </div>
 
           <div className="h-64 w-full flex items-center justify-center">
@@ -427,9 +535,19 @@ export const ManagementPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '12px', fontSize: '12px', color: '#0F172A' }}
+                  contentStyle={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E2E8F0',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    color: '#0F172A'
+                  }}
                 />
-                <Legend formatter={(value) => <span style={{ color: '#334155', fontSize: '11px', fontWeight: 600 }}>{value}</span>} />
+                <Legend
+                  formatter={(value) => (
+                    <span style={{ color: '#334155', fontSize: '11px', fontWeight: 600 }}>{value}</span>
+                  )}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -442,23 +560,35 @@ export const ManagementPage: React.FC = () => {
               <Activity className="w-5 h-5 text-medical-primary" />
               Synthèse Exécutive pour le Conseil d'Administration
             </h3>
-            <p className="text-xs text-slate-500">Point de vue global sur la santé financière et opérationnelle</p>
+            <p className="text-xs text-slate-500">Point de vue global basé sur la base de données réelle</p>
           </div>
 
           <div className="space-y-3 text-xs text-slate-700">
             <div className="bg-slate-50 p-3.5 rounded-xl border border-medical-border">
               <strong className="text-medical-dark block mb-1">Occupation de la Capacité Lits :</strong>
-              L'établissement enregistre {hospitalSettings.occupiedBeds} lits occupés sur {hospitalSettings.totalBeds} ({Math.round((hospitalSettings.occupiedBeds / hospitalSettings.totalBeds) * 100)}% de taux d'occupation).
+              L'établissement enregistre {activePatientsCount} patient(s) actif(s) sur {hospitalSettings.totalBeds || 100} lits de capacité ({bedOccupancyPercent}% de taux d'occupation).
             </div>
 
             <div className="bg-medical-subtle p-3.5 rounded-xl border border-emerald-200">
               <strong className="text-emerald-900 block mb-1">Rendement Pharmaceutique & Labo :</strong>
-              La pharmacie et le laboratoire génèrent 58% du chiffre d'affaires récurrent de l'hôpital.
+              La pharmacie et le laboratoire génèrent {pharmLabRevenueShare}% du chiffre d'affaires récurrent encaissé.
             </div>
 
             <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
-              <strong className="text-amber-800 block mb-1">Recommandations d'Amélioration :</strong>
-              Augmenter le stock d'Antibiotiques pour anticiper la hausse de fréquentation du service Pédiatrie.
+              <strong className="text-amber-800 block mb-1 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                Alertes & Recommandations d'Amélioration :
+              </strong>
+              {lowStockItems.length > 0 ? (
+                <span>
+                  Alerte Stock : {lowStockItems.map((item) => item.name).join(', ')} en seuil critique. Réapprovisionnement recommandé.
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-emerald-800">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  Tous les stocks de pharmacie et consommables sont à un niveau optimal.
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -466,3 +596,6 @@ export const ManagementPage: React.FC = () => {
     </div>
   )
 }
+
+export default ManagementPage
+
