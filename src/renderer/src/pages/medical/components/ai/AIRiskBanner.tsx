@@ -50,7 +50,7 @@ export const AIRiskBanner: React.FC<AIRiskBannerProps> = ({ predictionResult }) 
     >
       <div className="flex items-center gap-3.5">
         <div className="p-3 rounded-xl bg-white/80 border border-current/20 shadow-xs shrink-0">
-          {p.niveauRisque === 'LOW' || p.niveauRisque === 'NORMAL' ? (
+          {(p.niveauRisque as string) === 'LOW' || (p.niveauRisque as string) === 'NORMAL' ? (
             <CheckCircle className="w-6 h-6 text-emerald-600" />
           ) : (
             <AlertTriangle className="w-6 h-6 text-current" />

@@ -3,8 +3,9 @@ import { Activity, Brain, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { AIModelId } from '../../../../services/aiDiagnosticService'
 
 interface AIFeatureFormProps {
-  selectedModelId: AIModelId
+  selectedModelId?: AIModelId
   features: Record<string, number>
+  handleFeatureChange?: (key: string, value: number) => void
   handleRunPrediction: (e?: React.FormEvent) => void
   isLoading: boolean
   loadingStep: number
@@ -12,7 +13,6 @@ interface AIFeatureFormProps {
 }
 
 export const AIFeatureForm: React.FC<AIFeatureFormProps> = ({
-  selectedModelId,
   features,
   handleRunPrediction,
   isLoading,
