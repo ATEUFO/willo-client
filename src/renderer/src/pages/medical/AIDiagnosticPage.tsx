@@ -63,52 +63,32 @@ export const AIDiagnosticPage: React.FC = () => {
     return list[0] || null
   }, [vitals, selectedPatient])
 
-  // Features State
-  const [features, setFeatures] = useState<Record<string, number>>({
-    temperature: 38.9,
-    pressionSystolique: 90,
-    pressionDiastolique: 60,
-    frequenceCardiaque: 115,
-    frequenceRespiratoire: 24,
-    saturationO2: 93,
-    leucocytes: 14500,
-    lactate: 3.2,
-    scoreGlasgow: 14,
-    age: 54,
-    sexe: 1.0, // 1.0 = Masculin, 0.0 = Féminin
-    tdrMalaria: 1.0,
-    dureeSymptomesJours: 4,
-    plaquettes: 110000,
-    hemoglobine: 10.2,
-    nbHospitalisationsRecentes: 2,
-    dureeSejourJours: 5,
-    comorbiditesCount: 2,
-    autonomie: 75,
-    bmi: 28.4,
-    cholesterol: 5.4,
-    diabete: 0,
-    tabagisme: 1,
-    creatinine: 145.0,
-    bilirubine: 38.0,
-    crp: 72.0,
-    potassium: 4.5,
-    natremie: 137.0
-  })
+  // Dynamic Features State derived strictly from selected patient & recorded vitals
+  const [features, setFeatures] = useState<Record<string, number>>({})
 
-  // Pre-fill features when patient or vitals change
+  // Update features dynamically when patient or vitals change
   useEffect(() => {
     if (selectedPatient) {
       const sexeVal = selectedPatient.gender === 'F' ? 0.0 : 1.0
-      setFeatures((prev) => ({
-        ...prev,
-        age: selectedPatient.age || 45,
-        sexe: sexeVal,
-        temperature: patientVitals?.temperature || prev.temperature || 37.2,
-        pressionSystolique: patientVitals?.systolic || prev.pressionSystolique || 120,
-        pressionDiastolique: patientVitals?.diastolic || prev.pressionDiastolique || 80,
-        frequenceCardiaque: patientVitals?.pulse || prev.frequenceCardiaque || 78,
-        saturationO2: patientVitals?.spO2 || prev.saturationO2 || 97
-      }))
+      const initial: Record<string, number> = {
+        age: selectedPatient.age || 0,
+        sexe: sexeVal
+      }
+
+      if (patientVitals) {
+        if (typeof patientVitals.temperature === 'number') initial.temperature = patientVitals.temperature
+        if (typeof patientVitals.systolic === 'number') initial.pressionSystolique = patientVitals.systolic
+        if (typeof patientVitals.diastolic === 'number') initial.pressionDiastolique = patientVitals.diastolic
+        if (typeof patientVitals.pulse === 'number') initial.frequenceCardiaque = patientVitals.pulse
+        if (typeof patientVitals.spO2 === 'number') initial.saturationO2 = patientVitals.spO2
+        if (typeof (patientVitals as any).respiratoryRate === 'number') {
+          initial.frequenceRespiratoire = (patientVitals as any).respiratoryRate
+        }
+      }
+
+      setFeatures(initial)
+    } else {
+      setFeatures({})
     }
   }, [selectedPatient, patientVitals])
 
@@ -152,11 +132,18 @@ export const AIDiagnosticPage: React.FC = () => {
     const t2 = setTimeout(() => setLoadingStep(3), 900)
 
     try {
+      const cleanFeatures: Record<string, number> = {}
+      Object.entries(features).forEach(([k, v]) => {
+        if (typeof v === 'number' && !isNaN(v) && v !== null && v !== undefined) {
+          cleanFeatures[k] = v
+        }
+      })
+
       const payload: AIPredictionRequest = {
         nomModele: selectedModelId,
         patientId: selectedPatient.id,
         encounterId: `enc-${selectedPatient.id.substring(0, 8)}`,
-        features
+        features: cleanFeatures
       }
 
       const result = await aiDiagnosticService.predict(payload)
