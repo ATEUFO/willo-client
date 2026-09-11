@@ -7,7 +7,7 @@ import { ServerInfo } from "./find-server";
 function getLocalSubnetPrefix(): string {
   const nets = os.networkInterfaces();
   for (const iface of Object.values(nets).flat()) {
-    if (iface && iface.family === "IPv4" && !iface.internal) {
+    if (iface && (iface.family === "IPv4" || (iface.family as any) === 4) && !iface.internal) {
       return iface.address.split(".").slice(0, 3).join(".");
     }
   }

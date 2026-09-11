@@ -26,7 +26,7 @@ function createWindow(): void {
     resizable: false,
     center: true,
     show: false, // Hide initially to ensure it starts at 0s and avoids blank screen
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { icon } : {}),
     webPreferences: {
       preload: preloadPath,
       sandbox: false
@@ -46,7 +46,7 @@ function createWindow(): void {
     show: false,
     frame: false, // frameless window for custom titlebar
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { icon } : {}),
     webPreferences: {
       preload: preloadPath,
       sandbox: false
