@@ -32,7 +32,15 @@ import {
   updateServerConfig,
   testServerConnection,
   autoDiscoverServer,
-  getPendingCount
+  getPendingCount,
+  getAllOutboxMutations,
+  deleteOutboxMutation,
+  retryOutboxMutation,
+  resolveOutboxConflict,
+  clearSentOutboxMutations,
+  aiCheckHealth,
+  aiGetModels,
+  aiPredict
 } from '../sync/sync-manager'
 import { discoverServers } from '../discovery/find-server'
 import { scanSubnetForServer } from '../discovery/subnet-scan'
@@ -454,6 +462,40 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('discovery:scanSubnet', async () => {
     return scanSubnetForServer()
+  })
+
+  // Outbox & Conflict Handlers
+  ipcMain.handle('outbox:getMutations', () => {
+    return getAllOutboxMutations()
+  })
+
+  ipcMain.handle('outbox:deleteMutation', (_, id: string) => {
+    return deleteOutboxMutation(id)
+  })
+
+  ipcMain.handle('outbox:retryMutation', (_, id: string) => {
+    return retryOutboxMutation(id)
+  })
+
+  ipcMain.handle('outbox:resolveConflict', (_, { id, resolution }: { id: string; resolution: 'force_client' | 'accept_server' }) => {
+    return resolveOutboxConflict(id, resolution)
+  })
+
+  ipcMain.handle('outbox:clearSent', () => {
+    return clearSentOutboxMutations()
+  })
+
+  // AI Proxy Handlers (Node.js network execution)
+  ipcMain.handle('ai:checkHealth', async () => {
+    return aiCheckHealth()
+  })
+
+  ipcMain.handle('ai:getModels', async () => {
+    return aiGetModels()
+  })
+
+  ipcMain.handle('ai:predict', async (_, reqPayload: any) => {
+    return aiPredict(reqPayload)
   })
 
   // Window Control Handlers

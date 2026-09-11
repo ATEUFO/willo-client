@@ -84,6 +84,18 @@ const api = {
     discover: (timeoutMs?: number) => ipcRenderer.invoke('discovery:discover', timeoutMs),
     scanSubnet: () => ipcRenderer.invoke('discovery:scanSubnet')
   },
+  outbox: {
+    getMutations: () => ipcRenderer.invoke('outbox:getMutations'),
+    deleteMutation: (id: string) => ipcRenderer.invoke('outbox:deleteMutation', id),
+    retryMutation: (id: string) => ipcRenderer.invoke('outbox:retryMutation', id),
+    resolveConflict: (id: string, resolution: 'force_client' | 'accept_server') => ipcRenderer.invoke('outbox:resolveConflict', { id, resolution }),
+    clearSent: () => ipcRenderer.invoke('outbox:clearSent')
+  },
+  ai: {
+    checkHealth: () => ipcRenderer.invoke('ai:checkHealth'),
+    getModels: () => ipcRenderer.invoke('ai:getModels'),
+    predict: (payload: any) => ipcRenderer.invoke('ai:predict', payload)
+  },
   terminalLog: (message: string, data?: any) => ipcRenderer.send('terminal:log', message, data),
   windowControls: {
     isMac: process.platform === 'darwin',

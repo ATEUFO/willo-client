@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Store from 'electron-store'
 import crypto from 'node:crypto'
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and, asc, desc } from 'drizzle-orm'
 import { getDrizzleDb } from '../database'
 import {
   patients,
@@ -89,19 +89,58 @@ export function updateServerConfig(host: string, port: string): void {
   store.set('serverHost', host)
   store.set('serverPort', port)
 
-  console.log(`⚙️ Server config updated dynamically to: ${serverBaseUrl}`)
+  console.log(`⚙️ Dynamic server config updated to: ${serverBaseUrl}`)
 
-  // Reconnect WebSocket to the new address if we are online
-  if (isOnline) {
-    connectWebSocket()
+  checkServerReachability().then((online) => {
+    if (online) {
+      connectWebSocket()
+      flushOutbox()
+    }
+  })
+}
+
+export async function checkServerReachability(): Promise<boolean> {
+  try {
+    const response = await axios.get(`${serverBaseUrl}/discovery`, { timeout: 2500 })
+    if (response.data && (response.data.service === 'willo-server' || response.data.service === 'realtime-gateway')) {
+      if (!isOnline) {
+        isOnline = true
+        console.log(`🌐 Serveur Willo ${serverBaseUrl} joignable ! Passage en mode En Ligne.`)
+        broadcastSyncStatus()
+        flushOutbox()
+      }
+      return true
+    }
+  } catch {
+    try {
+      const respHealth = await axios.get(`${serverBaseUrl}/health`, { timeout: 2000 })
+      if (respHealth.status === 200) {
+        if (!isOnline) {
+          isOnline = true
+          console.log(`🌐 Serveur Willo ${serverBaseUrl} (Health OK) joignable ! Passage en mode En Ligne.`)
+          broadcastSyncStatus()
+          flushOutbox()
+        }
+        return true
+      }
+    } catch {
+      // Offline
+    }
   }
-  broadcastSyncStatus()
+
+  if (isOnline) {
+    isOnline = false
+    console.warn(`⚠️ Serveur ${serverBaseUrl} non joignable. Passage en mode hors-ligne.`)
+    broadcastSyncStatus()
+  }
+
+  return false
 }
 
 export async function testServerConnection(host: string, port: string): Promise<{ success: boolean; siteName?: string; error?: string }> {
   try {
     const response = await axios.get(`http://${host}:${port}/discovery`, { timeout: 2000 })
-    if (response.data && response.data.service === 'willo-server') {
+    if (response.data && (response.data.service === 'willo-server' || response.data.service === 'realtime-gateway')) {
       return { success: true, siteName: response.data.siteName || 'Willo Server' }
     }
     return { success: false, error: 'Réponse invalide du serveur (non-Willo)' }
@@ -435,8 +474,8 @@ export function queueLocalMutation(resourceType: string, resourceId: string, act
 export async function flushOutbox(): Promise<void> {
   if (flushTimer) clearTimeout(flushTimer)
 
-  const token = await ensureFreshToken()
-  if (!token) {
+  const reachable = await checkServerReachability()
+  if (!reachable) {
     // Retry in 10 seconds if offline
     flushTimer = setTimeout(flushOutbox, 10000)
     return
@@ -452,6 +491,9 @@ export async function flushOutbox(): Promise<void> {
 
   if (pendingMutations.length === 0) return
 
+  // Fetch token if available (optional for workstation synchronization)
+  const token = await ensureFreshToken().catch(() => null)
+
   for (const mutation of pendingMutations) {
     try {
       const payloadObj = JSON.parse(mutation.payload)
@@ -460,13 +502,16 @@ export async function flushOutbox(): Promise<void> {
       // Include UUID for idempotency
       resourcePayload.clientMutationId = mutation.id
 
-      await axios.post(`${serverBaseUrl}/api/fhir/${mutation.resourceType}`, resourcePayload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'X-Client-Mutation-Id': mutation.id,
-          'X-Poste-Id': posteId
-        }
-      })
+      const headers: Record<string, string> = {
+        'X-Client-Mutation-Id': mutation.id,
+        'X-Poste-Id': posteId,
+        'Content-Type': 'application/json'
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      await axios.post(`${serverBaseUrl}/api/fhir/${mutation.resourceType}`, resourcePayload, { headers })
 
       // Mark mutation as sent
       db.update(outbox)
@@ -474,15 +519,16 @@ export async function flushOutbox(): Promise<void> {
         .where(eq(outbox.id, mutation.id))
         .run()
 
+      console.log(`✅ Outbox mutation ${mutation.id} (${mutation.resourceType}/${mutation.resourceId}) transmise au serveur avec succès.`)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       console.error(`Mutation ${mutation.id} push failed:`, message)
       const axiosError = err as { response?: { status?: number } }
       const status = axiosError.response && axiosError.response.status
       if (status === 409) {
-        // Conflict - Mark as failed for manual arbitrage
+        // Conflict - Mark for manual arbitration in Outbox modal
         db.update(outbox)
-          .set({ status: 'failed', errorMessage: 'Version Conflict (409)' })
+          .set({ status: 'conflict', errorMessage: 'Version Conflict (409)' })
           .where(eq(outbox.id, mutation.id))
           .run()
       } else if (status === 400) {
@@ -685,7 +731,185 @@ export function getOnlineStatus(): boolean {
   return isOnline
 }
 
+// ─── Outbox & Conflict Resolution Management ───────────────────────────────
+
+export function getAllOutboxMutations(): any[] {
+  try {
+    const db = getDrizzleDb()
+    return db.select().from(outbox).orderBy(desc(outbox.createdAt)).all()
+  } catch (err) {
+    console.error('Failed to query outbox mutations:', err)
+    return []
+  }
+}
+
+export function deleteOutboxMutation(id: string): boolean {
+  try {
+    const db = getDrizzleDb()
+    db.delete(outbox).where(eq(outbox.id, id)).run()
+    broadcastSyncStatus()
+    return true
+  } catch (err) {
+    console.error('Failed to delete outbox mutation:', err)
+    return false
+  }
+}
+
+export function retryOutboxMutation(id: string): boolean {
+  try {
+    const db = getDrizzleDb()
+    db.update(outbox)
+      .set({ status: 'pending', errorMessage: null })
+      .where(eq(outbox.id, id))
+      .run()
+    broadcastSyncStatus()
+    flushOutbox()
+    return true
+  } catch (err) {
+    console.error('Failed to retry outbox mutation:', err)
+    return false
+  }
+}
+
+export function resolveOutboxConflict(id: string, resolution: 'force_client' | 'accept_server'): boolean {
+  try {
+    const db = getDrizzleDb()
+    if (resolution === 'force_client') {
+      db.update(outbox)
+        .set({ status: 'pending', errorMessage: null })
+        .where(eq(outbox.id, id))
+        .run()
+      broadcastSyncStatus()
+      flushOutbox()
+    } else {
+      db.delete(outbox).where(eq(outbox.id, id)).run()
+      broadcastSyncStatus()
+    }
+    return true
+  } catch (err) {
+    console.error('Failed to resolve outbox conflict:', err)
+    return false
+  }
+}
+
+export function clearSentOutboxMutations(): boolean {
+  try {
+    const db = getDrizzleDb()
+    db.delete(outbox).where(eq(outbox.status, 'sent')).run()
+    broadcastSyncStatus()
+    return true
+  } catch (err) {
+    console.error('Failed to clear sent outbox mutations:', err)
+    return false
+  }
+}
+
+// ─── AI Microservice Node.js Proxy ──────────────────────────────────────────
+
+export async function aiCheckHealth(): Promise<any> {
+  const startTime = performance.now()
+  const gatewayUrl = `${serverBaseUrl}/api/diagnosis/health`
+  const directUrl = `http://${serverHost}:3007/health`
+
+  try {
+    const resp = await axios.get(gatewayUrl, { timeout: 4000 })
+    return {
+      online: true,
+      latencyMs: Math.round(performance.now() - startTime),
+      serverUrl: gatewayUrl,
+      version: resp.data?.service || 'ai-diagnosis-service',
+      modelsLoaded: resp.data?.models_loaded || 5,
+      modelStatus: 'Ready'
+    }
+  } catch (errGateway: any) {
+    console.warn(`⚠️ Gateway AI health check failed on ${gatewayUrl}, attempting direct ${directUrl}...`)
+    try {
+      const resp = await axios.get(directUrl, { timeout: 3000 })
+      return {
+        online: true,
+        latencyMs: Math.round(performance.now() - startTime),
+        serverUrl: directUrl,
+        version: resp.data?.service || 'ai-diagnosis-service',
+        modelsLoaded: resp.data?.models_loaded || 5,
+        modelStatus: 'Ready'
+      }
+    } catch (errDirect: any) {
+      console.error('❌ AI microservice health check failed on both endpoints:', errDirect.message)
+      return {
+        online: false,
+        latencyMs: Math.round(performance.now() - startTime),
+        serverUrl: gatewayUrl,
+        version: 'Offline',
+        modelsLoaded: 0,
+        modelStatus: 'Offline'
+      }
+    }
+  }
+}
+
+export async function aiGetModels(): Promise<any[]> {
+  const gatewayUrl = `${serverBaseUrl}/api/diagnosis/models`
+  const directUrl = `http://${serverHost}:3007/models`
+
+  try {
+    const resp = await axios.get(gatewayUrl, { timeout: 4000 })
+    return resp.data?.models || []
+  } catch {
+    try {
+      const resp = await axios.get(directUrl, { timeout: 3000 })
+      return resp.data?.models || []
+    } catch (err: any) {
+      console.error('❌ Failed to fetch AI models list:', err.message)
+      throw new Error(`Erreur lors du chargement des modèles IA: ${err.message}`)
+    }
+  }
+}
+
+export async function aiPredict(reqPayload: any): Promise<any> {
+  const startTime = performance.now()
+  const gatewayUrl = `${serverBaseUrl}/api/diagnosis/predict`
+  const directUrl = `http://${serverHost}:3007/predict`
+
+  try {
+    const resp = await axios.post(gatewayUrl, reqPayload, {
+      timeout: 10000,
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const latencyMs = Math.round(performance.now() - startTime)
+    return {
+      ...resp.data,
+      httpStatus: resp.status,
+      latencyMs,
+      apiUrl: gatewayUrl
+    }
+  } catch (errGateway: any) {
+    console.warn(`⚠️ Gateway AI predict failed, attempting direct endpoint (${directUrl})...`)
+    try {
+      const resp = await axios.post(directUrl, reqPayload, {
+        timeout: 10000,
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const latencyMs = Math.round(performance.now() - startTime)
+      return {
+        ...resp.data,
+        httpStatus: resp.status,
+        latencyMs,
+        apiUrl: directUrl
+      }
+    } catch (errDirect: any) {
+      const msg = errDirect.response?.data?.detail || errDirect.message || 'Erreur réseau d\'inférence'
+      console.error('❌ AI prediction failed on all endpoints:', msg)
+      throw new Error(`Échec d'analyse IA sur le serveur actif : ${msg}`)
+    }
+  }
+}
+
 export function getLastSyncedAt(): string {
   return lastSyncedAt
 }
+
+// Periodically check server reachability every 10 seconds to auto-connect and flush outbox
+setInterval(() => {
+  checkServerReachability()
+}, 10000)
 

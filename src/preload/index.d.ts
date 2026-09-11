@@ -92,6 +92,27 @@ export interface WilloAPI {
     discover: (timeoutMs?: number) => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
     scanSubnet: () => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>
   }
+  outbox: {
+    getMutations: () => Promise<Array<{
+      id: string
+      resourceType: string
+      resourceId: string
+      action: string
+      payload: string
+      status: 'pending' | 'sent' | 'failed' | 'conflict'
+      errorMessage?: string
+      createdAt: string
+    }>>
+    deleteMutation: (id: string) => Promise<boolean>
+    retryMutation: (id: string) => Promise<boolean>
+    resolveConflict: (id: string, resolution: 'force_client' | 'accept_server') => Promise<boolean>
+    clearSent: () => Promise<boolean>
+  }
+  ai: {
+    checkHealth: () => Promise<any>
+    getModels: () => Promise<any[]>
+    predict: (payload: any) => Promise<any>
+  }
   terminalLog: (message: string, data?: any) => void
   windowControls: {
     isMac: boolean

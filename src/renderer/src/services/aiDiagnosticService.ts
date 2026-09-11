@@ -216,9 +216,21 @@ class AIDiagnosticService {
    */
   public async checkHealth(): Promise<HealthStatusResponse> {
     await this.resolveServerConfig()
-    const startTime = performance.now()
 
-    // 1. Primary Attempt: API Gateway Proxy (/api/diagnosis/health)
+    // 1. Primary Attempt: Electron Main process IPC (Node.js network socket, bypasses CORS completely)
+    if (typeof window !== 'undefined' && (window as any).api?.ai?.checkHealth) {
+      try {
+        logAI('📡 [AI HEALTH REQUEST (IPC)] Checking AI service via Node.js Main Process...')
+        const res = await (window as any).api.ai.checkHealth()
+        logAI('✅ [AI HEALTH RESPONSE (IPC)]', res)
+        return res
+      } catch (errIpc) {
+        logAI('⚠️ Main process IPC health check failed, trying renderer HTTP fallback...', formatErrorForLog(errIpc))
+      }
+    }
+
+    const startTime = performance.now()
+    // 2. Secondary Attempt: API Gateway Proxy via Renderer HTTP
     try {
       logAI(`📡 [AI HEALTH REQUEST] Checking Gateway Proxy: ${this.gatewayUrl}/health`)
       const respProxy = await this.axiosGatewayClient.get('/health')
@@ -236,7 +248,6 @@ class AIDiagnosticService {
     } catch (errProxy) {
       logAI('⚠️ Gateway proxy health check failed, checking direct AI service on target host...', formatErrorForLog(errProxy))
 
-      // 2. Secondary Attempt: Direct microservice on target host (http://<targetHost>:3007/health)
       try {
         logAI(`📡 [AI HEALTH REQUEST] Checking Direct AI Service: ${this.directUrl}/health`)
         const resp = await axios.get(`${this.directUrl}/health`, { timeout: 3000 })
@@ -272,9 +283,20 @@ class AIDiagnosticService {
    */
   public async getModels(): Promise<AIModelMeta[]> {
     await this.resolveServerConfig()
+    
+    if (typeof window !== 'undefined' && (window as any).api?.ai?.getModels) {
+      try {
+        logAI('📡 [AI MODELS REQUEST (IPC)] Fetching available models via Main Process IPC...')
+        const models = await (window as any).api.ai.getModels()
+        logAI('✅ [AI MODELS RESPONSE (IPC)]', models)
+        return models || []
+      } catch (errIpc) {
+        logAI('⚠️ IPC models fetch failed, using HTTP fallback...', formatErrorForLog(errIpc))
+      }
+    }
+
     logAI('📡 [AI MODELS REQUEST] Fetching available models list from active server:', this.gatewayUrl)
 
-    // 1. Try API Gateway first
     try {
       const resProxy = await this.axiosGatewayClient.get('/models')
       logAI('✅ [AI MODELS RESPONSE (GATEWAY)]', resProxy.data)
@@ -282,7 +304,6 @@ class AIDiagnosticService {
     } catch (errProxy) {
       logAI('⚠️ Gateway models fetch failed, trying direct AI service...', formatErrorForLog(errProxy))
 
-      // 2. Try Direct service on target host
       try {
         const res = await axios.get(`${this.directUrl}/models`, { timeout: 3000 })
         logAI('✅ [AI MODELS RESPONSE (DIRECT)]', res.data)
@@ -299,9 +320,22 @@ class AIDiagnosticService {
    */
   public async predict(req: AIPredictionRequest): Promise<AIPredictionResponse> {
     await this.resolveServerConfig()
+
+    // Primary: IPC Main process (Node.js network socket)
+    if (typeof window !== 'undefined' && (window as any).api?.ai?.predict) {
+      try {
+        logAI('📡 [AI API REQUEST (IPC)] Sending inference request via Node.js Main Process:', req)
+        const response = await (window as any).api.ai.predict(req)
+        logAI('✅ [AI API RESPONSE (IPC)]', response)
+        return response
+      } catch (errIpc) {
+        logAI('⚠️ Main process IPC predict failed, trying renderer HTTP fallback...', formatErrorForLog(errIpc))
+      }
+    }
+
     const startTime = performance.now()
 
-    // 1. PRIMARY: Send request to API Gateway
+    // Secondary: Renderer HTTP Gateway
     try {
       const targetUrl = `${this.gatewayUrl}/predict`
       logAI('📡 [AI API REQUEST (GATEWAY)]', { url: targetUrl, method: 'POST', payload: req })
@@ -320,7 +354,6 @@ class AIDiagnosticService {
     } catch (errGateway) {
       logAI(`⚠️ API Gateway request failed, attempting Direct AI Microservice (${this.directUrl}/predict)...`, formatErrorForLog(errGateway))
 
-      // 2. FALLBACK: Try Direct Python FastAPI on http://<targetHost>:3007/predict
       try {
         const targetUrl = `${this.directUrl}/predict`
         logAI('📡 [AI API REQUEST (DIRECT)]', { url: targetUrl, method: 'POST', payload: req })
