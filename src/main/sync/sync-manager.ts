@@ -17,6 +17,7 @@ import {
   outbox
 } from '../database/schema'
 import { UserModel } from '../models/user.model'
+import { SystemLogModel } from '../models/system-log.model'
 import { BrowserWindow } from 'electron'
 import { discoverServers } from '../discovery/find-server'
 import { scanSubnetForServer } from '../discovery/subnet-scan'
@@ -106,6 +107,13 @@ export async function checkServerReachability(): Promise<boolean> {
       if (!isOnline) {
         isOnline = true
         console.log(`🌐 Serveur Willo ${serverBaseUrl} joignable ! Passage en mode En Ligne.`)
+        try {
+          SystemLogModel.create({
+            level: 'INFO',
+            service: 'SYNC',
+            message: `Connexion au serveur Willo (${serverBaseUrl}) rétablie - Mode En Ligne.`
+          })
+        } catch {}
         broadcastSyncStatus()
         flushOutbox()
       }
@@ -118,6 +126,13 @@ export async function checkServerReachability(): Promise<boolean> {
         if (!isOnline) {
           isOnline = true
           console.log(`🌐 Serveur Willo ${serverBaseUrl} (Health OK) joignable ! Passage en mode En Ligne.`)
+          try {
+            SystemLogModel.create({
+              level: 'INFO',
+              service: 'SYNC',
+              message: `Serveur Willo (${serverBaseUrl}) joignable - Synchronisation active.`
+            })
+          } catch {}
           broadcastSyncStatus()
           flushOutbox()
         }
@@ -131,6 +146,13 @@ export async function checkServerReachability(): Promise<boolean> {
   if (isOnline) {
     isOnline = false
     console.warn(`⚠️ Serveur ${serverBaseUrl} non joignable. Passage en mode hors-ligne.`)
+    try {
+      SystemLogModel.create({
+        level: 'WARNING',
+        service: 'SYNC',
+        message: `Serveur distant (${serverBaseUrl}) non joignable - Passage en mode Hors Ligne (BDD locale).`
+      })
+    } catch {}
     broadcastSyncStatus()
   }
 

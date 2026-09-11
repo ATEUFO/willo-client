@@ -123,6 +123,12 @@ export function registerIpcHandlers(): void {
         token: user.token
       })
 
+      SystemLogModel.create({
+        level: 'INFO',
+        service: 'AUTH',
+        message: `Connexion réussie de l'utilisateur ${user.prenom} ${user.nom} (${user.roles?.[0]?.nom || 'médecin'}).`
+      })
+
       // Add to local users table to allow offline login later
       try {
         UserModel.createUser({
@@ -495,6 +501,13 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('ai:predict', async (_, reqPayload: any) => {
+    try {
+      SystemLogModel.create({
+        level: 'INFO',
+        service: 'AI',
+        message: `Analyse clinique exécutée pour le modèle ${reqPayload?.nomModele || 'IA'} (Patient ID: ${reqPayload?.patientId || 'N/A'})`
+      })
+    } catch {}
     return aiPredict(reqPayload)
   })
 
