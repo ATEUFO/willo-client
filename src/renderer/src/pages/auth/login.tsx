@@ -6,11 +6,7 @@ import {
   EyeOff,
   ShieldCheck,
   ArrowRight,
-  Stethoscope,
-  UserCheck,
-  ShieldAlert,
-  AlertCircle,
-  Network
+  AlertCircle
 } from 'lucide-react'
 import { useHospitalStore } from '../store/hospitalStore'
 import willoLogo from '../../assets/willo_logo1.png'
@@ -21,7 +17,7 @@ interface LoginPageProps {
   onOpenConnections?: () => void
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess, onOpenConnections }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess }) => {
   const { login } = useHospitalStore()
 
   const [username, setUsername] = useState('')
@@ -68,51 +64,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
     }
   }
 
-  const quickLogin = (demoUser: string): void => {
-    setUsername(demoUser)
-    setPassword('password123')
-  }
-
   return (
     <div className="min-h-screen bg-medical-lightBg flex items-center justify-center p-4 selection:bg-medical-primary selection:text-white">
       <div className="w-full max-w-md space-y-6">
         {/* Logo & Branding */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-md border border-medical-border">
-            <img src={willoLogo} alt="WILLO" className="h-12 w-auto object-contain" />
+          <div className="inline-flex items-center justify-center p-4 bg-white rounded-2xl shadow-md border border-medical-border">
+            <img src={willoLogo} alt="WILLO" className="h-14 w-auto object-contain" />
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-medical-dark tracking-tight">
               WILLO HOSPITAL
             </h1>
             <p className="text-xs text-slate-500 font-medium">
-              Système d'Information Hospitalier (SIH) • Authentification SQLite
+              Système d'Information Hospitalier
             </p>
           </div>
         </div>
 
         {/* Login Form Card */}
         <div className="bg-medical-cardBg border border-medical-border rounded-2xl p-6 sm:p-8 shadow-xl space-y-5">
-          <div className="border-b border-medical-border pb-3 flex items-center justify-between">
+          <div className="border-b border-medical-border pb-3">
             <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-medical-primary" />
               Connexion Utilisateur
             </h2>
-            <div className="flex items-center gap-2">
-              {onOpenConnections && (
-                <button
-                  type="button"
-                  onClick={onOpenConnections}
-                  className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg border border-slate-200 hover:border-slate-300 transition-all cursor-pointer flex items-center justify-center"
-                  title="Configurer la connexion réseau"
-                >
-                  <Network className="w-3.5 h-3.5" />
-                </button>
-              )}
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-medical-subtle text-emerald-800 border border-emerald-200">
-                Database Auth
-              </span>
-            </div>
           </div>
 
           {errorMessage && (
@@ -136,7 +112,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="ex: skouassi ou admin"
+                  placeholder="Nom d'utilisateur"
                   className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                 />
               </div>
@@ -182,7 +158,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
 
               <button
                 type="button"
-                onClick={() => alert("Veuillez contacter l'administrateur système de l'hôpital pour réinitialiser votre mot de passe.")}
+                onClick={() => alert("Veuillez contacter l'administrateur de l'hôpital pour réinitialiser votre mot de passe.")}
                 className="text-medical-primary hover:underline font-semibold"
               >
                 Mot de passe oublié ?
@@ -198,7 +174,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Connexion à la BDD...
+                  Connexion en cours...
                 </span>
               ) : (
                 <>
@@ -209,41 +185,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
             </button>
           </form>
 
-          {/* Quick Demo Login Preset Buttons */}
-          <div className="border-t border-medical-border pt-4 space-y-2">
-            <span className="text-[11px] font-semibold text-slate-500 block">Identifiants de Test (Mot de passe: password123) :</span>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => quickLogin('skouassi')}
-                className="p-2 bg-slate-50 hover:bg-medical-subtle border border-medical-border rounded-xl text-[11px] font-semibold text-slate-700 flex flex-col items-center gap-1 transition-colors"
-              >
-                <Stethoscope className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Dr. Kouassi</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('adiop')}
-                className="p-2 bg-slate-50 hover:bg-medical-subtle border border-medical-border rounded-xl text-[11px] font-semibold text-slate-700 flex flex-col items-center gap-1 transition-colors"
-              >
-                <UserCheck className="w-3.5 h-3.5 text-sky-600" />
-                <span>Accueil</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('admin')}
-                className="p-2 bg-slate-50 hover:bg-medical-subtle border border-medical-border rounded-xl text-[11px] font-semibold text-slate-700 flex flex-col items-center gap-1 transition-colors"
-              >
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
-                <span>Admin</span>
-              </button>
-            </div>
-          </div>
-
           {/* Switch to Signin Link */}
-          <div className="text-center pt-2">
+          <div className="text-center pt-2 border-t border-medical-border">
             <p className="text-xs text-slate-600">
               Nouveau membre du personnel ?{' '}
               <button
@@ -257,8 +200,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-[11px] text-slate-400 font-mono">
-          WILLO Client v1.0.0 • SQLite Database Authenticated
+        <p className="text-center text-[11px] text-slate-400 font-medium">
+          WILLO • Plateforme Hospitalière
         </p>
       </div>
     </div>

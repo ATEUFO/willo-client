@@ -84,7 +84,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
       })
 
       if (regResult.success) {
-        setSuccessMessage('Compte créé dans la BDD SQLite ! Connexion en cours...')
+        setSuccessMessage('Compte créé avec succès ! Connexion en cours...')
         // Perform auto login
         const loginRes = await login(username.trim(), password)
         setIsLoading(false)
@@ -110,8 +110,8 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
       <div className="w-full max-w-lg space-y-6">
         {/* Header Branding */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-md border border-medical-border">
-            <img src={willoLogo} alt="WILLO" className="h-12 w-auto object-contain" />
+          <div className="inline-flex items-center justify-center p-4 bg-white rounded-2xl shadow-md border border-medical-border">
+            <img src={willoLogo} alt="WILLO" className="h-14 w-auto object-contain" />
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-medical-dark tracking-tight">
@@ -125,14 +125,11 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
 
         {/* Form Card */}
         <div className="bg-medical-cardBg border border-medical-border rounded-2xl p-6 sm:p-8 shadow-xl space-y-5">
-          <div className="border-b border-medical-border pb-3 flex items-center justify-between">
+          <div className="border-b border-medical-border pb-3">
             <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-medical-primary" />
               Créer un Compte Utilisateur
             </h2>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-medical-subtle text-emerald-800 border border-emerald-200">
-              SQLite Auth
-            </span>
           </div>
 
           {errorMessage && (
@@ -162,7 +159,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Dr. Sarah Kouassi"
+                    placeholder="Nom et Prénom"
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                   />
                 </div>
@@ -178,7 +175,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="s.kouassi"
+                    placeholder="Nom d'utilisateur"
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                   />
                 </div>
@@ -196,7 +193,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="s.kouassi@willo-hospital.org"
+                  placeholder="adresse@email.com"
                   className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                 />
               </div>
@@ -303,7 +300,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
                   className="mt-0.5 rounded border-medical-border text-medical-primary focus:ring-medical-primary accent-medical-primary shrink-0"
                 />
                 <span>
-                  J'accepte les règles de confidentialité des données de santé (HL7 FHIR & secret médical).
+                  J'accepte les règles de confidentialité des données de santé et le secret médical.
                 </span>
               </label>
             </div>
@@ -317,7 +314,7 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Création du compte dans la BDD...
+                  Création du compte...
                 </span>
               ) : (
                 <>
@@ -341,8 +338,8 @@ export const SigninPage: React.FC<SigninPageProps> = ({ onSwitchToLogin, onSigni
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-[11px] text-slate-400 font-mono">
-          WILLO Client v1.0.0 • Sécurité & Traçabilité Médicale Local
+        <p className="text-center text-[11px] text-slate-400 font-medium">
+          WILLO • Sécurité & Traçabilité Médicale
         </p>
       </div>
     </div>
