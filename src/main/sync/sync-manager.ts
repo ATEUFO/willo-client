@@ -18,6 +18,38 @@ import {
 } from '../database/schema'
 import { UserModel } from '../models/user.model'
 import { BrowserWindow } from 'electron'
+import { discoverServers } from '../discovery/find-server'
+import { scanSubnetForServer } from '../discovery/subnet-scan'
+
+// Global HTTP Request/Response Debug Interceptors
+axios.interceptors.request.use((config) => {
+  const method = (config.method || 'GET').toUpperCase()
+  const url = config.url || ''
+  console.log(`📡 [HTTP REQUEST] ${method} ${url}`, config.data ? { payload: config.data } : '')
+  ;(config as any).meta = { startTime: performance.now() }
+  return config
+}, (error) => {
+  console.error(`❌ [HTTP REQUEST ERROR]`, error)
+  return Promise.reject(error)
+})
+
+axios.interceptors.response.use((response) => {
+  const startTime = (response.config as any).meta?.startTime || performance.now()
+  const latency = Math.round(performance.now() - startTime)
+  const method = (response.config.method || 'GET').toUpperCase()
+  const url = response.config.url || ''
+  console.log(`✅ [HTTP RESPONSE ${response.status}] ${method} ${url} (${latency}ms)`, response.data)
+  return response
+}, (error) => {
+  const config = error.config || {}
+  const startTime = (config as any).meta?.startTime || performance.now()
+  const latency = Math.round(performance.now() - startTime)
+  const method = (config.method || 'GET').toUpperCase()
+  const url = config.url || ''
+  const status = error.response?.status ? `HTTP ${error.response.status}` : 'NETWORK_ERROR'
+  console.error(`❌ [HTTP RESPONSE ERROR - ${status}] ${method} ${url} (${latency}ms):`, error.response?.data || error.message)
+  return Promise.reject(error)
+})
 
 const store = new Store()
 
@@ -249,9 +281,17 @@ export async function ensureFreshToken(): Promise<string | null> {
     accessToken = response.data.accessToken
     isOnline = true
     return accessToken
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
-    console.warn('Session refresh failed:', message)
+  } catch (err: any) {
+    const status = err.response?.status
+    if (status === 401 || status === 403 || status === 404) {
+      console.warn('🔑 Jeton de rafraîchissement expiré ou invalide. Réinitialisation de la session.')
+      store.delete('refreshToken')
+      refreshToken = null
+      accessToken = null
+    } else {
+      const message = err instanceof Error ? err.message : String(err)
+      console.warn('Session refresh network failure:', message)
+    }
     isOnline = false
     broadcastSyncStatus()
     return null
@@ -477,6 +517,14 @@ export async function connectWebSocket(): Promise<void> {
     }
   }
 
+  const storedRefresh = refreshToken || (store.get('refreshToken') as string)
+  if (!storedRefresh) {
+    // User is not authenticated yet. Reconnection will start automatically upon login.
+    isOnline = false
+    broadcastSyncStatus()
+    return
+  }
+
   const token = await ensureFreshToken()
   if (!token) {
     scheduleReconnect()
@@ -547,16 +595,62 @@ export async function connectWebSocket(): Promise<void> {
   }
 }
 
+let isAutoDiscovering = false
+
+export async function autoDiscoverServer(): Promise<boolean> {
+  if (isAutoDiscovering) return false
+  isAutoDiscovering = true
+  console.log('🔍 Tentative de découverte automatique du serveur Willo sur le réseau local...')
+
+  try {
+    // 1. Try Bonjour mDNS
+    const mDnsServers = await discoverServers(3500)
+    if (mDnsServers.length > 0) {
+      const server = mDnsServers[0]
+      console.log(`✅ Serveur Willo auto-détecté via Bonjour/mDNS : ${server.host}:${server.port}`)
+      updateServerConfig(server.host, String(server.port))
+      isAutoDiscovering = false
+      return true
+    }
+
+    // 2. Try Subnet Scan fallback
+    const subnetServers = await scanSubnetForServer()
+    if (subnetServers.length > 0) {
+      const server = subnetServers[0]
+      console.log(`✅ Serveur Willo auto-détecté via Scan Réseau : ${server.host}:${server.port}`)
+      updateServerConfig(server.host, String(server.port))
+      isAutoDiscovering = false
+      return true
+    }
+  } catch (err) {
+    console.warn('⚠️ La découverte automatique du serveur a échoué :', err)
+  } finally {
+    isAutoDiscovering = false
+  }
+
+  return false
+}
+
 // Schedule WebSocket reconnection with exponential backoff + jitter
 function scheduleReconnect() {
   if (reconnectTimer) clearTimeout(reconnectTimer)
+
+  const storedRefresh = refreshToken || (store.get('refreshToken') as string)
+  if (!storedRefresh) {
+    console.log('🔌 Aucune session active. Attente d\'authentification utilisateur pour la connexion WebSocket.')
+    return
+  }
   
   const jitter = Math.random() * 1000
   const delay = Math.min(30000, reconnectDelay) + jitter
   reconnectDelay = reconnectDelay * 2
 
-  console.log(`🔌 Scheduling WebSocket reconnect in ${Math.round(delay)}ms...`)
-  reconnectTimer = setTimeout(() => {
+  console.log(`🔌 Planification de reconnexion WebSocket dans ${Math.round(delay)}ms...`)
+  reconnectTimer = setTimeout(async () => {
+    // Try auto-discovery if current host connection is failing and host is default local
+    if (!isOnline && (serverHost === '127.0.0.1' || serverHost === 'localhost')) {
+      await autoDiscoverServer()
+    }
     connectWebSocket()
   }, delay)
 }

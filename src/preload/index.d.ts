@@ -86,6 +86,7 @@ export interface WilloAPI {
     getServerConfig: () => Promise<{ host: string; port: string; posteId: string }>
     updateServerConfig: (config: { host: string; port: string }) => Promise<boolean>
     testConnection: (config: { host: string; port: string }) => Promise<{ success: boolean; siteName?: string; error?: string }>
+    autoDiscover: () => Promise<boolean>
   }
   discovery: {
     discover: (timeoutMs?: number) => Promise<Array<{ name: string; host: string; port: number; caFingerprint: string }>>

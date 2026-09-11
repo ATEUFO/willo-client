@@ -142,6 +142,30 @@ class AIDiagnosticService {
       }
     })
 
+    // Log all AI Gateway HTTP requests and responses for debugging
+    this.axiosGatewayClient.interceptors.request.use((config) => {
+      const fullUrl = `${config.baseURL || ''}${config.url || ''}`
+      logAI(`📡 [AI HTTP REQUEST] ${config.method?.toUpperCase()} ${fullUrl}`, config.data ? { payload: config.data } : '')
+      ;(config as any).meta = { startTime: performance.now() }
+      return config
+    })
+
+    this.axiosGatewayClient.interceptors.response.use((response) => {
+      const startTime = (response.config as any).meta?.startTime || performance.now()
+      const latency = Math.round(performance.now() - startTime)
+      const fullUrl = `${response.config.baseURL || ''}${response.config.url || ''}`
+      logAI(`✅ [AI HTTP RESPONSE ${response.status}] ${response.config.method?.toUpperCase()} ${fullUrl} (${latency}ms)`, response.data)
+      return response
+    }, (error) => {
+      const config = error.config || {}
+      const startTime = (config as any).meta?.startTime || performance.now()
+      const latency = Math.round(performance.now() - startTime)
+      const fullUrl = `${config.baseURL || ''}${config.url || ''}`
+      const status = error.response?.status ? `HTTP ${error.response.status}` : 'NETWORK_ERROR'
+      logAI(`❌ [AI HTTP ERROR - ${status}] ${config.method?.toUpperCase()} ${fullUrl} (${latency}ms):`, error.response?.data || error.message)
+      return Promise.reject(error)
+    })
+
     this.resolveServerConfig()
   }
 

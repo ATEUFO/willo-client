@@ -31,6 +31,7 @@ import {
   getServerConfig,
   updateServerConfig,
   testServerConnection,
+  autoDiscoverServer,
   getPendingCount
 } from '../sync/sync-manager'
 import { discoverServers } from '../discovery/find-server'
@@ -441,6 +442,10 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('sync:testConnection', async (_, { host, port }) => {
     return testServerConnection(host, port)
+  })
+
+  ipcMain.handle('sync:autoDiscover', async () => {
+    return autoDiscoverServer()
   })
 
   ipcMain.handle('discovery:discover', async (_, timeoutMs?: number) => {
