@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Server,
   Users,
@@ -36,6 +36,54 @@ export const AdminPage: React.FC = () => {
   })
 
   const [logFilter, setLogFilter] = useState<string>('ALL')
+
+  // Real-time system metrics (RAM, CPU, Cache DB, connected user sessions)
+  const [systemMetrics, setSystemMetrics] = useState<{
+    cpuPercent: number
+    ramPercent: number
+    usedRamGB: string
+    totalRamGB: string
+    dbSizeMB: string
+    connectedCount: number
+    currentSessionUser: string | null
+    totalUsers: number
+    activeUsers: number
+    uptimeSeconds: number
+  }>({
+    cpuPercent: 12,
+    ramPercent: 32,
+    usedRamGB: '2.5',
+    totalRamGB: '8.0',
+    dbSizeMB: '1.2 MB',
+    connectedCount: 1,
+    currentSessionUser: null,
+    totalUsers: users.length,
+    activeUsers: users.filter((u) => u.status === 'Active').length,
+    uptimeSeconds: 0
+  })
+
+  useEffect(() => {
+    let isMounted = true
+    const fetchMetrics = async () => {
+      try {
+        if (window.api?.system?.getMetrics) {
+          const metrics = await window.api.system.getMetrics()
+          if (isMounted && metrics) {
+            setSystemMetrics(metrics)
+          }
+        }
+      } catch (err) {
+        console.error('Erreur de récupération des métriques système:', err)
+      }
+    }
+
+    fetchMetrics()
+    const interval = setInterval(fetchMetrics, 2000)
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
+  }, [])
 
   const handleAddUserSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -126,7 +174,9 @@ export const AdminPage: React.FC = () => {
               <div>
                 <p className="text-xs text-slate-500 font-medium">État du Serveur</p>
                 <p className="text-lg font-bold text-emerald-600">Opérationnel</p>
-                <p className="text-xs text-slate-400">Uptime: 99.98% (14j)</p>
+                <p className="text-xs text-slate-400">
+                  Uptime: {systemMetrics.uptimeSeconds > 0 ? `${Math.floor(systemMetrics.uptimeSeconds / 3600)}h ${Math.floor((systemMetrics.uptimeSeconds % 3600) / 60)}m` : '99.98%'}
+                </p>
               </div>
             </div>
 
@@ -136,8 +186,12 @@ export const AdminPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-xs text-slate-500 font-medium">Utilisateurs Connectés</p>
-                <p className="text-lg font-bold text-slate-800">{users.filter((u) => u.status === 'Active').length} Actifs</p>
-                <p className="text-xs text-slate-400">Total comptes: {users.length}</p>
+                <p className="text-lg font-bold text-slate-800">{systemMetrics.connectedCount} Connecté(s)</p>
+                <p className="text-xs text-slate-400">
+                  {systemMetrics.currentSessionUser
+                    ? `Session: ${systemMetrics.currentSessionUser}`
+                    : `Total comptes: ${users.length} (${users.filter((u) => u.status === 'Active').length} actifs)`}
+                </p>
               </div>
             </div>
 
@@ -146,9 +200,13 @@ export const AdminPage: React.FC = () => {
                 <HardDrive className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">Charge Serveur / BDD</p>
-                <p className="text-lg font-bold text-amber-600">24% CPU • 38% RAM</p>
-                <p className="text-xs text-slate-400">Stockage cache: 1.2 GB</p>
+                <p className="text-xs text-slate-500 font-medium">Charge Serveur / RAM</p>
+                <p className="text-lg font-bold text-amber-600">
+                  {systemMetrics.cpuPercent}% CPU • {systemMetrics.ramPercent}% RAM
+                </p>
+                <p className="text-xs text-slate-400">
+                  RAM: {systemMetrics.usedRamGB}/{systemMetrics.totalRamGB} GB • BDD: {systemMetrics.dbSizeMB}
+                </p>
               </div>
             </div>
 
@@ -472,8 +530,21 @@ export const AdminPage: React.FC = () => {
                       </td>
                       <td className="p-3 text-right">
                         <button
-                          onClick={() => alert(`Téléchargement de ${b.filename} démarré.`)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-emerald-700 rounded-lg text-[11px] inline-flex items-center gap-1 border border-slate-200 font-medium"
+                          onClick={async () => {
+                            try {
+                              if (window.api?.backups?.download) {
+                                const res = await window.api.backups.download(b.id)
+                                if (res && res.success) {
+                                  alert(`Fichier de sauvegarde téléchargé avec succès sous:\n${res.filePath}`)
+                                }
+                              } else {
+                                alert(`Téléchargement de ${b.filename} simulé.`)
+                              }
+                            } catch (err) {
+                              alert(`Erreur lors du téléchargement: ${err instanceof Error ? err.message : String(err)}`)
+                            }
+                          }}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-emerald-700 rounded-lg text-[11px] inline-flex items-center gap-1 border border-slate-200 font-medium cursor-pointer"
                         >
                           <Download className="w-3 h-3" />
                           Télécharger

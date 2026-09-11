@@ -63,6 +63,21 @@ export interface WilloAPI {
   backups: {
     getAll: () => Promise<any[]>
     trigger: () => Promise<any>
+    download: (id: string) => Promise<{ success: boolean; filePath?: string; canceled?: boolean }>
+  }
+  system: {
+    getMetrics: () => Promise<{
+      cpuPercent: number
+      ramPercent: number
+      usedRamGB: string
+      totalRamGB: string
+      dbSizeMB: string
+      connectedCount: number
+      currentSessionUser: string | null
+      totalUsers: number
+      activeUsers: number
+      uptimeSeconds: number
+    }>
   }
   sync: {
     getStatus: () => Promise<{ isOnline: boolean; lastSyncedAt: string; pendingCacheSync: number }>

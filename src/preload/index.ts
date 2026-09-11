@@ -65,7 +65,11 @@ const api = {
   },
   backups: {
     getAll: () => ipcRenderer.invoke('backups:getAll'),
-    trigger: () => ipcRenderer.invoke('backups:trigger')
+    trigger: () => ipcRenderer.invoke('backups:trigger'),
+    download: (id: string) => ipcRenderer.invoke('backups:download', id)
+  },
+  system: {
+    getMetrics: () => ipcRenderer.invoke('system:getMetrics')
   },
   sync: {
     getStatus: () => ipcRenderer.invoke('sync:getStatus'),

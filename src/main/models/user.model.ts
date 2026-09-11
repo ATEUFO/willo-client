@@ -1,6 +1,15 @@
 import { getDrizzleDb } from '../database'
 import { users, currentUser } from '../database/schema'
-import { eq, sql } from 'drizzle-orm'
+import { eq, sql, and } from 'drizzle-orm'
+import { createHash } from 'node:crypto'
+
+export function hashPassword(password: string): string {
+  return createHash('sha256').update(password).digest('hex')
+}
+
+export function isHashedPassword(password: string): boolean {
+  return typeof password === 'string' && /^[a-f0-9]{64}$/i.test(password)
+}
 
 export interface UserAccount {
   id: string
@@ -60,16 +69,43 @@ export class UserModel {
 
   /**
    * Authenticates user against SQLite users table.
+   * Hashes the password and looks up user matching username & hashed password.
    */
   static authenticate(username: string, password: string): UserAccount | null {
-    const user = this.getUserByUsername(username)
+    const db = getDrizzleDb()
+    const hashedPassword = hashPassword(password)
+
+    // Look up user matching username and hashed password directly in SQL
+    let row = db
+      .select()
+      .from(users)
+      .where(
+        and(
+          sql`LOWER(${users.username}) = LOWER(${username})`,
+          eq(users.password, hashedPassword)
+        )
+      )
+      .get()
+
+    let user = row as (UserAccount & { password?: string }) | undefined
+
+    // Backward compatibility: If no match found by hashed password, check for legacy unhashed entry
+    if (!user) {
+      const legacyUser = this.getUserByUsername(username)
+      if (legacyUser && legacyUser.password === password) {
+        db.update(users)
+          .set({ password: hashedPassword })
+          .where(eq(users.id, legacyUser.id))
+          .run()
+        user = legacyUser
+      }
+    }
+
     if (!user) return null
     if (user.status !== 'Active') return null
-    if (user.password !== password) return null
 
     // Update last_login
     const now = new Date().toISOString().replace('T', ' ').substring(0, 16)
-    const db = getDrizzleDb()
     db.update(users)
       .set({ lastLogin: now })
       .where(eq(users.id, user.id))
@@ -99,13 +135,14 @@ export class UserModel {
   }
 
   /**
-   * Creates a new user account.
+   * Creates a new user account with hashed password.
    */
   static createUser(user: Omit<UserAccount, 'id' | 'lastLogin'> & { password?: string }): UserAccount {
     const db = getDrizzleDb()
     const id = `usr-${Date.now()}`
     const lastLogin = 'Jamais'
-    const password = user.password || 'password123'
+    const rawPassword = user.password || 'password123'
+    const password = isHashedPassword(rawPassword) ? rawPassword : hashPassword(rawPassword)
 
     db.insert(users)
       .values({
@@ -187,5 +224,77 @@ export class UserModel {
   static clearCurrentUser(): void {
     const db = getDrizzleDb()
     db.delete(currentUser).run()
+  }
+
+  /**
+   * Seeds initial default test users into local SQLite DB if table is empty,
+   * and ensures all existing user passwords in SQLite are hashed.
+   */
+  static seedDefaultUsers(): void {
+    try {
+      const db = getDrizzleDb()
+
+      // 1. Migrate any existing plaintext passwords in users table to SHA-256 hashes
+      const allRows = db.select().from(users).all()
+      for (const row of allRows) {
+        if (row.password && !isHashedPassword(row.password)) {
+          const hashedPassword = hashPassword(row.password)
+          db.update(users)
+            .set({ password: hashedPassword })
+            .where(eq(users.id, row.id))
+            .run()
+        }
+      }
+
+      // 2. Insert test demo users if user matching username does not exist
+      const defaultPasswordHash = hashPassword('password123')
+      const defaultUsers = [
+        {
+          id: 'usr-demo-1',
+          name: 'Dr. Sarah Kouassi',
+          username: 'skouassi',
+          password: defaultPasswordHash,
+          role: 'médecin',
+          department: 'Médecine Générale',
+          status: 'Active' as const,
+          lastLogin: 'Jamais'
+        },
+        {
+          id: 'usr-demo-2',
+          name: 'Awa Diop',
+          username: 'adiop',
+          password: defaultPasswordHash,
+          role: 'accueil',
+          department: 'Caisse & Admissions',
+          status: 'Active' as const,
+          lastLogin: 'Jamais'
+        },
+        {
+          id: 'usr-demo-3',
+          name: 'Administrateur Système',
+          username: 'admin',
+          password: defaultPasswordHash,
+          role: 'admin',
+          department: 'Direction Médicale',
+          status: 'Active' as const,
+          lastLogin: 'Jamais'
+        }
+      ]
+
+      for (const u of defaultUsers) {
+        const existing = db
+          .select({ id: users.id })
+          .from(users)
+          .where(sql`LOWER(${users.username}) = LOWER(${u.username})`)
+          .get()
+
+        if (!existing) {
+          db.insert(users).values(u).run()
+        }
+      }
+      console.log('Default test users check and seed completed.')
+    } catch (err) {
+      console.error('Failed to seed default users:', err)
+    }
   }
 }

@@ -180,7 +180,7 @@ function broadcastSyncStatus() {
 }
 
 // Check count of pending mutations in the outbox
-function getPendingCount(): number {
+export function getPendingCount(): number {
   try {
     const db = getDrizzleDb()
     const rows = db.select({ id: outbox.id }).from(outbox).where(eq(outbox.status, 'pending')).all()

@@ -1,4 +1,7 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain, BrowserWindow, dialog, app } from 'electron'
+import os from 'node:os'
+import fs from 'node:fs'
+import path from 'node:path'
 import {
   UserModel,
   PatientModel,
@@ -12,8 +15,12 @@ import {
   AppointmentModel,
   InvoiceModel,
   SystemLogModel,
-  BackupModel
+  BackupModel,
+  hashPassword
 } from '../models'
+import { getDrizzleDb, getDatabasePath } from '../database'
+import { users } from '../database/schema'
+import { eq } from 'drizzle-orm'
 import {
   queueLocalMutation,
   authenticateRemote,
@@ -23,12 +30,65 @@ import {
   pullDeltas,
   getServerConfig,
   updateServerConfig,
-  testServerConnection
+  testServerConnection,
+  getPendingCount
 } from '../sync/sync-manager'
 import { discoverServers } from '../discovery/find-server'
 import { scanSubnetForServer } from '../discovery/subnet-scan'
 
 export function registerIpcHandlers(): void {
+  // Ensure default demo test users are present & all stored passwords are hashed
+  UserModel.seedDefaultUsers()
+
+  // System Metrics Handler (real CPU, RAM, database cache size, connected session user)
+  ipcMain.handle('system:getMetrics', async () => {
+    const totalMem = os.totalmem()
+    const freeMem = os.freemem()
+    const usedMem = Math.max(0, totalMem - freeMem)
+    const ramPercent = Math.round((usedMem / totalMem) * 100)
+    const usedRamGB = (usedMem / (1024 * 1024 * 1024)).toFixed(1)
+    const totalRamGB = (totalMem / (1024 * 1024 * 1024)).toFixed(1)
+
+    // Calculate CPU usage percentage
+    const cpus = os.cpus()
+    let idleSum = 0
+    let totalSum = 0
+    for (const cpu of cpus) {
+      for (const type in cpu.times) {
+        totalSum += cpu.times[type as keyof typeof cpu.times]
+      }
+      idleSum += cpu.times.idle
+    }
+    const cpuPercent = totalSum > 0 ? Math.min(100, Math.max(1, Math.round(100 - (idleSum / totalSum) * 100))) : 15
+
+    // Get SQLite DB file size
+    let dbSizeMB = '0 MB'
+    try {
+      const dbPath = getDatabasePath()
+      if (fs.existsSync(dbPath)) {
+        const bytes = fs.statSync(dbPath).size
+        dbSizeMB = (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+      }
+    } catch {}
+
+    const currentSession = UserModel.getCurrentUser()
+    const allUsers = UserModel.getAllUsers()
+    const activeUsersCount = allUsers.filter((u) => u.status === 'Active').length
+
+    return {
+      cpuPercent,
+      ramPercent,
+      usedRamGB,
+      totalRamGB,
+      dbSizeMB,
+      connectedCount: currentSession ? 1 : 0,
+      currentSessionUser: currentSession ? currentSession.name : null,
+      totalUsers: allUsers.length,
+      activeUsers: activeUsersCount,
+      uptimeSeconds: Math.floor(process.uptime())
+    }
+  })
+
   // Terminal Logger handler for forwarding renderer logs to main process terminal
   ipcMain.on('terminal:log', (_, message: string, data?: any) => {
     if (data !== undefined) {
@@ -65,7 +125,16 @@ export function registerIpcHandlers(): void {
           status: 'Active'
         })
       } catch {
-        // Ignored if user already exists
+        // If user already exists, update local hashed password to match latest remote login password
+        const existing = UserModel.getUserByUsername(user.email)
+        if (existing) {
+          const hashedPassword = hashPassword(password)
+          const db = getDrizzleDb()
+          db.update(users)
+            .set({ password: hashedPassword })
+            .where(eq(users.id, existing.id))
+            .run()
+        }
       }
 
       return UserModel.getCurrentUser()
@@ -277,10 +346,19 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('backups:trigger', async () => {
+    let sizeStr = '43.1 MB'
+    try {
+      const dbPath = getDatabasePath()
+      if (fs.existsSync(dbPath)) {
+        const bytes = fs.statSync(dbPath).size
+        sizeStr = (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+      }
+    } catch {}
+
     const filename = `willo_manual_dump_${new Date().toISOString().replace(/[:.]/g, '')}.sql.gz`
     const backup = BackupModel.create({
       filename,
-      size: '43.1 MB',
+      size: sizeStr,
       type: 'Manual',
       status: 'Completed'
     })
@@ -290,6 +368,47 @@ export function registerIpcHandlers(): void {
       message: `Dump manuel déclenché par l'administrateur: ${filename}`
     })
     return backup
+  })
+
+  ipcMain.handle('backups:download', async (_, backupId: string) => {
+    const backupList = BackupModel.getAll()
+    const backup = backupList.find((b) => b.id === backupId)
+    const filename = backup ? backup.filename : `willo_db_dump_${Date.now()}.sql`
+
+    const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
+    const { filePath, canceled } = await dialog.showSaveDialog(win, {
+      title: 'Enregistrer la sauvegarde de la base de données',
+      defaultPath: path.join(app.getPath('downloads'), filename),
+      filters: [
+        { name: 'Fichier Dump / Base de Données', extensions: ['sql', 'gz', 'db'] },
+        { name: 'Tous les fichiers', extensions: ['*'] }
+      ]
+    })
+
+    if (canceled || !filePath) {
+      return { success: false, canceled: true }
+    }
+
+    try {
+      const dbPath = getDatabasePath()
+      if (fs.existsSync(dbPath)) {
+        fs.copyFileSync(dbPath, filePath)
+      } else {
+        const dumpContent = `-- WILLO DATABASE DUMP\n-- Exported At: ${new Date().toISOString()}\n`
+        fs.writeFileSync(filePath, dumpContent, 'utf-8')
+      }
+
+      SystemLogModel.create({
+        level: 'INFO',
+        service: 'DATABASE',
+        message: `Sauvegarde ${filename} téléchargée et enregistrée sous: ${filePath}`
+      })
+
+      return { success: true, filePath }
+    } catch (err) {
+      console.error('Backup download export error:', err)
+      throw err
+    }
   })
 
   // Sync Handlers exposed to Renderer
@@ -360,18 +479,4 @@ export function registerIpcHandlers(): void {
     const win = BrowserWindow.fromWebContents(event.sender)
     return win ? win.isMaximized() : false
   })
-}
-
-// Helper to count pending outbox items
-function getPendingCount(): number {
-  try {
-    const { getDrizzleDb } = require('../database')
-    const { outbox } = require('../database/schema')
-    const { eq } = require('drizzle-orm')
-    const db = getDrizzleDb()
-    const rows = db.select().from(outbox).where(eq(outbox.status, 'pending')).all()
-    return rows.length
-  } catch {
-    return 0
-  }
 }
