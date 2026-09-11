@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Database } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 interface AIFhirDrawerProps {
   fhirResource: any
@@ -11,22 +11,22 @@ export const AIFhirDrawer: React.FC<AIFhirDrawerProps> = ({ fhirResource }) => {
   if (!fhirResource) return null
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2">
+    <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-200/80 space-y-2">
       <button
         type="button"
         onClick={() => setShowFhirResource(!showFhirResource)}
-        className="text-xs font-bold text-slate-700 hover:text-emerald-600 flex items-center gap-2 transition-colors cursor-pointer w-full justify-between"
+        className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-2 transition-colors cursor-pointer w-full justify-between"
       >
         <span className="flex items-center gap-2">
-          <Database className="w-4 h-4 text-blue-500" /> Structure Dossier Normalisé `RiskAssessment`
+          <FileText className="w-3.5 h-3.5 text-slate-400" /> Données Brutes de Santé
         </span>
-        <span className="text-[11px] text-slate-400 font-mono">
-          {showFhirResource ? 'Masquer Détails' : 'Afficher Détails'}
+        <span className="text-[11px] text-slate-400">
+          {showFhirResource ? 'Masquer' : 'Afficher'}
         </span>
       </button>
 
       {showFhirResource && (
-        <pre className="p-3.5 bg-slate-950 text-blue-300 rounded-xl text-[10px] font-mono overflow-x-auto max-h-60 border border-slate-800">
+        <pre className="p-3 bg-slate-900 text-slate-300 rounded-lg text-[10px] overflow-x-auto max-h-48 border border-slate-800 font-mono">
           {JSON.stringify(fhirResource, null, 2)}
         </pre>
       )}
