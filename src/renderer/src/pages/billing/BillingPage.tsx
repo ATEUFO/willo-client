@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   CreditCard,
   Printer,
@@ -14,7 +14,7 @@ import { useHospitalStore, Invoice } from '../store/hospitalStore'
 import { CreateInvoiceModal } from './components/CreateInvoiceModal'
 
 export const BillingPage: React.FC = () => {
-  const { invoices, dailyClosure, payInvoice, closeDailyRegister, patients, addInvoice } = useHospitalStore()
+  const { invoices, dailyClosure: storeDailyClosure, payInvoice, closeDailyRegister, patients, addInvoice } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'pos' | 'invoices' | 'closure'>('pos')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(invoices[0] || null)
@@ -24,6 +24,8 @@ export const BillingPage: React.FC = () => {
   useEffect(() => {
     if (!selectedInvoice && invoices.length > 0) {
       setSelectedInvoice(invoices[0])
+    } else if (invoices.length === 0) {
+      setSelectedInvoice(null)
     }
   }, [invoices, selectedInvoice])
 
@@ -31,6 +33,36 @@ export const BillingPage: React.FC = () => {
 
   const unpaidInvoices = invoices.filter((i) => i.status === 'Unpaid')
   const paidInvoices = invoices.filter((i) => i.status === 'Paid')
+
+  // Real-time calculation of daily closure totals from database paid invoices
+  const dailyClosure = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0]
+    const paidToday = paidInvoices.filter((i) => i.paidAt && i.paidAt.startsWith(today))
+    const targetPaid = paidToday.length > 0 ? paidToday : paidInvoices
+
+    const cashTotal = targetPaid
+      .filter((i) => i.paymentMethod === 'Espèces')
+      .reduce((sum, i) => sum + (i.patientShare || 0), 0)
+
+    const cardTotal = targetPaid
+      .filter((i) => i.paymentMethod === 'Carte Bancaire')
+      .reduce((sum, i) => sum + (i.patientShare || 0), 0)
+
+    const mobileTotal = targetPaid
+      .filter((i) => i.paymentMethod === 'Mobile Money')
+      .reduce((sum, i) => sum + (i.patientShare || 0), 0)
+
+    const grandTotal = cashTotal + cardTotal + mobileTotal
+
+    return {
+      date: today,
+      cashTotal,
+      cardTotal,
+      mobileTotal,
+      grandTotal,
+      status: storeDailyClosure?.status || 'Open'
+    }
+  }, [paidInvoices, storeDailyClosure])
 
   const handleProcessPayment = () => {
     if (!activeInvoice) return
@@ -123,7 +155,7 @@ export const BillingPage: React.FC = () => {
                   </div>
                 </div>
               ))}
-              {unpaidInvoices.length === 0 && <p className="text-xs text-slate-400 py-6 text-center">Aucune facture en attente</p>}
+              {unpaidInvoices.length === 0 && <p className="text-xs text-slate-400 py-6 text-center">Aucune facture en attente d'encaissement</p>}
             </div>
           </div>
 
@@ -241,7 +273,7 @@ export const BillingPage: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="p-12 text-center text-slate-400">Sélectionnez une facture dans la liste de gauche</div>
+              <div className="p-12 text-center text-slate-400">Sélectionnez une facture dans la liste de gauche ou créez-en une nouvelle.</div>
             )}
           </div>
         </div>
@@ -281,6 +313,13 @@ export const BillingPage: React.FC = () => {
                     <td className="p-3 text-slate-500">{inv.paidAt}</td>
                   </tr>
                 ))}
+                {paidInvoices.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-slate-400 font-sans">
+                      Aucun reçu payé enregistré pour le moment.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -316,22 +355,22 @@ export const BillingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-slate-50 border border-medical-border p-4 rounded-xl space-y-1">
               <span className="text-xs text-slate-500 font-medium">Total Espèces</span>
-              <p className="text-xl font-bold text-emerald-700 font-mono">{dailyClosure.cashTotal} F CFA</p>
+              <p className="text-xl font-bold text-emerald-700 font-mono">{dailyClosure.cashTotal.toLocaleString('fr-FR')} F CFA</p>
             </div>
 
             <div className="bg-slate-50 border border-medical-border p-4 rounded-xl space-y-1">
               <span className="text-xs text-slate-500 font-medium">Total Carte Bancaire</span>
-              <p className="text-xl font-bold text-blue-700 font-mono">{dailyClosure.cardTotal} F CFA</p>
+              <p className="text-xl font-bold text-blue-700 font-mono">{dailyClosure.cardTotal.toLocaleString('fr-FR')} F CFA</p>
             </div>
 
             <div className="bg-slate-50 border border-medical-border p-4 rounded-xl space-y-1">
               <span className="text-xs text-slate-500 font-medium">Total Mobile Money</span>
-              <p className="text-xl font-bold text-purple-700 font-mono">{dailyClosure.mobileTotal} F CFA</p>
+              <p className="text-xl font-bold text-purple-700 font-mono">{dailyClosure.mobileTotal.toLocaleString('fr-FR')} F CFA</p>
             </div>
 
             <div className="bg-medical-subtle border border-emerald-200 p-4 rounded-xl space-y-1">
               <span className="text-xs text-emerald-800 font-semibold">Recette Totale du Jour</span>
-              <p className="text-xl font-bold text-medical-primary font-mono">{dailyClosure.grandTotal} F CFA</p>
+              <p className="text-xl font-bold text-medical-primary font-mono">{dailyClosure.grandTotal.toLocaleString('fr-FR')} F CFA</p>
             </div>
           </div>
         </div>

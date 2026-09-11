@@ -301,10 +301,10 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   invoices: [],
   dailyClosure: {
     date: new Date().toISOString().split('T')[0],
-    cashTotal: 45000,
-    cardTotal: 120000,
-    mobileTotal: 85000,
-    grandTotal: 250000,
+    cashTotal: 0,
+    cardTotal: 0,
+    mobileTotal: 0,
+    grandTotal: 0,
     status: 'Open'
   },
 
