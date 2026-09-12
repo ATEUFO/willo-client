@@ -488,7 +488,7 @@ curl -X GET http://localhost:5030/discovery
 }
 ```
 
-3. **Réponse d'authentification réussie du serveur** :
+1. **Réponse d'authentification réussie du serveur** :
 
 ```json
 {
@@ -504,7 +504,7 @@ curl -X GET http://localhost:5030/discovery
 }
 ```
 
-4. **Message d'Événement Temps Réel Reçu** :
+1. **Message d'Événement Temps Réel Reçu** :
 
 ```json
 {
@@ -544,6 +544,7 @@ curl -X GET http://localhost:5030/api/clinique/consultations/patient/pat-uuid-01
 ### Fichier de Configuration (`.env`)
 
 Assurez-vous que le fichier `.env` à la racine de `willo-server` contient la configuration nécessaire :
+fgfd
 
 ```env
 POSTGRES_USER=sih_admin
