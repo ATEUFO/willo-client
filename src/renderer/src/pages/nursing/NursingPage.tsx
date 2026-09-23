@@ -11,7 +11,7 @@ import {
   CheckCircle,
   FileText
 } from 'lucide-react'
-import { useHospitalStore, Patient } from '../store/hospitalStore'
+import { useHospitalStore } from '../store/hospitalStore'
 
 export const NursingPage: React.FC = () => {
   const {
@@ -25,8 +25,7 @@ export const NursingPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'worklist' | 'vitals_history' | 'care_plan'>('worklist')
 
-  // Selected patient for vitals entry
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(patients[0] || null)
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
 
   // Vitals form
   const [systolic, setSystolic] = useState<number>(120)
@@ -37,15 +36,21 @@ export const NursingPage: React.FC = () => {
   const [spO2, setSpO2] = useState<number>(98)
   const [nurseNotes, setNurseNotes] = useState<string>('')
 
+  // Waiting list for vitals (only patients who haven't taken vitals yet)
+  const waitingPatients = patients.filter((p) => p.status === 'Waiting')
+
+  // Currently selected patient must be in waitingPatients queue
+  const selectedPatient = waitingPatients.find((p) => p.id === selectedPatientId) || waitingPatients[0] || null
+
   // Abnormal checks
   const isAbnormal =
     systolic > 140 || diastolic > 90 || systolic < 90 || temperature > 38.0 || pulse > 100 || spO2 < 95
 
-  const handleSaveVitals = (e: React.FormEvent) => {
+  const handleSaveVitals = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPatient) return
 
-    addVitals({
+    await addVitals({
       patientId: selectedPatient.id,
       patientName: selectedPatient.name,
       systolic,
@@ -63,10 +68,8 @@ export const NursingPage: React.FC = () => {
       type: 'success'
     })
     setNurseNotes('')
+    setSelectedPatientId(null)
   }
-
-  // Waiting list for vitals
-  const waitingPatients = patients.filter((p) => p.status === 'Waiting' || p.status === 'Vitals Taken')
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -127,27 +130,33 @@ export const NursingPage: React.FC = () => {
             </h3>
 
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-              {waitingPatients.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedPatient(p)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all ${selectedPatient?.id === p.id
-                      ? 'bg-medical-subtle border-emerald-300 shadow-xs'
-                      : 'bg-white border-medical-border hover:border-slate-300'
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 text-xs">{p.name}</span>
-                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">
-                      {p.queueNumber}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-                    <span>{p.gender}, {p.age} ans • {p.bloodType}</span>
-                    <span className="text-slate-400 font-mono">{p.arrivalTime}</span>
-                  </div>
+              {waitingPatients.length === 0 ? (
+                <div className="p-4 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  Aucun patient en attente de prise de constantes.
                 </div>
-              ))}
+              ) : (
+                waitingPatients.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => setSelectedPatientId(p.id)}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all ${selectedPatient?.id === p.id
+                        ? 'bg-medical-subtle border-emerald-300 shadow-xs'
+                        : 'bg-white border-medical-border hover:border-slate-300'
+                      }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 text-xs">{p.name}</span>
+                      <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">
+                        {p.queueNumber}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+                      <span>{p.gender}, {p.age} ans • {p.bloodType}</span>
+                      <span className="text-slate-400 font-mono">{p.arrivalTime}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -299,7 +308,11 @@ export const NursingPage: React.FC = () => {
                 </button>
               </form>
             ) : (
-              <div className="p-12 text-center text-slate-400">Sélectionnez un patient dans la liste de gauche</div>
+              <div className="p-12 text-center text-slate-400 font-medium text-sm">
+                {waitingPatients.length === 0
+                  ? 'Aucun patient en attente de prise de constantes.'
+                  : 'Sélectionnez un patient dans la liste de gauche'}
+              </div>
             )}
           </div>
         </div>

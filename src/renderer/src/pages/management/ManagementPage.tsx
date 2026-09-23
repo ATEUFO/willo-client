@@ -46,24 +46,24 @@ export const ManagementPage: React.FC = () => {
     return new Date().toISOString().substring(0, 7)
   })
 
-  // Helper to parse period (YYYY-MM) from invoice/consultation date strings (supports "YYYY-MM-DD" and "DD/MM/YYYY")
-  const getPeriodFromDate = (dateStr: string) => {
-    if (!dateStr) return ''
-    if (dateStr.includes('-')) {
-      const parts = dateStr.split('-')
-      if (parts[0].length === 4) {
-        return `${parts[0]}-${parts[1]}` // YYYY-MM
+  // Helper to parse period (YYYY-MM) from any date string format
+  const getPeriodFromDate = (dateStr?: string) => {
+    if (!dateStr) return new Date().toISOString().substring(0, 7)
+    try {
+      const matchIso = dateStr.match(/(\d{4})[-/](\d{2})/)
+      if (matchIso) {
+        return `${matchIso[1]}-${matchIso[2]}`
       }
-    }
-    if (dateStr.includes('/')) {
-      const parts = dateStr.split('/')
-      if (parts[2] && parts[2].length >= 4) {
-        const year = parts[2].substring(0, 4)
-        const month = parts[1].padStart(2, '0')
-        return `${year}-${month}` // YYYY-MM
+      const matchFr = dateStr.match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/)
+      if (matchFr) {
+        return `${matchFr[3]}-${matchFr[2].padStart(2, '0')}`
       }
-    }
-    return ''
+      const parsed = new Date(dateStr)
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().substring(0, 7)
+      }
+    } catch {}
+    return new Date().toISOString().substring(0, 7)
   }
 
   // Get previous period (YYYY-MM) helper
@@ -102,17 +102,50 @@ export const ManagementPage: React.FC = () => {
     return ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100
   }, [currentMonthRevenue, prevMonthRevenue])
 
-  // KPI 2: Fréquentation Mensuelle
+  // KPI 2: Fréquentation Mensuelle (Comptage de l'ensemble des clients / patients enregistrés ou en visite)
   const currentMonthAttendance = useMemo(() => {
-    const monthConsultations = consultations.filter((c) => getPeriodFromDate(c.date) === selectedPeriod).length
-    const monthAppointments = appointments.filter((a) => getPeriodFromDate(a.date) === selectedPeriod).length
-    return monthConsultations + monthAppointments
-  }, [consultations, appointments, selectedPeriod])
+    const clientIds = new Set<string>()
+
+    // Include registered patients
+    patients.forEach((p) => {
+      const pPeriod = getPeriodFromDate((p as any).createdAt || p.arrivalTime)
+      if (pPeriod === selectedPeriod || !pPeriod) {
+        clientIds.add(p.id)
+      }
+    })
+
+    // Include consultation patients
+    consultations.forEach((c) => {
+      if (getPeriodFromDate(c.date) === selectedPeriod && c.patientId) {
+        clientIds.add(c.patientId)
+      }
+    })
+
+    // Include appointment patients
+    appointments.forEach((a) => {
+      if (getPeriodFromDate(a.date) === selectedPeriod && a.patientId) {
+        clientIds.add(a.patientId)
+      }
+    })
+
+    return clientIds.size > 0 ? clientIds.size : patients.length
+  }, [patients, consultations, appointments, selectedPeriod])
 
   const prevMonthAttendance = useMemo(() => {
-    const prevConsultations = consultations.filter((c) => getPeriodFromDate(c.date) === prevPeriod).length
-    const prevAppointments = appointments.filter((a) => getPeriodFromDate(a.date) === prevPeriod).length
-    return prevConsultations + prevAppointments
+    const prevClientIds = new Set<string>()
+
+    consultations.forEach((c) => {
+      if (getPeriodFromDate(c.date) === prevPeriod && c.patientId) {
+        prevClientIds.add(c.patientId)
+      }
+    })
+    appointments.forEach((a) => {
+      if (getPeriodFromDate(a.date) === prevPeriod && a.patientId) {
+        prevClientIds.add(a.patientId)
+      }
+    })
+
+    return prevClientIds.size
   }, [consultations, appointments, prevPeriod])
 
   const attendanceEvolutionPercent = useMemo(() => {

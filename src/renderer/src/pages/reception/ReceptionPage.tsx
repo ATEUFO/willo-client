@@ -15,12 +15,17 @@ export const ReceptionPage: React.FC = () => {
   const {
     patients,
     appointments,
+    users,
     addPatient,
     updatePatientStatus,
     addAppointment,
     cancelAppointment,
     showNotification
   } = useHospitalStore()
+
+  const doctorList = React.useMemo(() => {
+    return (users || []).filter((u) => u.role === 'consultation')
+  }, [users])
 
   const [activeSubTab, setActiveSubTab] = useState<'queue' | 'calendar' | 'patients'>('queue')
   const [searchQuery, setSearchQuery] = useState('')
@@ -36,13 +41,13 @@ export const ReceptionPage: React.FC = () => {
     address: '',
     bloodType: 'O+',
     emergencyContact: '',
-    assignedDoctor: 'Dr. Sarah Kouassi'
+    assignedDoctor: ''
   })
 
   // Appointment form
   const [newApp, setNewApp] = useState({
     patientId: '',
-    doctorName: 'Dr. Sarah Kouassi',
+    doctorName: '',
     date: new Date().toISOString().split('T')[0],
     time: '10:00',
     department: 'Médecine Générale',
@@ -69,7 +74,7 @@ export const ReceptionPage: React.FC = () => {
       address: '',
       bloodType: 'O+',
       emergencyContact: '',
-      assignedDoctor: 'Dr. Sarah Kouassi'
+      assignedDoctor: ''
     })
     showNotification(`Patient ${created.name} enregistré avec le code ${created.patientCode}!`, {
       title: 'Enregistrement Patient',
@@ -464,6 +469,22 @@ export const ReceptionPage: React.FC = () => {
                 />
               </div>
 
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Médecin Référent / Affecté (Optionnel)</label>
+                <select
+                  value={newPatient.assignedDoctor}
+                  onChange={(e) => setNewPatient({ ...newPatient, assignedDoctor: e.target.value })}
+                  className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
+                >
+                  <option value="">Aucun (File générale)</option>
+                  {doctorList.map((doc) => (
+                    <option key={doc.id} value={doc.name}>
+                      {doc.name} {doc.department ? `(${doc.department})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-3">
                 <button
                   type="button"
@@ -503,6 +524,22 @@ export const ReceptionPage: React.FC = () => {
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} ({p.patientCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Médecin</label>
+                <select
+                  value={newApp.doctorName}
+                  onChange={(e) => setNewApp({ ...newApp, doctorName: e.target.value })}
+                  className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
+                >
+                  <option value="">-- Sélectionner un médecin --</option>
+                  {doctorList.map((doc) => (
+                    <option key={doc.id} value={doc.name}>
+                      {doc.name} {doc.department ? `(${doc.department})` : ''}
                     </option>
                   ))}
                 </select>

@@ -66,7 +66,9 @@ export const MedicalPage: React.FC = () => {
   const doctorList = useMemo(() => {
     const docs = new Set<string>()
     patients.forEach((p) => {
-      if (p.assignedDoctor) docs.add(p.assignedDoctor)
+      if (p.assignedDoctor && p.assignedDoctor.trim() !== '' && p.assignedDoctor !== 'Non assigné') {
+        docs.add(p.assignedDoctor)
+      }
     })
     if (currentUser?.role === 'consultation' && currentUser.name) {
       docs.add(currentUser.name)
@@ -84,7 +86,7 @@ export const MedicalPage: React.FC = () => {
       if (!matchesSearch) return false
 
       if (selectedDoctorFilter !== 'all') {
-        const doc = p.assignedDoctor || 'Non assigné'
+        const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : 'Sans médecin affecté (File générale)'
         return doc === selectedDoctorFilter
       }
 
@@ -96,7 +98,7 @@ export const MedicalPage: React.FC = () => {
   const groupedPatients = useMemo(() => {
     const groups: Record<string, Patient[]> = {}
     filteredPatients.forEach((p) => {
-      const doc = p.assignedDoctor || 'Non assigné'
+      const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : 'Sans médecin affecté (File générale)'
       if (!groups[doc]) {
         groups[doc] = []
       }
@@ -216,7 +218,7 @@ export const MedicalPage: React.FC = () => {
                   {doc}
                 </option>
               ))}
-              <option value="Non assigné">Non assignés</option>
+              <option value="Sans médecin affecté (File générale)">Sans médecin affecté</option>
             </select>
           </div>
         </div>
@@ -674,7 +676,7 @@ export const MedicalPage: React.FC = () => {
       {isConsultationModalOpen && activePatient && (
         <ConsultationFormModal
           patient={activePatient}
-          doctorName={currentUser?.name || 'Dr. Sarah Kouassi'}
+          doctorName={currentUser?.name || activePatient?.assignedDoctor || 'Médecin de garde'}
           onClose={() => setIsConsultationModalOpen(false)}
           onSave={(consultData) => {
             addConsultation({

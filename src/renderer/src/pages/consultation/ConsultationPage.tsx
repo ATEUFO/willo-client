@@ -18,20 +18,21 @@ export const ConsultationPage: React.FC = () => {
     patients,
     vitals,
     labRequests,
+    currentUser,
     addConsultation,
     showNotification
   } = useHospitalStore()
 
   // Selected Patient
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(patients[2] || patients[0] || null)
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(patients[0] || null)
 
   useEffect(() => {
     if (!selectedPatient && patients.length > 0) {
-      setSelectedPatient(patients[2] || patients[0])
+      setSelectedPatient(patients[0])
     }
   }, [patients, selectedPatient])
 
-  const activePatient = selectedPatient || patients[2] || patients[0] || null
+  const activePatient = selectedPatient || patients[0] || null
 
   const [activeTab360, setActiveTab360] = useState<'history' | 'vitals' | 'prescriptions' | 'labs'>('vitals')
 
@@ -85,7 +86,7 @@ export const ConsultationPage: React.FC = () => {
     addConsultation({
       patientId: activePatient.id,
       patientName: activePatient.name,
-      doctorName: 'Dr. Sarah Kouassi',
+      doctorName: currentUser?.name || activePatient.assignedDoctor || 'Médecin de garde',
       chiefComplaint,
       clinicalNotes,
       diagnoses,
