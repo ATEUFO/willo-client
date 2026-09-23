@@ -19,7 +19,8 @@ export const NursingPage: React.FC = () => {
     vitals,
     careTasks,
     addVitals,
-    toggleCareTaskStatus
+    toggleCareTaskStatus,
+    showNotification
   } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'worklist' | 'vitals_history' | 'care_plan'>('worklist')
@@ -57,7 +58,10 @@ export const NursingPage: React.FC = () => {
       nurseNotes
     })
 
-    alert(`Constantes enregistrées pour ${selectedPatient.name}. Statut mis à jour!`)
+    showNotification(`Constantes enregistrées pour ${selectedPatient.name}. Statut mis à jour!`, {
+      title: 'Prise de Constantes',
+      type: 'success'
+    })
     setNurseNotes('')
   }
 

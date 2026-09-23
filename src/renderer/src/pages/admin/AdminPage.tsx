@@ -23,7 +23,8 @@ export const AdminPage: React.FC = () => {
     hospitalSettings,
     triggerBackup,
     addUser,
-    updateUserStatus
+    updateUserStatus,
+    showNotification
   } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'supervision' | 'users' | 'settings' | 'backups'>('supervision')
@@ -338,7 +339,7 @@ export const AdminPage: React.FC = () => {
                     </td>
                     <td className="p-3 text-right space-x-2">
                       <button
-                        onClick={() => alert(`Mot de passe réinitialisé pour ${usr.name}`)}
+                        onClick={() => showNotification(`Mot de passe réinitialisé pour ${usr.name}`, { title: 'Réinitialisation Mot de passe', type: 'info' })}
                         className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-amber-700 text-[11px] inline-flex items-center gap-1 border border-slate-200 font-medium"
                         title="Réinitialiser le mot de passe"
                       >
@@ -430,7 +431,7 @@ export const AdminPage: React.FC = () => {
               </div>
 
               <button
-                onClick={() => alert('Paramètres sauvegardés avec succès!')}
+                onClick={() => showNotification('Paramètres sauvegardés avec succès!', { title: 'Configuration', type: 'success' })}
                 className="w-full bg-medical-primary hover:bg-medical-hover text-white font-semibold py-2.5 rounded-xl transition-all shadow-sm"
               >
                 Enregistrer les Modifications
@@ -535,13 +536,13 @@ export const AdminPage: React.FC = () => {
                               if (window.api?.backups?.download) {
                                 const res = await window.api.backups.download(b.id)
                                 if (res && res.success) {
-                                  alert(`Fichier de sauvegarde téléchargé avec succès sous:\n${res.filePath}`)
+                                  showNotification(`Fichier de sauvegarde téléchargé avec succès sous:\n${res.filePath}`, { title: 'Téléchargement Dump', type: 'success' })
                                 }
                               } else {
-                                alert(`Téléchargement de ${b.filename} simulé.`)
+                                showNotification(`Téléchargement de ${b.filename} simulé.`, { title: 'Téléchargement Dump', type: 'info' })
                               }
                             } catch (err) {
-                              alert(`Erreur lors du téléchargement: ${err instanceof Error ? err.message : String(err)}`)
+                              showNotification(`Erreur lors du téléchargement: ${err instanceof Error ? err.message : String(err)}`, { title: 'Erreur Téléchargement', type: 'error' })
                             }
                           }}
                           className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-emerald-700 rounded-lg text-[11px] inline-flex items-center gap-1 border border-slate-200 font-medium cursor-pointer"

@@ -18,7 +18,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess }) => {
-  const { login } = useHospitalStore()
+  const { login, showNotification } = useHospitalStore()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -158,7 +158,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
 
               <button
                 type="button"
-                onClick={() => alert("Veuillez contacter l'administrateur de l'hôpital pour réinitialiser votre mot de passe.")}
+                onClick={() => showNotification("Veuillez contacter l'administrateur de l'hôpital pour réinitialiser votre mot de passe.", { title: 'Mot de passe oublié', type: 'info' })}
                 className="text-medical-primary hover:underline font-semibold"
               >
                 Mot de passe oublié ?

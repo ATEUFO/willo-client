@@ -14,12 +14,13 @@ import { useHospitalStore, Invoice } from '../store/hospitalStore'
 import { CreateInvoiceModal } from './components/CreateInvoiceModal'
 
 export const BillingPage: React.FC = () => {
-  const { invoices, dailyClosure: storeDailyClosure, payInvoice, closeDailyRegister, patients, addInvoice } = useHospitalStore()
+  const { invoices, dailyClosure: storeDailyClosure, payInvoice, closeDailyRegister, patients, addInvoice, showNotification } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'pos' | 'invoices' | 'closure'>('pos')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(invoices[0] || null)
   const [paymentMethod, setPaymentMethod] = useState<'Espèces' | 'Carte Bancaire' | 'Mobile Money'>('Espèces')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     if (!selectedInvoice && invoices.length > 0) {
@@ -67,7 +68,10 @@ export const BillingPage: React.FC = () => {
   const handleProcessPayment = () => {
     if (!activeInvoice) return
     payInvoice(activeInvoice.id, paymentMethod)
-    alert(`Paiement de ${activeInvoice.patientShare} F CFA reçu par ${paymentMethod}. Facture clôturée!`)
+    showNotification(`Paiement de ${activeInvoice.patientShare} F CFA reçu par ${paymentMethod}. Facture clôturée!`, {
+      title: 'Paiement Enregistré',
+      type: 'success'
+    })
   }
 
   const handlePrintReceipt = () => {
@@ -279,10 +283,25 @@ export const BillingPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 2: Paid Invoices History */}
+      {/* Tab 2: All / Paid Invoices History */}
       {activeTab === 'invoices' && (
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
-          <h3 className="font-bold text-medical-dark text-base">Historique des Reçus Payés</h3>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-medical-border pb-3">
+            <div>
+              <h3 className="font-bold text-medical-dark text-base">Historique & Registre Général des Factures ({invoices.length})</h3>
+              <p className="text-xs text-slate-500">Consulter, filtrer et réimprimer l'intégralité des factures de la base de données</p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                placeholder="Rechercher patient ou code FAC-..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-white border border-medical-border rounded-xl px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
+              />
+            </div>
+          </div>
 
           <div className="overflow-x-auto rounded-xl border border-medical-border">
             <table className="w-full text-left text-xs">
@@ -290,33 +309,64 @@ export const BillingPage: React.FC = () => {
                 <tr>
                   <th className="p-3">N° Facture</th>
                   <th className="p-3">Patient</th>
+                  <th className="p-3">Actes Facturés</th>
                   <th className="p-3">Total Brut</th>
                   <th className="p-3">Part Mutuelle</th>
-                  <th className="p-3">Payé par Patient</th>
-                  <th className="p-3">Mode de Règlement</th>
-                  <th className="p-3">Heure Paiement</th>
+                  <th className="p-3">A Payer Patient</th>
+                  <th className="p-3">Statut</th>
+                  <th className="p-3">Date / Règlement</th>
+                  <th className="p-3 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-medical-border text-slate-700 font-mono">
-                {paidInvoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-3 text-medical-dark font-bold">{inv.invoiceCode}</td>
-                    <td className="p-3 font-semibold text-slate-900 font-sans">{inv.patientName}</td>
-                    <td className="p-3 text-slate-500">{inv.subtotal} F CFA</td>
-                    <td className="p-3 text-emerald-800 font-semibold">{inv.insuranceAmount} F CFA</td>
-                    <td className="p-3 font-bold text-slate-900">{inv.patientShare} F CFA</td>
-                    <td className="p-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-medical-subtle text-emerald-800 border border-emerald-200 text-[10px] font-semibold">
-                        {inv.paymentMethod}
-                      </span>
-                    </td>
-                    <td className="p-3 text-slate-500">{inv.paidAt}</td>
-                  </tr>
-                ))}
-                {paidInvoices.length === 0 && (
+                {invoices
+                  .filter((inv) => {
+                    if (!searchQuery.trim()) return true
+                    const q = searchQuery.toLowerCase().trim()
+                    return (
+                      inv.patientName.toLowerCase().includes(q) ||
+                      inv.invoiceCode.toLowerCase().includes(q) ||
+                      inv.patientId.toLowerCase().includes(q)
+                    )
+                  })
+                  .map((inv) => (
+                    <tr key={inv.id} className="hover:bg-slate-50/80 transition-colors cursor-pointer" onClick={() => { setSelectedInvoice(inv); setActiveTab('pos') }}>
+                      <td className="p-3 text-medical-dark font-bold">{inv.invoiceCode}</td>
+                      <td className="p-3 font-semibold text-slate-900 font-sans">{inv.patientName}</td>
+                      <td className="p-3 font-sans text-slate-500">{inv.items.length} acte(s)</td>
+                      <td className="p-3 text-slate-500">{inv.subtotal} F CFA</td>
+                      <td className="p-3 text-emerald-800 font-semibold">{inv.insuranceAmount} F CFA</td>
+                      <td className="p-3 font-bold text-slate-900">{inv.patientShare} F CFA</td>
+                      <td className="p-3 font-sans">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            inv.status === 'Paid'
+                              ? 'bg-medical-subtle text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-800 border border-amber-200'
+                          }`}
+                        >
+                          {inv.status === 'Paid' ? 'Payé' : 'En Attente'}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-500 font-sans text-[11px]">{inv.paidAt || inv.date}</td>
+                      <td className="p-3 text-right font-sans">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedInvoice(inv)
+                            setActiveTab('pos')
+                          }}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-bold text-[10px] transition-colors"
+                        >
+                          Afficher Reçu
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                {invoices.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-slate-400 font-sans">
-                      Aucun reçu payé enregistré pour le moment.
+                    <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
+                      Aucune facture enregistrée dans la base de données.
                     </td>
                   </tr>
                 )}

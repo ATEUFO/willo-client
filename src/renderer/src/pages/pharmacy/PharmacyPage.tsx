@@ -17,7 +17,8 @@ export const PharmacyPage: React.FC = () => {
     purchaseOrders,
     dispensePrescription,
     addStockItem,
-    createPurchaseOrder
+    createPurchaseOrder,
+    showNotification
   } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'dispense' | 'inventory' | 'orders'>('dispense')
@@ -57,7 +58,10 @@ export const PharmacyPage: React.FC = () => {
 
   const handleDispense = (id: string) => {
     dispensePrescription(id)
-    alert('Délivrance de l\'ordonnance validée et stock mis à jour!')
+    showNotification("Délivrance de l'ordonnance validée et stock mis à jour!", {
+      title: 'Délivrance Validée',
+      type: 'success'
+    })
   }
 
   const handleAddStockSubmit = (e: React.FormEvent) => {
@@ -75,7 +79,10 @@ export const PharmacyPage: React.FC = () => {
       expiryDate: '',
       batchNumber: ''
     })
-    alert('Nouveau produit ajouté à l\'inventaire de la pharmacie!')
+    showNotification("Nouveau produit ajouté à l'inventaire de la pharmacie!", {
+      title: 'Stock mis à jour',
+      type: 'success'
+    })
   }
 
   const handleCreatePOSubmit = (e: React.FormEvent) => {
@@ -86,7 +93,10 @@ export const PharmacyPage: React.FC = () => {
       totalCost: newPO.estimatedCost
     })
     setShowAddPOModal(false)
-    alert('Bon de commande généré et transmis!')
+    showNotification('Bon de commande généré et transmis!', {
+      title: 'Bon de Commande',
+      type: 'success'
+    })
   }
 
   return (

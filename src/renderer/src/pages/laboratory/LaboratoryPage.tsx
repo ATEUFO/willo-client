@@ -13,7 +13,7 @@ import { ResultsEntryForm } from './components/ResultsEntryForm'
 import { LaboratoryKanban } from './components/LaboratoryKanban'
 
 export const LaboratoryPage: React.FC = () => {
-  const { labRequests, updateLabRequestStatus, currentUser } = useHospitalStore()
+  const { labRequests, updateLabRequestStatus, currentUser, showNotification } = useHospitalStore()
 
   // Navigation & Search Views
   const [activeView, setActiveView] = useState<'kanban' | 'results_entry'>('kanban')
@@ -67,7 +67,10 @@ export const LaboratoryPage: React.FC = () => {
       results: dataToSave
     })
 
-    alert(`Brouillon enregistré localement pour ${selectedRequest.patientName}.`)
+    showNotification(`Brouillon enregistré localement pour ${selectedRequest.patientName}.`, {
+      title: 'Brouillon Enregistré',
+      type: 'info'
+    })
   }
 
   // Final validation and transmission to the doctor (Status: 'Completed')
@@ -87,7 +90,10 @@ export const LaboratoryPage: React.FC = () => {
 
     updateLabRequestStatus(selectedRequest.id, 'Completed', dataToSave)
 
-    alert(`Bilan d'analyses validé avec succès. Transmis au médecin traitant!`)
+    showNotification(`Bilan d'analyses validé avec succès. Transmis au médecin traitant!`, {
+      title: 'Bilan Validé',
+      type: 'success'
+    })
     setActiveView('kanban')
     setSelectedRequest(null)
   }
@@ -108,7 +114,10 @@ export const LaboratoryPage: React.FC = () => {
       setActiveView('results_entry')
       setBarcodeInput('')
     } else {
-      alert(`Aucun échantillon ne correspond au code : "${barcodeInput}"`)
+      showNotification(`Aucun échantillon ne correspond au code : "${barcodeInput}"`, {
+        title: 'Recherche Échantillon',
+        type: 'warning'
+      })
     }
   }
 

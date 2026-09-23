@@ -32,7 +32,7 @@ interface OutboxSyncModalProps {
 }
 
 export const OutboxSyncModal: React.FC<OutboxSyncModalProps> = ({ isOpen, onClose }) => {
-  const { isOnline, loadAllData } = useHospitalStore()
+  const { isOnline, loadAllData, showNotification } = useHospitalStore()
   const [mutations, setMutations] = useState<OutboxMutation[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [selectedPayload, setSelectedPayload] = useState<{ title: string; json: any } | null>(null)
@@ -68,12 +68,11 @@ export const OutboxSyncModal: React.FC<OutboxSyncModalProps> = ({ isOpen, onClos
         loadAllData()
       }
     } catch (err) {
-      alert(`Erreur lors de la tentative : ${err instanceof Error ? err.message : String(err)}`)
+      showNotification(`Erreur lors de la tentative : ${err instanceof Error ? err.message : String(err)}`, { title: 'Erreur Sync', type: 'error' })
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Voulez-vous vraiment supprimer cet enregistrement du journal de synchronisation local ?')) return
     try {
       if (window.api && window.api.outbox) {
         await window.api.outbox.deleteMutation(id)
@@ -81,7 +80,7 @@ export const OutboxSyncModal: React.FC<OutboxSyncModalProps> = ({ isOpen, onClos
         loadAllData()
       }
     } catch (err) {
-      alert(`Erreur lors de la suppression : ${err instanceof Error ? err.message : String(err)}`)
+      showNotification(`Erreur lors de la suppression : ${err instanceof Error ? err.message : String(err)}`, { title: 'Erreur Suppression', type: 'error' })
     }
   }
 
@@ -93,7 +92,7 @@ export const OutboxSyncModal: React.FC<OutboxSyncModalProps> = ({ isOpen, onClos
         loadAllData()
       }
     } catch (err) {
-      alert(`Erreur lors de la résolution du conflit : ${err instanceof Error ? err.message : String(err)}`)
+      showNotification(`Erreur lors de la résolution du conflit : ${err instanceof Error ? err.message : String(err)}`, { title: 'Erreur Conflit', type: 'error' })
     }
   }
 

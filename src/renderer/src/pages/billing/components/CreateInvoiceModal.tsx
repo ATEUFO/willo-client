@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { X, Plus, Trash2, CreditCard } from 'lucide-react'
-import { Patient, Invoice, InvoiceItem } from '../../store/hospitalStore'
+import { Patient, Invoice, InvoiceItem, useHospitalStore } from '../../store/hospitalStore'
 
 interface CreateInvoiceModalProps {
   onClose: () => void
@@ -13,6 +13,7 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
   onSave,
   patients
 }) => {
+  const { showNotification } = useHospitalStore()
   const [selectedPatientId, setSelectedPatientId] = useState<string>('')
   const [insuranceName, setInsuranceName] = useState<string>('Sans Mutuelle')
   const [insuranceCoveragePercent, setInsuranceCoveragePercent] = useState<number>(0)
@@ -69,11 +70,11 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!activePatient) {
-      alert('Veuillez sélectionner un patient.')
+      showNotification('Veuillez sélectionner un patient.', { title: 'Champ requis', type: 'warning' })
       return
     }
     if (items.length === 0) {
-      alert('Veuillez ajouter au moins un acte facturable.')
+      showNotification('Veuillez ajouter au moins un acte facturable.', { title: 'Champ requis', type: 'warning' })
       return
     }
 

@@ -34,7 +34,8 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
     isOnline,
     lastSyncedAt,
     pendingCacheSync,
-    loadAllData
+    loadAllData,
+    showNotification
   } = useHospitalStore()
 
   const [activeTab, setActiveTab] = useState<'status' | 'manual' | 'bonjour' | 'subnet'>('status')
@@ -147,7 +148,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
         }, 1000)
       }
     } catch (err) {
-      alert(`Erreur lors de la sauvegarde : ${err instanceof Error ? err.message : String(err)}`)
+      showNotification(`Erreur lors de la sauvegarde : ${err instanceof Error ? err.message : String(err)}`, { title: 'Erreur Réseau', type: 'error' })
     }
   }
 

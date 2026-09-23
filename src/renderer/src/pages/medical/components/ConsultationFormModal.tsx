@@ -7,7 +7,7 @@ import {
   Trash2,
   X
 } from 'lucide-react'
-import { Patient } from '../../store/hospitalStore'
+import { Patient, useHospitalStore } from '../../store/hospitalStore'
 
 interface ConsultationFormModalProps {
   patient: Patient
@@ -29,6 +29,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
   onClose,
   onSave
 }) => {
+  const { showNotification } = useHospitalStore()
   // Form State
   const [chiefComplaint, setChiefComplaint] = useState('')
   const [clinicalNotes, setClinicalNotes] = useState('')
@@ -95,7 +96,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!chiefComplaint.trim()) {
-      alert('Veuillez renseigner le motif principal de consultation.')
+      showNotification('Veuillez renseigner le motif principal de consultation.', { title: 'Champ requis', type: 'warning' })
       return
     }
     onSave({

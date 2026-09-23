@@ -20,6 +20,8 @@ import { hasModuleAccess, getAllowedModules } from './config/permissions'
 import { ShieldAlert } from 'lucide-react'
 import willoLogo from './assets/willo_logo1.png'
 
+import { NotificationModal } from './components/modals/NotificationModal'
+
 function App(): React.JSX.Element {
   const isSplash = window.location.search.includes('splash=true') || window.location.hash.includes('splash=true')
 
@@ -157,6 +159,7 @@ function App(): React.JSX.Element {
       )}
 
       {showSettingsModal && <SettingsModal />}
+      <NotificationModal />
     </div>
   )
 }

@@ -18,7 +18,8 @@ export const ReceptionPage: React.FC = () => {
     addPatient,
     updatePatientStatus,
     addAppointment,
-    cancelAppointment
+    cancelAppointment,
+    showNotification
   } = useHospitalStore()
 
   const [activeSubTab, setActiveSubTab] = useState<'queue' | 'calendar' | 'patients'>('queue')
@@ -70,7 +71,10 @@ export const ReceptionPage: React.FC = () => {
       emergencyContact: '',
       assignedDoctor: 'Dr. Sarah Kouassi'
     })
-    alert(`Patient ${created.name} enregistré avec le code ${created.patientCode}!`)
+    showNotification(`Patient ${created.name} enregistré avec le code ${created.patientCode}!`, {
+      title: 'Enregistrement Patient',
+      type: 'success'
+    })
   }
 
   const handleBookAppointment = (e: React.FormEvent) => {
@@ -87,7 +91,10 @@ export const ReceptionPage: React.FC = () => {
       type: newApp.type
     })
     setShowAddAppModal(false)
-    alert(`Rendez-vous confirmé pour ${selectedPat.name}!`)
+    showNotification(`Rendez-vous confirmé pour ${selectedPat.name}!`, {
+      title: 'Prise de Rendez-vous',
+      type: 'success'
+    })
   }
 
   return (

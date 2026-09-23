@@ -18,7 +18,8 @@ export const ConsultationPage: React.FC = () => {
     patients,
     vitals,
     labRequests,
-    addConsultation
+    addConsultation,
+    showNotification
   } = useHospitalStore()
 
   // Selected Patient
@@ -92,7 +93,10 @@ export const ConsultationPage: React.FC = () => {
       labOrders
     })
 
-    alert(`Consultation enregistrée avec succès pour ${activePatient.name}!`)
+    showNotification(`Consultation enregistrée avec succès pour ${activePatient.name}!`, {
+      title: 'Consultation Enregistrée',
+      type: 'success'
+    })
   }
 
   // Filter vitals for patient
@@ -414,7 +418,7 @@ export const ConsultationPage: React.FC = () => {
               />
               <button
                 type="button"
-                onClick={() => alert('Analyse des symptômes actualisée par l\'IA!')}
+                onClick={() => showNotification("Analyse des symptômes actualisée par l'IA!", { title: 'Diagnostic IA', type: 'info' })}
                 className="absolute right-2 bottom-2 bg-medical-primary hover:bg-medical-hover text-white px-2.5 py-1 rounded-lg text-[10px] font-semibold flex items-center gap-1 shadow-xs"
               >
                 <Send className="w-3 h-3" /> Analyser

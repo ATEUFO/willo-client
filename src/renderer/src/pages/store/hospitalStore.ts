@@ -187,6 +187,14 @@ export interface Invoice {
   paidAt?: string
 }
 
+export interface NotificationModalConfig {
+  isOpen: boolean
+  title?: string
+  message: string
+  type: 'success' | 'error' | 'info' | 'warning'
+  confirmText?: string
+}
+
 interface HospitalState {
   // Auth & Session
   currentUser: UserAccount | null
@@ -200,6 +208,7 @@ interface HospitalState {
   pendingCacheSync: number
   showConnectionsModal: boolean
   showSettingsModal: boolean
+  notificationModal: NotificationModalConfig | null
 
   // Data State loaded from better-sqlite3 DB
   users: UserAccount[]
@@ -245,6 +254,8 @@ interface HospitalState {
   toggleOnline: () => void
   setShowConnectionsModal: (show: boolean) => void
   setShowSettingsModal: (show: boolean) => void
+  showNotification: (message: string, options?: { title?: string; type?: 'success' | 'error' | 'info' | 'warning'; confirmText?: string }) => void
+  closeNotification: () => void
   triggerBackup: () => Promise<void>
   addUser: (user: Omit<UserAccount, 'id' | 'lastLogin'> & { password?: string }) => Promise<void>
   updateUserStatus: (id: string, status: 'Active' | 'Inactive') => Promise<void>
@@ -274,6 +285,7 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   pendingCacheSync: 0,
   showConnectionsModal: false,
   showSettingsModal: false,
+  notificationModal: null,
 
   users: [],
   systemLogs: [],
@@ -453,6 +465,8 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
         }
       }
 
+      const activePatientsCount = (patientsData || []).filter((p: any) => p.status !== 'Completed').length
+
       set({
         users: usersData || [],
         patients: patientsData || [],
@@ -467,6 +481,10 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
         invoices: invoicesData || [],
         systemLogs: logsData || [],
         backups: backupsData || [],
+        hospitalSettings: {
+          ...get().hospitalSettings,
+          occupiedBeds: activePatientsCount
+        },
         isOnline: isOnlineState,
         lastSyncedAt: syncTime,
         pendingCacheSync: pendingCount
@@ -481,6 +499,20 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   setShowConnectionsModal: (show) => set({ showConnectionsModal: show }),
 
   setShowSettingsModal: (show) => set({ showSettingsModal: show }),
+
+  showNotification: (message, options) => {
+    set({
+      notificationModal: {
+        isOpen: true,
+        message,
+        title: options?.title,
+        type: options?.type || 'info',
+        confirmText: options?.confirmText
+      }
+    })
+  },
+
+  closeNotification: () => set({ notificationModal: null }),
 
   toggleOnline: async () => {
     const nextOnline = !get().isOnline
@@ -517,9 +549,10 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
 
   addPatient: async (patientData) => {
     const count = get().patients.length + 1
+    const nowTs = Date.now()
     const newPat: Patient = {
       ...patientData,
-      id: `pat-${Date.now()}`,
+      id: `pat-${nowTs}`,
       patientCode: `PAT-2026-${String(count).padStart(3, '0')}`,
       status: 'Waiting',
       queueNumber: `A-${String(count).padStart(3, '0')}`,
@@ -527,6 +560,32 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
     }
     if (window.api && window.api.patients) {
       await window.api.patients.create(newPat)
+
+      // Create an admission ticket invoice for the Caisse
+      if (window.api.invoices) {
+        const ticketInvoice: Invoice = {
+          id: `inv-${nowTs}`,
+          invoiceCode: `FAC-2026-${String(Math.floor(1000 + Math.random() * 9000))}`,
+          patientId: newPat.id,
+          patientName: newPat.name,
+          date: new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 5),
+          items: [
+            {
+              description: "Frais d'ouverture de dossier & Ticket d'accueil",
+              category: 'Consultation',
+              amount: 5000
+            }
+          ],
+          subtotal: 5000,
+          insuranceName: 'Sans Mutuelle',
+          insuranceCoveragePercent: 0,
+          insuranceAmount: 0,
+          patientShare: 5000,
+          status: 'Unpaid'
+        }
+        await window.api.invoices.create(ticketInvoice)
+      }
+
       await get().loadAllData()
     }
     return newPat
@@ -581,16 +640,120 @@ export const useHospitalStore = create<HospitalState>((set, get) => ({
   },
 
   addConsultation: async (consData) => {
+    const nowTimestamp = Date.now()
     const newCons: ConsultationRecord = {
       ...consData,
-      id: `cons-${Date.now()}`,
+      id: `cons-${nowTimestamp}`,
       date: new Date().toLocaleString()
     }
     if (window.api && window.api.consultations) {
       await window.api.consultations.create(newCons)
-      if (window.api.patients) {
-        await window.api.patients.updateStatus(consData.patientId, 'Pharmacy Pending')
+
+      // 1. Create LabRequests if lab orders exist
+      if (consData.labOrders && consData.labOrders.length > 0 && window.api.lab) {
+        for (let i = 0; i < consData.labOrders.length; i++) {
+          const testName = consData.labOrders[i]
+          const labReq = {
+            id: `lab-${nowTimestamp}-${i}`,
+            requestCode: `LAB-2026-${String(Math.floor(100 + Math.random() * 900))}`,
+            patientId: consData.patientId,
+            patientName: consData.patientName,
+            testName,
+            category: 'Biochimie',
+            requestedBy: consData.doctorName,
+            dateRequested: new Date().toISOString().slice(0, 10),
+            status: 'To Do',
+            results: []
+          }
+          await window.api.lab.create(labReq)
+        }
       }
+
+      // 2. Create PrescriptionDispense entry if prescriptions exist
+      if (consData.prescriptions && consData.prescriptions.length > 0 && window.api.prescriptions) {
+        const prescItems = consData.prescriptions.map((p) => {
+          const matchingStock = get().inventory.find(
+            (inv) => inv.name.toLowerCase().includes(p.drugName.toLowerCase())
+          )
+          const unitPrice = matchingStock ? matchingStock.unitPrice : 3500
+          return {
+            drugName: p.drugName,
+            quantity: 1,
+            unitPrice
+          }
+        })
+        const totalPrescCost = prescItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+        const prescData = {
+          id: `presc-${nowTimestamp}`,
+          prescriptionCode: `ORD-2026-${String(Math.floor(100 + Math.random() * 900))}`,
+          patientId: consData.patientId,
+          patientName: consData.patientName,
+          doctorName: consData.doctorName,
+          items: JSON.stringify(prescItems),
+          totalAmount: totalPrescCost,
+          status: 'Pending'
+        }
+        await window.api.prescriptions.create(prescData)
+      }
+
+      // 3. Create an Invoice for Caisse containing consultation acts, lab orders, and pharmacy items
+      if (window.api.invoices) {
+        const invoiceItems: InvoiceItem[] = [
+          {
+            description: `Consultation Médicale (${consData.chiefComplaint})`,
+            category: 'Consultation',
+            amount: 15000
+          }
+        ]
+
+        if (consData.labOrders && consData.labOrders.length > 0) {
+          consData.labOrders.forEach((labTest) => {
+            invoiceItems.push({
+              description: `Analyse Labo: ${labTest}`,
+              category: 'Laboratoire',
+              amount: 7500
+            })
+          })
+        }
+
+        if (consData.prescriptions && consData.prescriptions.length > 0) {
+          consData.prescriptions.forEach((drug) => {
+            const matchingStock = get().inventory.find(
+              (inv) => inv.name.toLowerCase().includes(drug.drugName.toLowerCase())
+            )
+            const price = matchingStock ? matchingStock.unitPrice : 3500
+            invoiceItems.push({
+              description: `Médicament: ${drug.drugName}`,
+              category: 'Pharmacie',
+              amount: price
+            })
+          })
+        }
+
+        const subtotal = invoiceItems.reduce((sum, item) => sum + item.amount, 0)
+        const invoiceData: Invoice = {
+          id: `inv-${nowTimestamp}`,
+          invoiceCode: `FAC-2026-${String(Math.floor(1000 + Math.random() * 9000))}`,
+          patientId: consData.patientId,
+          patientName: consData.patientName,
+          date: new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 5),
+          items: invoiceItems,
+          subtotal,
+          insuranceName: 'Sans Mutuelle',
+          insuranceCoveragePercent: 0,
+          insuranceAmount: 0,
+          patientShare: subtotal,
+          status: 'Unpaid'
+        }
+        await window.api.invoices.create(invoiceData)
+      }
+
+      // Update patient status to reflect next step
+      const nextStatus = consData.labOrders && consData.labOrders.length > 0 ? 'Lab Pending' : 'Pharmacy Pending'
+      if (window.api.patients) {
+        await window.api.patients.updateStatus(consData.patientId, nextStatus)
+      }
+
       await get().loadAllData()
     }
   },
