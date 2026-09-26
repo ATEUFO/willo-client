@@ -72,7 +72,7 @@ Les exécutables générés se trouvent dans le dossier `dist/` ou `out/`.
 
 ## 👨‍💻 Développeur & Auteur
 
-Ce projet a été conçu et développé par **Arthur**.
+Ce projet a été conçu et développé par **TSOGMO ATEUFO Arthur**.
 
 ### 🔗 Liens & Réseaux Sociaux
 
