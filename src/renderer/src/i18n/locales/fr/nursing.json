@@ -1,0 +1,57 @@
+{
+  "title": "Espace Soins & Prise de Constantes",
+  "subtitle": "Saisie rapide des paramètres vitaux, alertes d'anomalie et plan d'administration des soins",
+  "tabs": {
+    "worklist": "Saisie Constantes ({{count}})",
+    "vitalsHistory": "Historique Relevés ({{count}})",
+    "carePlan": "Plan de Soins ({{count}})"
+  },
+  "worklist": {
+    "waitingTitle": "Patients en Attente ({{count}})",
+    "noPatients": "Aucun patient en attente de prise de constantes.",
+    "yearsOld": "{{age}} ans",
+    "selectPatientPrompt": "Sélectionnez un patient dans la liste de gauche",
+    "formTitle": "Prise de Constantes pour :",
+    "patientCode": "Code Patient : {{code}}",
+    "assignedDoctor": "Médecin : {{doctor}}",
+    "abnormalAlert": "Alerte Constantes Anormales !",
+    "normalAlert": "Constantes dans la Norme",
+    "tensionLabel": "Tension Artérielle (mmHg)",
+    "tensionRef": "Réf: 120/80",
+    "tempLabel": "Température (°C)",
+    "tempRef": "Réf: 36.5 - 37.5",
+    "pulseLabel": "Pouls (BPM)",
+    "pulseRef": "Réf: 60 - 100",
+    "weightLabel": "Poids Corporel (kg)",
+    "spO2Label": "Saturation SpO2 (%)",
+    "spO2Ref": "Réf: 95 - 100%",
+    "nurseNotesLabel": "Observations Infirmier(ère)",
+    "nurseNotesPlaceholder": "Signes cliniques observés, symptômes rapportés...",
+    "submitBtn": "Valider & Transmettre au Médecin",
+    "successNotification": "Constantes enregistrées pour {{name}}. Statut mis à jour!",
+    "notificationTitle": "Prise de Constantes"
+  },
+  "history": {
+    "title": "Historique des Prises de Constantes",
+    "columns": {
+      "timestamp": "Horodatage",
+      "patient": "Patient",
+      "tension": "Tension",
+      "temperature": "Température",
+      "pulse": "Pouls",
+      "weight": "Poids",
+      "spO2": "SpO2",
+      "visualDiagnostic": "Diagnostic Visuel",
+      "observations": "Observations"
+    },
+    "abnormalTag": "Anormal / Alerte",
+    "normalTag": "Normal"
+  },
+  "carePlan": {
+    "title": "Plan de Soins (Injections & Pansements)",
+    "subtitle": "Liste des actes médicaux prescrits à administrer aux patients",
+    "prescribedBy": "Prescrit par {{doctor}} • Prévu à {{time}}",
+    "administeredAt": "Administré à {{time}}",
+    "toAdminister": "À administrer"
+  }
+}

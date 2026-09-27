@@ -1,49 +1,133 @@
 {
   "title": "Médecin / Clinique",
-  "tabs": {
-    "patients": "Patients",
-    "vitals": "Constantes",
-    "consultations": "Consultations",
-    "careTasks": "Soins"
+  "directory": {
+    "title": "Répertoire Patients",
+    "gridTooltip": "Mode Mosaïque",
+    "listTooltip": "Mode Liste",
+    "searchPlaceholder": "Rechercher par nom ou code...",
+    "filterDoctorLabel": "Filtrer par médecin:",
+    "allDoctors": "Tous les médecins",
+    "noDoctor": "Sans médecin affecté",
+    "noPatients": "Aucun patient correspondant",
+    "yearsOld": "{{age}} ans",
+    "male": "Homme",
+    "female": "Femme"
   },
-  "vitals": {
-    "title": "Saisie des constantes",
-    "systolic": "Systolique (mmHg)",
-    "diastolic": "Diastolique (mmHg)",
-    "temperature": "Température (°C)",
-    "pulse": "Pouls (bpm)",
-    "weight": "Poids (kg)",
-    "spO2": "SpO2 (%)",
-    "abnormal": "Valeur anormale",
-    "nurseNotes": "Notes infirmier"
+  "ehr": {
+    "bloodType": "Groupe Sanguin: {{type}}",
+    "aiBtn": "Diagnostic IA",
+    "vitalsBtn": "Prendre Constantes",
+    "newConsultationBtn": "Nouvelle Consultation",
+    "noPatientSelectedTitle": "Dossier Médical Non Sélectionné",
+    "noPatientSelectedSub": "Veuillez sélectionner un patient dans la liste de gauche pour afficher son dossier complet, son historique de soins et ses consultations."
   },
-  "consultation": {
-    "title": "Consultation médicale",
-    "chiefComplaint": "Motif de consultation",
-    "clinicalNotes": "Notes cliniques",
-    "diagnoses": "Diagnostics",
-    "prescriptions": "Prescriptions",
-    "labOrders": "Examens demandés",
-    "drug": "Médicament",
-    "dosage": "Posologie",
-    "frequency": "Fréquence",
-    "duration": "Durée"
+  "vitalsSection": {
+    "title": "Paramètres Personnels & Constantes Vitales",
+    "lastRecorded": "Relevé du {{time}}",
+    "tension": "Tension",
+    "temp": "Température",
+    "pulse": "Pouls",
+    "spO2": "Saturation",
+    "weight": "Poids",
+    "nurseNotes": "Observations Cliniques de l'Infirmier(ère)",
+    "noVitalsRecorded": "Aucune constante n'a été saisie aujourd'hui pour ce patient.",
+    "addVitalsBtn": "Enregistrer les Constantes"
   },
-  "careTasks": {
-    "title": "Soins & Tâches",
-    "types": {
-      "injection": "Injection",
-      "pansement": "Pansement",
-      "medicament": "Médicament",
-      "perfusion": "Perfusion"
+  "historySection": {
+    "title": "Dossier Médical & Antécédents",
+    "allergiesTitle": "Allergies Signalées",
+    "allergiesDefault": "Pénicilline (réaction cutanée forte)",
+    "historyTitle": "Antécédents & Pathologies Chroniques",
+    "htn": "Hypertension artérielle essentielle (suivie depuis 2021)",
+    "cardio": "Pas d'antécédents chirurgicaux cardiaques",
+    "address": "Adresse du patient : {{address}}",
+    "contact": "Contact urgence : {{contact}}"
+  },
+  "labsSection": {
+    "title": "Analyses & Prescriptions de Laboratoire ({{count}})",
+    "validated": "Validé",
+    "pending": "En attente",
+    "noLabs": "Aucune analyse demandée pour le moment."
+  },
+  "consultationsSection": {
+    "title": "Historique des Consultations & Fiches Cliniques",
+    "newBtn": "Nouvelle",
+    "columns": {
+      "date": "Date",
+      "doctor": "Médecin",
+      "chiefComplaint": "Motif Principal",
+      "diagnosis": "Diagnostic (CIM-10)",
+      "details": "Fiche Clinique"
     },
-    "statuses": {
-      "pending": "En attente",
-      "administered": "Administré"
+    "detailsBtn": "Détails",
+    "noConsultations": "Aucune consultation n'a été enregistrée pour le moment."
+  },
+  "statuses": {
+    "waiting": "En attente",
+    "vitalsTaken": "Constantes Prises",
+    "inConsultation": "En Consultation",
+    "labPending": "Labo en cours",
+    "pharmacyPending": "Pharma en cours",
+    "completed": "Clôturé"
+  },
+  "vitalsModal": {
+    "title": "Saisie des Constantes Vitales",
+    "warningAbnormal": "Attention: Une ou plusieurs constantes sortent de la norme !",
+    "allNormal": "Toutes les constantes sont dans les plages de référence.",
+    "tensionLabel": "Tension (Sys / Dia)",
+    "tempLabel": "Température (°C)",
+    "pulseLabel": "Pouls (BPM)",
+    "spO2Label": "Saturation SpO2 (%)",
+    "weightLabel": "Poids (kg)",
+    "nurseNotesLabel": "Observations / Symptômes Observés",
+    "nurseNotesPlaceholder": "Ex: Patient conscient, céphalées signalées. Légère fatigue à la marche...",
+    "cancel": "Annuler",
+    "submit": "Enregistrer les Constantes"
+  },
+  "consultationModal": {
+    "title": "Saisie de la Consultation Clinique",
+    "sub": "Patient : {{patientName}} ({{code}}) • Médecin : {{doctorName}}",
+    "chiefComplaint": "Motif Principal de Consultation *",
+    "chiefComplaintPlaceholder": "Ex: Douleurs thoraciques, fièvre modérée...",
+    "diagnoses": "Diagnostics Retenus (CIM-10)",
+    "diagnosesPlaceholder": "Ex: I10 - Hypertension artérielle...",
+    "noDiagnoses": "Aucun diagnostic enregistré.",
+    "clinicalNotes": "Observations Cliniques & Signes Cardinaux (Examen Physique)",
+    "clinicalNotesPlaceholder": "Saisir l'examen clinique complet, auscultation, palpation abdominale, etc...",
+    "labOrders": "Demandes d'Analyses Biologiques",
+    "labOrdersPlaceholder": "Ex: NFS Complète, Glycémie, Créatinine...",
+    "requestLabBtn": "Demander",
+    "prescriptions": "Prescriptions Médicamenteuses",
+    "drugPlaceholder": "Médicament (Ex: Amlodipine 5mg)",
+    "dosagePlaceholder": "Posologie (Ex: 1 comprimé)",
+    "frequencyPlaceholder": "Fréquence (Ex: Matin / Soir)",
+    "durationPlaceholder": "Durée (Ex: 30 jours)",
+    "noPrescriptions": "Aucune prescription rédigée.",
+    "cancel": "Fermer sans enregistrer",
+    "submit": "Valider & Transmettre la Consultation",
+    "requiredWarning": "Veuillez renseigner le motif principal de consultation.",
+    "requiredTitle": "Champ requis"
+  },
+  "detailsModal": {
+    "title": "Dossier de Consultation Clinique",
+    "recordedDate": "Enregistré le : {{date}}",
+    "patient": "Patient",
+    "doctor": "Médecin Consultant",
+    "chiefComplaint": "Motif Principal de Consultation",
+    "diagnoses": "Diagnostics Retenus (CIM-10)",
+    "noDiagnoses": "Aucun diagnostic codifié.",
+    "clinicalNotes": "Observations Cliniques & Compte-Rendu",
+    "noNotes": "Aucun compte rendu détaillé rédigé.",
+    "labOrders": "Examens Biologiques Demandés",
+    "prescriptions": "Traitement & Prescription Rédigée",
+    "table": {
+      "drug": "Médicament",
+      "dose": "Dose",
+      "frequency": "Fréquence",
+      "duration": "Durée"
     },
-    "prescribed": "Prescrit par",
-    "scheduled": "Prévu à",
-    "bed": "Lit"
+    "noPrescriptions": "Aucune prescription associée.",
+    "close": "Fermer le Dossier"
   },
   "ai": {
     "title": "Diagnostic IA",
@@ -56,5 +140,43 @@
     "recommendations": "Recommandations",
     "riskLevel": "Niveau de risque",
     "history": "Historique des diagnostics"
+  },
+  "consultationPage": {
+    "title": "Espace Consultation Médicale",
+    "subtitle": "Dossier médical électronique 360°, prescription et module d'assistance IA",
+    "activePatientLabel": "Patient Actif :",
+    "noPatientAvailableTitle": "Aucun patient disponible",
+    "noPatientAvailableSub": "Veuillez d'abord ajouter ou sélectionner un patient.",
+    "tabs": {
+      "todayVitals": "Constantes du jour",
+      "history": "Historique",
+      "prescriptions": "Prescriptions",
+      "labs": "Analyses Labo ({{count}})"
+    },
+    "formTitle": "Saisie de Consultation & Prescriptions",
+    "addDiagnosisBtn": "Ajouter",
+    "prescriptionTitle": "Ordonnance Médicamenteuse (Auto-complétion Pharmacie)",
+    "prescribeBtn": "Prescrire",
+    "submitConsultation": "Clôturer la Consultation & Envoyer en Pharmacie/Caisse",
+    "aiTitle": "Assistant Médical IA",
+    "aiSubtitle": "Aide au diagnostic & interactions médicamenteuses",
+    "aiInputLabel": "Saisir ou analyser les symptômes",
+    "aiSuggestionsTitle": "Pistes Diagnostiques Suggérées",
+    "aiInteractionTitle": "Contrôle d'Interactions",
+    "saveSuccess": "Consultation enregistrée avec succès pour {{name}}!",
+    "saveSuccessTitle": "Consultation Enregistrée",
+    "aiNotification": "Analyse des symptômes actualisée par l'IA!"
+  },
+  "aiDiagnosticPage": {
+    "title": "Analyse & Aide au Diagnostic Clinique",
+    "subtitle": "Évaluation assistée des constantes et du profil médical du patient.",
+    "serverConnected": "Serveur Connecté",
+    "offlineMode": "Mode Autonome",
+    "clinicalEvaluation": "Évaluation Clinique",
+    "historyTab": "Historique ({{count}})",
+    "copyReport": "Copier le Rapport Textuel",
+    "reportCopied": "Rapport Copié !",
+    "archivedSuccess": "Enregistré au dossier patient !",
+    "archiveToRecord": "Archiver au Dossier Médical Patient"
   }
 }

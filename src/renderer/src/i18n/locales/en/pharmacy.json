@@ -1,7 +1,89 @@
 {
   "title": "Pharmacy",
-  "tabs": { "prescriptions": "Prescriptions", "stock": "Stock", "orders": "Orders" },
-  "prescriptions": { "title": "Prescriptions to dispense", "code": "Code", "patient": "Patient", "prescribedBy": "Prescribed by", "date": "Date", "items": "Items", "total": "Total", "status": "Status", "dispense": "Dispense", "statuses": { "pending": "Pending", "dispensed": "Dispensed" } },
-  "stock": { "title": "Drug Stock", "code": "Code", "name": "Name", "category": "Category", "quantity": "Quantity", "minQty": "Min qty", "unitPrice": "Unit price", "expiry": "Expiry", "batch": "Batch", "statuses": { "normal": "Normal", "expiringSoon": "Expiring Soon", "lowStock": "Low Stock", "outOfStock": "Out of Stock" } },
-  "orders": { "title": "Purchase Orders", "code": "Code", "supplier": "Supplier", "items": "Items", "total": "Total cost", "date": "Date", "status": "Status", "statuses": { "draft": "Draft", "sent": "Sent", "received": "Received" } }
+  "headerTitle": "Pharmacy & Medication Management",
+  "headerSub": "Fast dispensing counter, tracking expiries / stockouts, and purchase orders",
+  "tabs": {
+    "dispense": "Dispensing Counter",
+    "inventory": "Inventory Management ({{count}})",
+    "orders": "Purchase Orders ({{count}})"
+  },
+  "dispense": {
+    "title": "Prescription Dispensing Counter",
+    "sub": "Enter the prescription code to view the list of medications",
+    "searchPlaceholder": "Enter prescription code (e.g. ORD-2026-001)...",
+    "patient": "Patient: {{name}}",
+    "prescribedBy": "Prescription written by {{doctor}} on {{date}}",
+    "dispensed": "Dispensed",
+    "pending": "Awaiting Dispensing",
+    "table": {
+      "drug": "Prescribed Medication",
+      "qty": "Quantity to Dispense",
+      "unitPrice": "Unit Price",
+      "total": "Total F CFA",
+      "stockCheck": "Stock Check",
+      "inStock": "In Stock (Available OK)",
+      "boxes": "box(es)"
+    },
+    "totalAmount": "Total Medication Amount:",
+    "validateBtn": "Validate Dispensing",
+    "noPrescription": "No prescription awaiting dispensing. Enter a prescription code above."
+  },
+  "inventory": {
+    "title": "Inventory & Expiry Tracking",
+    "sub": "Imminent expiry filters and stockout alerts",
+    "filters": {
+      "all": "All",
+      "expiring": "Expiring <30d",
+      "low": "Low Stock",
+      "out": "Out of Stock"
+    },
+    "addProduct": "Add Product",
+    "columns": {
+      "code": "Code",
+      "name": "Medication Name",
+      "category": "Category",
+      "currentStock": "Current Stock",
+      "minThresh": "Min. Threshold",
+      "unitPrice": "Unit Price",
+      "batch": "Batch No.",
+      "expiry": "Expiry Date",
+      "status": "Status"
+    },
+    "statuses": {
+      "normal": "Normal",
+      "expiringSoon": "Expiring Soon",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out of Stock"
+    },
+    "empty": "No products registered in the pharmacy inventory."
+  },
+  "orders": {
+    "title": "Restock Purchase Orders",
+    "sub": "Generate purchase requisitions for the central pharmacy",
+    "generateBtn": "Generate Purchase Order",
+    "columns": {
+      "code": "PO No.",
+      "supplier": "Supplier",
+      "items": "Ordered Items",
+      "estimatedCost": "Estimated Cost",
+      "date": "Date",
+      "status": "Status"
+    },
+    "empty": "No purchase orders registered at this time."
+  },
+  "modal": {
+    "addStockTitle": "Add Product to Stock",
+    "codeLabel": "Product Code",
+    "unitPriceLabel": "Unit Price (F CFA)",
+    "nameLabel": "Medication / Item Name",
+    "initQtyLabel": "Initial Quantity",
+    "minQtyLabel": "Min Alert Threshold",
+    "addStockBtn": "Add to Stock",
+    "addPOTitle": "New Purchase Order",
+    "supplierLabel": "Supplier",
+    "drugNameLabel": "Medication to Order",
+    "qtyLabel": "Quantity",
+    "costLabel": "Estimated Cost (F CFA)",
+    "emitPOBtn": "Issue Order"
+  }
 }

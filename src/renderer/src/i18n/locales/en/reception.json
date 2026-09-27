@@ -1,16 +1,26 @@
 {
   "title": "Reception & Triage",
+  "headerTitle": "Reception, Triage & Queue",
+  "headerSub": "Fast data entry, appointment booking, and patient file registration",
+  "searchPlaceholder": "Search by name, phone or ID...",
+  "newPatient": "New Patient",
   "tabs": {
-    "queue": "Queue",
-    "register": "Register Patient",
-    "appointments": "Appointments"
+    "queue": "Real-Time Queue ({{count}})",
+    "calendar": "Schedule & Appointments ({{count}})",
+    "registry": "Patient Directory ({{count}})"
   },
   "queue": {
-    "title": "Today's queue",
+    "title": "General Reception Queue",
     "empty": "No patients waiting",
-    "queueNumber": "No.",
-    "arrival": "Arrival",
-    "doctor": "Assigned doctor",
+    "ticket": "TICKET",
+    "arrivedAt": "Arrived at {{time}}",
+    "sendToVitals": "Send to Vitals",
+    "cards": {
+      "waiting": "Patients in Waiting Room",
+      "vitals": "Vitals In Progress",
+      "consultation": "In Medical Consultation",
+      "count": "{{count}} Patients"
+    },
     "statuses": {
       "waiting": "Waiting",
       "vitalsTaken": "Vitals Taken",
@@ -20,33 +30,22 @@
       "completed": "Completed"
     }
   },
-  "register": {
-    "title": "Register new patient",
-    "editTitle": "Edit patient",
-    "fullName": "Full name",
-    "age": "Age",
-    "gender": "Gender",
-    "male": "Male",
-    "female": "Female",
-    "phone": "Phone",
-    "address": "Address",
-    "bloodType": "Blood type",
-    "emergencyContact": "Emergency contact",
-    "assignedDoctor": "Assigned doctor",
-    "submit": "Register",
-    "success": "Patient registered successfully"
-  },
   "appointments": {
-    "title": "Appointments",
-    "schedule": "Schedule appointment",
+    "title": "Interactive Appointment Schedule",
+    "sub": "Booking, modifying, and cancelling scheduled consultations",
+    "book": "Schedule Appointment",
+    "modalTitle": "Schedule Medical Appointment",
+    "confirmBook": "Confirm Appointment",
+    "selectPatient": "-- Select a patient --",
+    "selectDoctor": "-- Select a doctor --",
     "columns": {
       "patient": "Patient",
       "doctor": "Doctor",
-      "date": "Date",
-      "time": "Time",
       "department": "Department",
-      "type": "Type",
-      "status": "Status"
+      "dateTime": "Date & Time",
+      "type": "Reason / Type",
+      "status": "Status",
+      "actions": "Actions"
     },
     "types": {
       "consultation": "Consultation",
@@ -60,5 +59,19 @@
       "completed": "Completed",
       "cancelled": "Cancelled"
     }
+  },
+  "registry": {
+    "title": "Patient File Directory",
+    "ageGender": "Age / Gender",
+    "years": "yrs"
+  },
+  "modal": {
+    "createTitle": "Quick Patient File Creation",
+    "namePlaceholder": "E.g. John Doe",
+    "phonePlaceholder": "+221 77 000 00 00",
+    "addressPlaceholder": "Dakar, Sacre-Coeur",
+    "emergencyPlaceholder": "Relative's name and phone number",
+    "noDoctor": "None (General Queue)",
+    "submitAdd": "Register & Add to Queue"
   }
 }

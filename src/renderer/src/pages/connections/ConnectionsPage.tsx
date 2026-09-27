@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Wifi,
   WifiOff,
@@ -30,6 +31,8 @@ interface ConnectionsPageProps {
 }
 
 export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClose }) => {
+  const { t } = useTranslation('connections')
+  const { t: tc } = useTranslation('common')
   const {
     isOnline,
     lastSyncedAt,
@@ -218,7 +221,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               <button
                 onClick={onBack}
                 className="p-2 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 rounded-xl transition-all cursor-pointer"
-                title="Retour à l'authentification"
+                title={tc('actions.back')}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -226,10 +229,10 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
             <div>
               <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <Network className="w-5 h-5 text-medical-primary" />
-                Configuration Réseau & Connexions
+                {t('header')}
               </h1>
               <p className="text-xs text-slate-500 font-medium">
-                Gérer la communication locale avec Willo Server
+                {t('headerSub')}
               </p>
             </div>
           </div>
@@ -256,7 +259,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               }`}
             >
               <Activity className="w-4 h-4 shrink-0" />
-              Statut & Diagnostic
+              {t('tabs.status')}
             </button>
 
             <button
@@ -268,7 +271,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               }`}
             >
               <Save className="w-4 h-4 shrink-0" />
-              Configuration Manuelle
+              {t('tabs.manual')}
             </button>
 
             <button
@@ -283,7 +286,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               }`}
             >
               <Wifi className="w-4 h-4 shrink-0" />
-              Recherche Automatique
+              {t('tabs.bonjour')}
             </button>
 
             <button
@@ -295,7 +298,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               }`}
             >
               <Search className="w-4 h-4 shrink-0" />
-              Scanner Réseau (mDNS Fallback)
+              {t('tabs.subnet')}
             </button>
           </div>
 
@@ -305,7 +308,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
             {activeTab === 'status' && (
               <div className="space-y-6">
                 <h2 className="text-sm font-bold text-slate-800 tracking-wide uppercase border-b pb-2">
-                  État de la connexion
+                  {t('status.title')}
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -315,14 +318,14 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                       <Server className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Serveur Distant</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('status.remoteServer')}</p>
                       <h3 className="text-xs font-bold text-slate-700">
                         {currentConfig?.host}:{currentConfig?.port}
                       </h3>
                       <div className="flex items-center gap-1.5 pt-0.5">
                         <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                         <span className={`text-[11px] font-bold ${isOnline ? 'text-emerald-600' : 'text-amber-600'}`}>
-                          {isOnline ? 'En ligne (WebSocket Connecté)' : 'Mode Hors Ligne (Déconnecté)'}
+                          {isOnline ? t('status.onlineWs') : t('status.offlineLocal')}
                         </span>
                       </div>
                     </div>
@@ -334,9 +337,9 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                       <Activity className="w-5 h-5" />
                     </div>
                     <div className="space-y-1 flex-1">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Latence (Ping)</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('status.latency')}</p>
                       <h3 className="text-xs font-bold text-slate-700">
-                        {isPinging ? 'Calcul en cours...' : pingTime !== null ? `${pingTime} ms` : 'N/A (Déconnecté)'}
+                        {isPinging ? t('status.computing') : pingTime !== null ? `${pingTime} ms` : t('status.na')}
                       </h3>
                       <button
                         onClick={() => currentConfig && performPing(currentConfig.host, currentConfig.port)}
@@ -344,7 +347,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                         className="text-[11px] font-bold text-medical-primary hover:underline flex items-center gap-1 transition-all mt-1 disabled:opacity-50 cursor-pointer"
                       >
                         <RefreshCw className={`w-3 h-3 ${isPinging ? 'animate-spin' : ''}`} />
-                        Rafraîchir
+                        {tc('actions.refresh')}
                       </button>
                     </div>
                   </div>
@@ -356,27 +359,27 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                     <div className="flex items-center gap-2.5">
                       <Database className="w-4 h-4 text-medical-primary" />
                       <div>
-                        <h3 className="text-xs font-bold text-slate-700">Base de Données Locale (SQLite)</h3>
-                        <p className="text-[11px] text-slate-500">Dernière synchronisation incrémentale : {lastSyncedAt || 'Jamais'}</p>
+                        <h3 className="text-xs font-bold text-slate-700">{t('status.localDb')}</h3>
+                        <p className="text-[11px] text-slate-500">{t('status.lastSync', { date: lastSyncedAt || tc('time.never') })}</p>
                       </div>
                     </div>
                     <span className="text-[10px] font-mono bg-medical-subtle text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-bold">
-                      Offline-First
+                      {t('status.offlineFirst')}
                     </span>
                   </div>
 
                   <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
                     <div>
                       <p className="text-xs font-bold text-slate-600">
-                        Modifications locales en attente :{' '}
+                        {t('status.pendingCount')}{' '}
                         <span className={pendingCacheSync > 0 ? 'text-amber-600' : 'text-emerald-600'}>
                           {pendingCacheSync}
                         </span>
                       </p>
                       <p className="text-[10px] text-slate-400">
                         {pendingCacheSync > 0
-                          ? 'Ces requêtes seront envoyées automatiquement dès la reconnexion.'
-                          : 'Aucune donnée en attente de synchronisation.'}
+                          ? t('status.pendingMsg')
+                          : t('status.noPending')}
                       </p>
                     </div>
                     {isOnline && (
@@ -385,7 +388,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                         className="px-3 py-1.5 bg-medical-subtle border border-emerald-200 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
                       >
                         <RefreshCw className="w-3.5 h-3.5 text-emerald-700" />
-                        Synchroniser maintenant
+                        {t('status.syncNow')}
                       </button>
                     )}
                   </div>
@@ -393,10 +396,10 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
 
                 {/* Client / Workstation ID Details */}
                 <div className="text-[11px] font-mono text-slate-400 bg-slate-50 p-3 rounded-xl border border-medical-border space-y-1">
-                  <p><span className="font-bold text-slate-600">ID Unique du Poste (UUID) :</span> {currentConfig?.posteId || 'N/A'}</p>
-                  <p><span className="font-bold text-slate-600">Type de client :</span> Electron Client (React + TypeScript + better-sqlite3)</p>
+                  <p><span className="font-bold text-slate-600">{t('status.posteId')}</span> {currentConfig?.posteId || 'N/A'}</p>
+                  <p><span className="font-bold text-slate-600">{t('status.clientType')}</span> {t('status.clientTypeValue')}</p>
                   <p className="text-[10px] text-slate-400/80 mt-1 italic">
-                    Cet identifiant est communiqué à Willo Server (en-tête X-Poste-Id) pour garantir la traçabilité des dossiers médicaux.
+                    {t('status.traceNote')}
                   </p>
                 </div>
               </div>
@@ -406,28 +409,28 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
             {activeTab === 'manual' && (
               <div className="space-y-6">
                 <h2 className="text-sm font-bold text-slate-800 tracking-wide uppercase border-b pb-2">
-                  Configuration IP Manuelle
+                  {t('manual.title')}
                 </h2>
 
                 <div className="space-y-4 max-w-md">
                   <div className="grid grid-cols-3 gap-3">
                     <div className="col-span-2 space-y-1">
-                      <label className="block text-xs font-bold text-slate-700">Adresse IP / Hôte</label>
+                      <label className="block text-xs font-bold text-slate-700">{t('manual.host')}</label>
                       <input
                         type="text"
                         value={manualHost}
                         onChange={(e) => setManualHost(e.target.value)}
-                        placeholder="ex: 192.168.1.50"
+                        placeholder={t('manual.hostPlaceholder')}
                         className="w-full px-3 py-2 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-medical-primary focus:bg-white transition-all"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-slate-700">Port</label>
+                      <label className="block text-xs font-bold text-slate-700">{t('manual.port')}</label>
                       <input
                         type="text"
                         value={manualPort}
                         onChange={(e) => setManualPort(e.target.value)}
-                        placeholder="ex: 5030"
+                        placeholder={t('manual.portPlaceholder')}
                         className="w-full px-3 py-2 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:border-medical-primary focus:bg-white transition-all"
                       />
                     </div>
@@ -440,7 +443,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                       disabled={isTesting || !manualHost || !manualPort}
                       className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                     >
-                      {isTesting ? 'Vérification...' : 'Tester la connexion'}
+                      {isTesting ? t('manual.testing') : t('manual.test')}
                     </button>
 
                     <button
@@ -450,7 +453,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                       className="px-4 py-2 bg-medical-primary hover:bg-medical-hover text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                     >
                       <Save className="w-3.5 h-3.5" />
-                      Appliquer & Enregistrer
+                      {t('manual.save')}
                     </button>
                   </div>
 
@@ -465,9 +468,9 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                         <>
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                           <div>
-                            <p className="font-bold">Connexion établie avec succès !</p>
+                            <p className="font-bold">{t('manual.successTitle')}</p>
                             <p className="text-[11px] text-emerald-700/90 mt-0.5">
-                              Serveur identifié : <span className="font-bold">{testResult.siteName}</span>
+                              {t('manual.successServer', { name: testResult.siteName })}
                             </p>
                           </div>
                         </>
@@ -475,7 +478,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                         <>
                           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                           <div>
-                            <p className="font-bold">Échec de la connexion</p>
+                            <p className="font-bold">{t('manual.errorTitle')}</p>
                             <p className="text-[11px] text-rose-700/90 mt-0.5">{testResult.error}</p>
                           </div>
                         </>
@@ -491,7 +494,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b pb-2">
                   <h2 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
-                    Découverte locale (Bonjour / mDNS)
+                    {t('bonjour.title')}
                   </h2>
                   <button
                     onClick={startBonjourDiscovery}
@@ -499,26 +502,25 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                     className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isDiscovering ? 'animate-spin' : ''}`} />
-                    Rechercher
+                    {t('bonjour.search')}
                   </button>
                 </div>
 
                 <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                  Le protocole <strong>ZeroConf / Bonjour</strong> recherche automatiquement les services Willo (<code>_willo._tcp</code>) 
-                  publiés sur votre réseau local. Aucun paramétrage manuel d'adresse IP n'est requis si le multicast réseau est autorisé.
+                  {t('bonjour.desc')}
                 </p>
 
                 {isDiscovering ? (
                   <div className="py-12 text-center space-y-3">
                     <div className="w-8 h-8 border-2 border-medical-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-xs font-semibold text-slate-500">Recherche de serveurs sur le réseau local...</p>
+                    <p className="text-xs font-semibold text-slate-500">{t('bonjour.scanning')}</p>
                   </div>
                 ) : discoveredServers.length === 0 ? (
                   <div className="py-12 border border-dashed border-slate-200 rounded-xl text-center space-y-2 bg-slate-50/50">
                     <WifiOff className="w-8 h-8 text-slate-300 mx-auto" />
-                    <h3 className="text-xs font-bold text-slate-500">Aucun serveur Willo détecté</h3>
+                    <h3 className="text-xs font-bold text-slate-500">{t('bonjour.noneTitle')}</h3>
                     <p className="text-[10px] text-slate-400 max-w-sm mx-auto">
-                      Vérifiez que le serveur Willo est démarré sur le même réseau local ou tentez le scan de secours.
+                      {t('bonjour.noneMsg')}
                     </p>
                   </div>
                 ) : (
@@ -526,10 +528,10 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                     <table className="w-full text-xs text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 font-bold border-b border-medical-border">
-                          <th className="px-4 py-2.5">Nom du Centre</th>
-                          <th className="px-4 py-2.5">Adresse IP / Hôte</th>
-                          <th className="px-4 py-2.5">Port</th>
-                          <th className="px-4 py-2.5 text-right">Action</th>
+                          <th className="px-4 py-2.5">{t('bonjour.columns.name')}</th>
+                          <th className="px-4 py-2.5">{t('bonjour.columns.host')}</th>
+                          <th className="px-4 py-2.5">{t('bonjour.columns.port')}</th>
+                          <th className="px-4 py-2.5 text-right">{t('bonjour.columns.action')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -546,14 +548,14 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                               <td className="px-4 py-3 text-right">
                                 {isCurrent ? (
                                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg mr-2">
-                                    <Check className="w-3 h-3" /> Connecté
+                                    <Check className="w-3 h-3" /> {t('bonjour.connected')}
                                   </span>
                                 ) : (
                                   <button
                                     onClick={() => handleSaveConfiguration(server.host, String(server.port))}
                                     className="px-2.5 py-1 bg-medical-primary hover:bg-medical-hover text-white text-[11px] font-bold rounded-lg transition-all shadow-xs cursor-pointer"
                                   >
-                                    Connecter
+                                    {tc('actions.connect')}
                                   </button>
                                 )}
                               </td>
@@ -572,7 +574,7 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b pb-2">
                   <h2 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
-                    Scanner de réseau local (mDNS Fallback)
+                    {t('subnet.title')}
                   </h2>
                   <button
                     onClick={startSubnetScan}
@@ -580,20 +582,18 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                     className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-                    Scanner
+                    {t('subnet.scan')}
                   </button>
                 </div>
 
                 <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                  Si la multidiffusion mDNS est bloquée par votre pare-feu ou votre commutateur, le scanner vérifie 
-                  chaque adresse de la plage réseau locale de classe C (port <code>5030</code>) pour identifier 
-                  le serveur de secours.
+                  {t('subnet.desc')}
                 </p>
 
                 {isScanning && (
                   <div className="space-y-3 bg-slate-50 p-4 border border-medical-border rounded-xl">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold text-slate-600">Scan du réseau local en cours...</span>
+                      <span className="font-bold text-slate-600">{t('subnet.scanning')}</span>
                       <span className="font-bold text-slate-500 font-mono">{scanProgress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden shadow-inner">
@@ -602,16 +602,16 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                         style={{ width: `${scanProgress}%` }}
                       />
                     </div>
-                    <p className="text-[10px] text-slate-400 italic">Vérification de la plage IP active (environ 5-10 secondes)...</p>
+                    <p className="text-[10px] text-slate-400 italic">{t('subnet.scanTime')}</p>
                   </div>
                 )}
 
                 {!isScanning && scannedServers.length === 0 && (
                   <div className="py-12 border border-dashed border-slate-200 rounded-xl text-center space-y-2 bg-slate-50/50">
                     <Search className="w-8 h-8 text-slate-300 mx-auto" />
-                    <h3 className="text-xs font-bold text-slate-500">Aucun serveur trouvé via scan IP</h3>
+                    <h3 className="text-xs font-bold text-slate-500">{t('subnet.noneTitle')}</h3>
                     <p className="text-[10px] text-slate-400 max-w-sm mx-auto">
-                      Cliquez sur <strong>Scanner</strong> pour sonder le réseau local de classe C et trouver Willo Server.
+                      {t('subnet.noneMsg')}
                     </p>
                   </div>
                 )}
@@ -621,10 +621,10 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                     <table className="w-full text-xs text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50 text-slate-500 font-bold border-b border-medical-border">
-                          <th className="px-4 py-2.5">Nom du Centre</th>
-                          <th className="px-4 py-2.5">Adresse IP / Hôte</th>
-                          <th className="px-4 py-2.5">Port</th>
-                          <th className="px-4 py-2.5 text-right">Action</th>
+                          <th className="px-4 py-2.5">{t('subnet.columns.name')}</th>
+                          <th className="px-4 py-2.5">{t('subnet.columns.host')}</th>
+                          <th className="px-4 py-2.5">{t('subnet.columns.port')}</th>
+                          <th className="px-4 py-2.5 text-right">{t('subnet.columns.action')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -641,14 +641,14 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
                               <td className="px-4 py-3 text-right">
                                 {isCurrent ? (
                                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg mr-2">
-                                    <Check className="w-3 h-3" /> Connecté
+                                    <Check className="w-3 h-3" /> {t('subnet.connected')}
                                   </span>
                                 ) : (
                                   <button
                                     onClick={() => handleSaveConfiguration(server.host, String(server.port))}
                                     className="px-2.5 py-1 bg-medical-primary hover:bg-medical-hover text-white text-[11px] font-bold rounded-lg transition-all shadow-xs cursor-pointer"
                                   >
-                                    Connecter
+                                    {tc('actions.connect')}
                                   </button>
                                 )}
                               </td>
@@ -667,3 +667,4 @@ export const ConnectionsPage: React.FC<ConnectionsPageProps> = ({ onBack, onClos
     </div>
   )
 }
+

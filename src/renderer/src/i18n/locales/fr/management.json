@@ -1,5 +1,62 @@
 {
   "title": "Direction & Rapports",
+  "headerTitle": "Espace Décisionnel & Direction Hospitalière",
+  "headerSub": "Tableaux de bord analytiques, indicateurs de performance et générateur de rapports statistiques",
+  "controls": {
+    "period": "Période :",
+    "exportPdf": "Export PDF",
+    "exportExcel": "Export Excel"
+  },
+  "kpi": {
+    "revenueTitle": "Revenu Mensuel Cumulé",
+    "attendanceTitle": "Fréquentation Mensuelle",
+    "patientsCount": "{{count}} Patients",
+    "vsPreviousMonth": "vs mois précédent",
+    "recoveryTitle": "Taux de Guérison / Sorties",
+    "recoverySub": "Dossiers clôturés sur {{count}} patient(s)",
+    "waitTimeTitle": "Temps d'Attente Moyen",
+    "waitTimeVal": "{{time}} min",
+    "waitingCount": "{{count}} patient(s) en attente"
+  },
+  "charts": {
+    "revenueChartTitle": "Évolution des Revenus Hospitaliers (F CFA)",
+    "revenueChartSub": "Progression mensuelle des encaissements réels",
+    "revenueLegend": "Revenu",
+    "attendanceChartTitle": "Fréquentation par Service Médical",
+    "attendanceChartSub": "Volume de consultations enregistrées par département",
+    "statusChartTitle": "Issue des Patients (Statut des Dossiers)",
+    "statusChartSub": "Répartition réelle des séjours hospitaliers",
+    "statusLabels": {
+      "cured": "Guéris / Sorties",
+      "inTreatment": "En Traitement",
+      "waiting": "En Attente"
+    }
+  },
+  "summary": {
+    "title": "Synthèse Exécutive pour le Conseil d'Administration",
+    "sub": "Point de vue global basé sur la base de données réelle",
+    "bedOccupancyTitle": "Occupation de la Capacité Lits :",
+    "bedOccupancyBody": "L'établissement enregistre {{active}} patient(s) actif(s) sur {{total}} lits de capacité ({{percent}}% de taux d'occupation).",
+    "pharmLabTitle": "Rendement Pharmaceutique & Labo :",
+    "pharmLabBody": "La pharmacie et le laboratoire génèrent {{percent}}% du chiffre d'affaires récurrent encaissé.",
+    "alertsTitle": "Alertes & Recommandations d'Amélioration :",
+    "stockAlert": "Alerte Stock : {{items}} en seuil critique. Réapprovisionnement recommandé.",
+    "stockOptimal": "Tous les stocks de pharmacie et consommables sont à un niveau optimal."
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Fév",
+    "mar": "Mar",
+    "apr": "Avr",
+    "may": "Mai",
+    "jun": "Juin",
+    "jul": "Juil",
+    "aug": "Août",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Déc"
+  },
   "tabs": { "overview": "Vue d'ensemble", "stats": "Statistiques", "reports": "Rapports" },
   "overview": { "totalPatients": "Total patients", "todayVisits": "Visites aujourd'hui", "revenue": "Revenus du mois", "pendingInvoices": "Factures en attente" },
   "stats": { "patientsByDay": "Patients par jour", "revenueByMonth": "Revenus par mois", "topDiagnoses": "Diagnostics fréquents", "labActivity": "Activité laboratoire" },

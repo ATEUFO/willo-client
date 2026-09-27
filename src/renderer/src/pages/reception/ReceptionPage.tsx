@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   UserCheck,
   Search,
@@ -12,6 +13,8 @@ import {
 import { useHospitalStore } from '../store/hospitalStore'
 
 export const ReceptionPage: React.FC = () => {
+  const { t } = useTranslation('reception')
+  const { t: tc } = useTranslation('common')
   const {
     patients,
     appointments,
@@ -22,6 +25,7 @@ export const ReceptionPage: React.FC = () => {
     cancelAppointment,
     showNotification
   } = useHospitalStore()
+
 
   const doctorList = React.useMemo(() => {
     return (users || []).filter((u) => u.role === 'consultation')
@@ -77,7 +81,7 @@ export const ReceptionPage: React.FC = () => {
       assignedDoctor: ''
     })
     showNotification(`Patient ${created.name} enregistré avec le code ${created.patientCode}!`, {
-      title: 'Enregistrement Patient',
+      title: t('register.title'),
       type: 'success'
     })
   }
@@ -97,9 +101,40 @@ export const ReceptionPage: React.FC = () => {
     })
     setShowAddAppModal(false)
     showNotification(`Rendez-vous confirmé pour ${selectedPat.name}!`, {
-      title: 'Prise de Rendez-vous',
+      title: t('appointments.title'),
       type: 'success'
     })
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'Waiting':
+        return t('queue.statuses.waiting')
+      case 'Vitals Taken':
+        return t('queue.statuses.vitalsTaken')
+      case 'In Consultation':
+        return t('queue.statuses.inConsultation')
+      case 'Lab Pending':
+        return t('queue.statuses.labPending')
+      case 'Pharmacy Pending':
+        return t('queue.statuses.pharmacyPending')
+      case 'Completed':
+        return t('queue.statuses.completed')
+      default:
+        return status
+    }
+  }
+
+  const getAppStatusLabel = (status: string) => {
+    switch (status) {
+      case 'Confirmed':
+        return t('appointments.statuses.confirmed')
+      case 'Cancelled':
+        return t('appointments.statuses.cancelled')
+      case 'Scheduled':
+      default:
+        return t('appointments.statuses.scheduled')
+    }
   }
 
   return (
@@ -109,10 +144,10 @@ export const ReceptionPage: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
             <UserCheck className="w-7 h-7 text-medical-primary" />
-            Accueil, Triage & File d'Attente
+            {t('headerTitle')}
           </h2>
           <p className="text-sm text-slate-500">
-            Rapidité de saisie, prise de rendez-vous et enregistrement des dossiers patients
+            {t('headerSub')}
           </p>
         </div>
 
@@ -122,7 +157,7 @@ export const ReceptionPage: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
-              placeholder="Rechercher par nom, téléphone ou ID..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-medical-border rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 focus:outline-none focus:border-medical-primary focus:ring-1 focus:ring-medical-primary shadow-xs"
@@ -131,10 +166,10 @@ export const ReceptionPage: React.FC = () => {
 
           <button
             onClick={() => setShowAddPatientModal(true)}
-            className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm shrink-0"
+            className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
-            Nouveau Patient
+            {t('newPatient')}
           </button>
         </div>
       </div>
@@ -149,7 +184,7 @@ export const ReceptionPage: React.FC = () => {
             }`}
         >
           <Clock className="w-3.5 h-3.5" />
-          File d'Attente Temps Réel ({patients.filter((p) => p.status !== 'Completed').length})
+          {t('tabs.queue', { count: patients.filter((p) => p.status !== 'Completed').length })}
         </button>
         <button
           onClick={() => setActiveSubTab('calendar')}
@@ -159,7 +194,7 @@ export const ReceptionPage: React.FC = () => {
             }`}
         >
           <Calendar className="w-3.5 h-3.5" />
-          Planning & Rendez-vous ({appointments.length})
+          {t('tabs.calendar', { count: appointments.length })}
         </button>
         <button
           onClick={() => setActiveSubTab('patients')}
@@ -169,7 +204,7 @@ export const ReceptionPage: React.FC = () => {
             }`}
         >
           <Search className="w-3.5 h-3.5" />
-          Annuaire des Patients ({patients.length})
+          {t('tabs.registry', { count: patients.length })}
         </button>
       </div>
 
@@ -182,8 +217,8 @@ export const ReceptionPage: React.FC = () => {
                 <UserCheck className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">Patients en Salle d'Attente</p>
-                <p className="text-xl font-bold text-amber-600">{patients.filter((p) => p.status === 'Waiting').length} Patients</p>
+                <p className="text-xs text-slate-500 font-medium">{t('queue.cards.waiting')}</p>
+                <p className="text-xl font-bold text-amber-600">{t('queue.cards.count', { count: patients.filter((p) => p.status === 'Waiting').length })}</p>
               </div>
             </div>
             <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl flex items-center gap-3 shadow-sm">
@@ -191,8 +226,8 @@ export const ReceptionPage: React.FC = () => {
                 <Clock className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">Prise de Constantes en Cours</p>
-                <p className="text-xl font-bold text-emerald-700">{patients.filter((p) => p.status === 'Vitals Taken').length} Patients</p>
+                <p className="text-xs text-slate-500 font-medium">{t('queue.cards.vitals')}</p>
+                <p className="text-xl font-bold text-emerald-700">{t('queue.cards.count', { count: patients.filter((p) => p.status === 'Vitals Taken').length })}</p>
               </div>
             </div>
             <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl flex items-center gap-3 shadow-sm">
@@ -200,14 +235,14 @@ export const ReceptionPage: React.FC = () => {
                 <Heart className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">En Consultation Médicale</p>
-                <p className="text-xl font-bold text-blue-700">{patients.filter((p) => p.status === 'In Consultation').length} Patients</p>
+                <p className="text-xs text-slate-500 font-medium">{t('queue.cards.consultation')}</p>
+                <p className="text-xl font-bold text-blue-700">{t('queue.cards.count', { count: patients.filter((p) => p.status === 'In Consultation').length })}</p>
               </div>
             </div>
           </div>
 
           <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
-            <h3 className="font-bold text-medical-dark text-base">File d'Attente Générale de l'Accueil</h3>
+            <h3 className="font-bold text-medical-dark text-base">{t('queue.title')}</h3>
 
             <div className="grid grid-cols-1 gap-3">
               {filteredPatients.map((pat) => (
@@ -217,21 +252,21 @@ export const ReceptionPage: React.FC = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-medical-subtle border border-emerald-200 flex flex-col items-center justify-center text-emerald-800">
-                      <span className="text-[10px] font-mono text-emerald-700 font-semibold">TICKET</span>
+                      <span className="text-[10px] font-mono text-emerald-700 font-semibold">{t('queue.ticket')}</span>
                       <span className="font-bold text-xs">{pat.queueNumber}</span>
                     </div>
 
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-900 text-sm">{pat.name}</span>
-                        <span className="text-xs text-slate-500">({pat.gender}, {pat.age} ans)</span>
+                        <span className="text-xs text-slate-500">({pat.gender === 'M' ? tc('patient.male') : tc('patient.female')}, {pat.age} {t('registry.years')})</span>
                         <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-slate-100 text-slate-700 border border-slate-200">
                           {pat.patientCode}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-slate-500">
                         <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-slate-400" /> {pat.phone}</span>
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-slate-400" /> Arrivé à {pat.arrivalTime}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-slate-400" /> {t('queue.arrivedAt', { time: pat.arrivalTime })}</span>
                         <span className="text-medical-dark font-medium">{pat.assignedDoctor}</span>
                       </div>
                     </div>
@@ -248,21 +283,15 @@ export const ReceptionPage: React.FC = () => {
                               : 'bg-slate-100 text-slate-600'
                         }`}
                     >
-                      {pat.status === 'Waiting'
-                        ? 'En Attente'
-                        : pat.status === 'Vitals Taken'
-                          ? 'Constantes Prises'
-                          : pat.status === 'In Consultation'
-                            ? 'En Consultation'
-                            : pat.status}
+                      {getStatusLabel(pat.status)}
                     </span>
 
                     {pat.status === 'Waiting' && (
                       <button
                         onClick={() => updatePatientStatus(pat.id, 'Vitals Taken')}
-                        className="px-3.5 py-1.5 rounded-xl bg-medical-primary hover:bg-medical-hover text-white text-xs font-medium flex items-center gap-1 shadow-xs transition-colors"
+                        className="px-3.5 py-1.5 rounded-xl bg-medical-primary hover:bg-medical-hover text-white text-xs font-medium flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
                       >
-                        Envoyer aux Constantes <ChevronRight className="w-3.5 h-3.5" />
+                        {t('queue.sendToVitals')} <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
@@ -278,16 +307,16 @@ export const ReceptionPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h3 className="font-bold text-medical-dark text-base">Planning Interactif des Rendez-Vous</h3>
-              <p className="text-xs text-slate-500">Prise, modification et annulation de consultations programmées</p>
+              <h3 className="font-bold text-medical-dark text-base">{t('appointments.title')}</h3>
+              <p className="text-xs text-slate-500">{t('appointments.sub')}</p>
             </div>
 
             <button
               onClick={() => setShowAddAppModal(true)}
-              className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+              className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm cursor-pointer"
             >
               <Calendar className="w-4 h-4" />
-              Fixer un Rendez-vous
+              {t('appointments.book')}
             </button>
           </div>
 
@@ -295,13 +324,13 @@ export const ReceptionPage: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                 <tr>
-                  <th className="p-3">Patient</th>
-                  <th className="p-3">Médecin</th>
-                  <th className="p-3">Département</th>
-                  <th className="p-3">Date & Heure</th>
-                  <th className="p-3">Motif / Type</th>
-                  <th className="p-3">Statut</th>
-                  <th className="p-3 text-right">Actions</th>
+                  <th className="p-3">{t('appointments.columns.patient')}</th>
+                  <th className="p-3">{t('appointments.columns.doctor')}</th>
+                  <th className="p-3">{t('appointments.columns.department')}</th>
+                  <th className="p-3">{t('appointments.columns.dateTime')}</th>
+                  <th className="p-3">{t('appointments.columns.type')}</th>
+                  <th className="p-3">{t('appointments.columns.status')}</th>
+                  <th className="p-3 text-right">{t('appointments.columns.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-medical-border text-slate-700">
@@ -311,7 +340,7 @@ export const ReceptionPage: React.FC = () => {
                     <td className="p-3 text-medical-dark font-medium">{app.doctorName}</td>
                     <td className="p-3 text-slate-600">{app.department}</td>
                     <td className="p-3 font-mono text-slate-700">
-                      {app.date} à <span className="text-medical-primary font-bold">{app.time}</span>
+                      {app.date} {tc('time.date') === 'Date' ? 'at' : 'à'} <span className="text-medical-primary font-bold">{app.time}</span>
                     </td>
                     <td className="p-3">
                       <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium">
@@ -327,16 +356,16 @@ export const ReceptionPage: React.FC = () => {
                               : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}
                       >
-                        {app.status === 'Confirmed' ? 'Confirmé' : app.status === 'Cancelled' ? 'Annulé' : 'Programmé'}
+                        {getAppStatusLabel(app.status)}
                       </span>
                     </td>
                     <td className="p-3 text-right space-x-2">
                       {app.status !== 'Cancelled' && (
                         <button
                           onClick={() => cancelAppointment(app.id)}
-                          className="px-2.5 py-1 bg-red-50 border border-red-200 text-medical-danger hover:bg-red-100 rounded-lg text-[11px] font-medium"
+                          className="px-2.5 py-1 bg-red-50 border border-red-200 text-medical-danger hover:bg-red-100 rounded-lg text-[11px] font-medium cursor-pointer"
                         >
-                          Annuler
+                          {tc('actions.cancel')}
                         </button>
                       )}
                     </td>
@@ -351,7 +380,7 @@ export const ReceptionPage: React.FC = () => {
       {/* SubTab 3: Full Patient Registry */}
       {activeSubTab === 'patients' && (
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
-          <h3 className="font-bold text-medical-dark text-base">Annuaire des Dossiers Patients</h3>
+          <h3 className="font-bold text-medical-dark text-base">{t('registry.title')}</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPatients.map((p) => (
@@ -364,10 +393,10 @@ export const ReceptionPage: React.FC = () => {
                 </div>
 
                 <div className="text-xs text-slate-500 space-y-1">
-                  <p><strong className="text-slate-700">Âge / Sexe:</strong> {p.age} ans ({p.gender}) • <strong className="text-slate-700">Groupe Sanguin:</strong> {p.bloodType}</p>
-                  <p><strong className="text-slate-700">Téléphone:</strong> {p.phone}</p>
-                  <p><strong className="text-slate-700">Adresse:</strong> {p.address}</p>
-                  <p><strong className="text-slate-700">Contact Urgence:</strong> {p.emergencyContact}</p>
+                  <p><strong className="text-slate-700">{t('registry.ageGender')}:</strong> {p.age} {t('registry.years')} ({p.gender === 'M' ? tc('patient.male') : tc('patient.female')}) • <strong className="text-slate-700">{tc('patient.bloodType')}:</strong> {p.bloodType}</p>
+                  <p><strong className="text-slate-700">{tc('patient.phone')}:</strong> {p.phone}</p>
+                  <p><strong className="text-slate-700">{tc('patient.address')}:</strong> {p.address}</p>
+                  <p><strong className="text-slate-700">{t('register.emergencyContact')}:</strong> {p.emergencyContact}</p>
                 </div>
               </div>
             ))}
@@ -379,29 +408,29 @@ export const ReceptionPage: React.FC = () => {
       {showAddPatientModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-medical-border rounded-2xl p-6 w-full max-w-lg space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-medical-dark">Création Rapide de Dossier Patient</h3>
+            <h3 className="text-lg font-bold text-medical-dark">{t('modal.createTitle')}</h3>
 
             <form onSubmit={handleRegisterPatient} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Nom & Prénom</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('register.fullName')}</label>
                   <input
                     type="text"
                     required
                     value={newPatient.name}
                     onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
-                    placeholder="Ex: Ibrahima Faye"
+                    placeholder={t('modal.namePlaceholder')}
                     className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Téléphone</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('register.phone')}</label>
                   <input
                     type="text"
                     required
                     value={newPatient.phone}
                     onChange={(e) => setNewPatient({ ...newPatient, phone: e.target.value })}
-                    placeholder="+221 77 000 00 00"
+                    placeholder={t('modal.phonePlaceholder')}
                     className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                   />
                 </div>
@@ -409,7 +438,7 @@ export const ReceptionPage: React.FC = () => {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Âge</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('register.age')}</label>
                   <input
                     type="number"
                     value={newPatient.age}
@@ -418,18 +447,18 @@ export const ReceptionPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Sexe</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('register.gender')}</label>
                   <select
                     value={newPatient.gender}
                     onChange={(e) => setNewPatient({ ...newPatient, gender: e.target.value as 'M' | 'F' })}
                     className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                   >
-                    <option value="M">Masculin (M)</option>
-                    <option value="F">Féminin (F)</option>
+                    <option value="M">{t('register.male')}</option>
+                    <option value="F">{t('register.female')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Groupe Sanguin</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('register.bloodType')}</label>
                   <select
                     value={newPatient.bloodType}
                     onChange={(e) => setNewPatient({ ...newPatient, bloodType: e.target.value })}
@@ -448,35 +477,35 @@ export const ReceptionPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Adresse Habituelle</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('register.address')}</label>
                 <input
                   type="text"
                   value={newPatient.address}
                   onChange={(e) => setNewPatient({ ...newPatient, address: e.target.value })}
-                  placeholder="Dakar, Sacré-Cœur"
+                  placeholder={t('modal.addressPlaceholder')}
                   className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Contact d'Urgence</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('register.emergencyContact')}</label>
                 <input
                   type="text"
                   value={newPatient.emergencyContact}
                   onChange={(e) => setNewPatient({ ...newPatient, emergencyContact: e.target.value })}
-                  placeholder="Nom et numéro de téléphone du proche"
+                  placeholder={t('modal.emergencyPlaceholder')}
                   className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Médecin Référent / Affecté (Optionnel)</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('register.assignedDoctor')}</label>
                 <select
                   value={newPatient.assignedDoctor}
                   onChange={(e) => setNewPatient({ ...newPatient, assignedDoctor: e.target.value })}
                   className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                 >
-                  <option value="">Aucun (File générale)</option>
+                  <option value="">{t('modal.noDoctor')}</option>
                   {doctorList.map((doc) => (
                     <option key={doc.id} value={doc.name}>
                       {doc.name} {doc.department ? `(${doc.department})` : ''}
@@ -489,15 +518,15 @@ export const ReceptionPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddPatientModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium cursor-pointer"
                 >
-                  Annuler
+                  {tc('actions.cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm"
+                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm cursor-pointer"
                 >
-                  Enregistrer & Ajouter à la File
+                  {t('modal.submitAdd')}
                 </button>
               </div>
             </form>
@@ -509,18 +538,18 @@ export const ReceptionPage: React.FC = () => {
       {showAddAppModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-medical-border rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-medical-dark">Fixer un Rendez-vous Médical</h3>
+            <h3 className="text-lg font-bold text-medical-dark">{t('appointments.modalTitle')}</h3>
 
             <form onSubmit={handleBookAppointment} className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Patient</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('appointments.columns.patient')}</label>
                 <select
                   required
                   value={newApp.patientId}
                   onChange={(e) => setNewApp({ ...newApp, patientId: e.target.value })}
                   className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                 >
-                  <option value="">-- Sélectionner un patient --</option>
+                  <option value="">{t('appointments.selectPatient')}</option>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name} ({p.patientCode})
@@ -530,13 +559,13 @@ export const ReceptionPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Médecin</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('appointments.columns.doctor')}</label>
                 <select
                   value={newApp.doctorName}
                   onChange={(e) => setNewApp({ ...newApp, doctorName: e.target.value })}
                   className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
                 >
-                  <option value="">-- Sélectionner un médecin --</option>
+                  <option value="">{t('appointments.selectDoctor')}</option>
                   {doctorList.map((doc) => (
                     <option key={doc.id} value={doc.name}>
                       {doc.name} {doc.department ? `(${doc.department})` : ''}
@@ -547,7 +576,7 @@ export const ReceptionPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Date</label>
+                  <label className="block text-slate-600 font-medium mb-1">{tc('time.date')}</label>
                   <input
                     type="date"
                     value={newApp.date}
@@ -556,7 +585,7 @@ export const ReceptionPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Heure</label>
+                  <label className="block text-slate-600 font-medium mb-1">{tc('time.time')}</label>
                   <input
                     type="time"
                     value={newApp.time}
@@ -566,29 +595,19 @@ export const ReceptionPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Médecin Assigné</label>
-                <input
-                  type="text"
-                  value={newApp.doctorName}
-                  onChange={(e) => setNewApp({ ...newApp, doctorName: e.target.value })}
-                  className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-medical-primary"
-                />
-              </div>
-
               <div className="flex items-center justify-end gap-3 pt-3">
                 <button
                   type="button"
                   onClick={() => setShowAddAppModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium cursor-pointer"
                 >
-                  Annuler
+                  {tc('actions.cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm"
+                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm cursor-pointer"
                 >
-                  Confirmer le Rendez-vous
+                  {t('appointments.confirmBook')}
                 </button>
               </div>
             </form>

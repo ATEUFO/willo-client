@@ -7,12 +7,14 @@ import {
   Clock,
   FileText
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useHospitalStore, LabRequest, LabResultItem } from '../store/hospitalStore'
 import { PrintReportModal } from './components/PrintReportModal'
 import { ResultsEntryForm } from './components/ResultsEntryForm'
 import { LaboratoryKanban } from './components/LaboratoryKanban'
 
 export const LaboratoryPage: React.FC = () => {
+  const { t } = useTranslation('laboratory')
   const { labRequests, updateLabRequestStatus, currentUser, showNotification } = useHospitalStore()
 
   // Navigation & Search Views
@@ -67,8 +69,8 @@ export const LaboratoryPage: React.FC = () => {
       results: dataToSave
     })
 
-    showNotification(`Brouillon enregistré localement pour ${selectedRequest.patientName}.`, {
-      title: 'Brouillon Enregistré',
+    showNotification(t('notifications.draftSaved', { patient: selectedRequest.patientName }), {
+      title: t('notifications.draftTitle'),
       type: 'info'
     })
   }
@@ -90,8 +92,8 @@ export const LaboratoryPage: React.FC = () => {
 
     updateLabRequestStatus(selectedRequest.id, 'Completed', dataToSave)
 
-    showNotification(`Bilan d'analyses validé avec succès. Transmis au médecin traitant!`, {
-      title: 'Bilan Validé',
+    showNotification(t('notifications.validated'), {
+      title: t('notifications.validatedTitle'),
       type: 'success'
     })
     setActiveView('kanban')
@@ -114,8 +116,8 @@ export const LaboratoryPage: React.FC = () => {
       setActiveView('results_entry')
       setBarcodeInput('')
     } else {
-      showNotification(`Aucun échantillon ne correspond au code : "${barcodeInput}"`, {
-        title: 'Recherche Échantillon',
+      showNotification(t('notifications.noSampleFound', { code: barcodeInput }), {
+        title: t('notifications.sampleSearchTitle'),
         type: 'warning'
       })
     }
@@ -126,7 +128,7 @@ export const LaboratoryPage: React.FC = () => {
     const codeNum = parseInt(req.requestCode.replace(/\D/g, '')) || 0
     if (codeNum % 3 === 0) {
       return {
-        label: 'Urgent',
+        label: t('urgency.urgent'),
         bg: 'bg-red-50 text-red-700 border-red-200',
         text: 'text-red-600',
         glow: 'shadow-[0_0_10px_rgba(239,68,68,0.25)] border-red-300 animate-pulse'
@@ -134,13 +136,13 @@ export const LaboratoryPage: React.FC = () => {
     }
     if (codeNum % 3 === 1) {
       return {
-        label: 'Prioritaire',
+        label: t('urgency.priority'),
         bg: 'bg-amber-50 text-amber-800 border-amber-200',
         text: 'text-amber-600'
       }
     }
     return {
-      label: 'Normal',
+      label: t('urgency.normal'),
       bg: 'bg-slate-50 text-slate-600 border-slate-200',
       text: 'text-slate-500'
     }
@@ -187,10 +189,10 @@ export const LaboratoryPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              Espace Laboratoire & Biologie Clinique
+              {t('headerTitle')}
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              Pipeline des prélèvements, saisie biologique instantanée et validation de comptes-rendus.
+              {t('headerSub')}
             </p>
           </div>
         </div>
@@ -206,7 +208,7 @@ export const LaboratoryPage: React.FC = () => {
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
-            Pipeline Kanban ({labRequests.length})
+            {t('views.kanban', { count: labRequests.length })}
           </button>
           <button
             onClick={() => {
@@ -224,7 +226,7 @@ export const LaboratoryPage: React.FC = () => {
             }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
-            Saisie de Résultats
+            {t('views.resultsEntry')}
           </button>
         </div>
       </div>
@@ -236,7 +238,7 @@ export const LaboratoryPage: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Rechercher par patient, ID ou analyse..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-800 focus:outline-none focus:border-medical-primary focus:ring-1 focus:ring-medical-primary transition-all"
@@ -245,17 +247,17 @@ export const LaboratoryPage: React.FC = () => {
 
         {/* Category filter */}
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-500 font-semibold whitespace-nowrap">Catégorie :</span>
+          <span className="text-slate-500 font-semibold whitespace-nowrap">{t('categoryFilterLabel')}</span>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="w-full bg-slate-50 border border-medical-border rounded-xl p-2 text-slate-700 focus:outline-none focus:border-medical-primary font-semibold"
           >
-            <option value="all">Toutes les disciplines</option>
-            <option value="Biochimie">Biochimie</option>
-            <option value="Hématologie">Hématologie</option>
-            <option value="Microbiologie">Microbiologie</option>
-            <option value="Immunologie">Immunologie</option>
+            <option value="all">{t('allCategories')}</option>
+            <option value="Biochimie">{t('categories.biochimie')}</option>
+            <option value="Hématologie">{t('categories.hematologie')}</option>
+            <option value="Microbiologie">{t('categories.microbiologie')}</option>
+            <option value="Immunologie">{t('categories.immunologie')}</option>
           </select>
         </div>
 
@@ -263,7 +265,7 @@ export const LaboratoryPage: React.FC = () => {
         <form onSubmit={handleBarcodeSubmit} className="relative">
           <input
             type="text"
-            placeholder="Scanner ou saisir code échantillon (Ex: LAB-2026-088)..."
+            placeholder={t('scanPlaceholder')}
             value={barcodeInput}
             onChange={(e) => setBarcodeInput(e.target.value)}
             className="w-full pl-4 pr-16 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs font-mono font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
@@ -272,7 +274,7 @@ export const LaboratoryPage: React.FC = () => {
             type="submit"
             className="absolute right-1 top-1/2 -translate-y-1/2 bg-slate-800 text-white font-bold text-[10px] uppercase px-2.5 py-1.5 rounded-lg hover:bg-slate-900 transition-all cursor-pointer"
           >
-            Scan
+            {t('scanBtn')}
           </button>
         </form>
       </div>
@@ -301,7 +303,7 @@ export const LaboratoryPage: React.FC = () => {
           <div className="bg-white border border-medical-border rounded-2xl p-4 space-y-4 shadow-2xs lg:col-span-1">
             <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-500" />
-              Dossiers en attente de saisie
+              {t('sidebar.pendingTitle')}
             </h3>
             
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
@@ -326,16 +328,16 @@ export const LaboratoryPage: React.FC = () => {
                           ? 'bg-amber-50 text-amber-800 border border-amber-200'
                           : 'bg-slate-50 text-slate-600 border border-slate-200'
                       }`}>
-                        {req.status === 'In Progress' ? 'Brouillon' : 'À prélever'}
+                        {req.status === 'In Progress' ? t('sidebar.draft') : t('sidebar.toSample')}
                       </span>
                     </div>
                     <h4 className="font-bold text-xs text-slate-800 truncate">{req.testName}</h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Patient : {req.patientName}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{t('sidebar.patient', { name: req.patientName })}</p>
                   </div>
                 )
               })}
               {sidebarPendingRequests.length === 0 && (
-                <p className="text-xs text-slate-400 text-center py-6">Aucune saisie en attente</p>
+                <p className="text-xs text-slate-400 text-center py-6">{t('sidebar.noPending')}</p>
               )}
             </div>
           </div>
@@ -353,9 +355,9 @@ export const LaboratoryPage: React.FC = () => {
             ) : (
               <div className="py-20 text-center text-slate-400 space-y-3">
                 <FileText className="w-12 h-12 mx-auto stroke-1" />
-                <h4 className="font-bold text-slate-700 text-sm">Aucun échantillon sélectionné</h4>
+                <h4 className="font-bold text-slate-700 text-sm">{t('emptyState.noSelectionTitle')}</h4>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Sélectionnez une demande dans la barre latérale gauche ou scannez un code d'analyse pour ouvrir sa grille de saisie biologique.
+                  {t('emptyState.noSelectionSub')}
                 </p>
               </div>
             )}

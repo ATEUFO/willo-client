@@ -1,60 +1,182 @@
 {
   "title": "Doctor / Clinic",
-  "tabs": {
-    "patients": "Patients",
-    "vitals": "Vitals",
-    "consultations": "Consultations",
-    "careTasks": "Care Tasks"
+  "directory": {
+    "title": "Patient Directory",
+    "gridTooltip": "Grid View",
+    "listTooltip": "List View",
+    "searchPlaceholder": "Search by name or code...",
+    "filterDoctorLabel": "Filter by doctor:",
+    "allDoctors": "All doctors",
+    "noDoctor": "Unassigned doctor",
+    "noPatients": "No matching patients",
+    "yearsOld": "{{age}} yrs",
+    "male": "Male",
+    "female": "Female"
   },
-  "vitals": {
-    "title": "Record vitals",
-    "systolic": "Systolic (mmHg)",
-    "diastolic": "Diastolic (mmHg)",
-    "temperature": "Temperature (°C)",
-    "pulse": "Pulse (bpm)",
-    "weight": "Weight (kg)",
-    "spO2": "SpO2 (%)",
-    "abnormal": "Abnormal value",
-    "nurseNotes": "Nurse notes"
+  "ehr": {
+    "bloodType": "Blood Type: {{type}}",
+    "aiBtn": "AI Diagnosis",
+    "vitalsBtn": "Take Vitals",
+    "newConsultationBtn": "New Consultation",
+    "noPatientSelectedTitle": "No Patient Record Selected",
+    "noPatientSelectedSub": "Please select a patient from the left list to view their full electronic record, care history, and consultations."
   },
-  "consultation": {
-    "title": "Medical consultation",
-    "chiefComplaint": "Chief complaint",
-    "clinicalNotes": "Clinical notes",
-    "diagnoses": "Diagnoses",
+  "vitalsSection": {
+    "title": "Personal Parameters & Vital Signs",
+    "lastRecorded": "Recorded at {{time}}",
+    "tension": "Blood Pressure",
+    "temp": "Temperature",
+    "pulse": "Pulse",
+    "spO2": "Saturation",
+    "weight": "Weight",
+    "nurseNotes": "Nurse Clinical Observations",
+    "noVitalsRecorded": "No vitals recorded today for this patient.",
+    "addVitalsBtn": "Record Vitals"
+  },
+  "historySection": {
+    "title": "Medical File & History",
+    "allergiesTitle": "Reported Allergies",
+    "allergiesDefault": "Penicillin (severe skin reaction)",
+    "historyTitle": "Medical History & Chronic Conditions",
+    "htn": "Essential hypertension (monitored since 2021)",
+    "cardio": "No cardiac surgical history",
+    "address": "Patient address: {{address}}",
+    "contact": "Emergency contact: {{contact}}"
+  },
+  "labsSection": {
+    "title": "Laboratory Orders & Tests ({{count}})",
+    "validated": "Validated",
+    "pending": "Pending",
+    "noLabs": "No laboratory tests ordered yet."
+  },
+  "consultationsSection": {
+    "title": "Consultation History & Clinical Files",
+    "newBtn": "New",
+    "columns": {
+      "date": "Date",
+      "doctor": "Doctor",
+      "chiefComplaint": "Chief Complaint",
+      "diagnosis": "Diagnosis (ICD-10)",
+      "details": "Clinical File"
+    },
+    "detailsBtn": "Details",
+    "noConsultations": "No consultations recorded yet."
+  },
+  "statuses": {
+    "waiting": "Waiting",
+    "vitalsTaken": "Vitals Taken",
+    "inConsultation": "In Consultation",
+    "labPending": "Lab Pending",
+    "pharmacyPending": "Pharmacy Pending",
+    "completed": "Completed"
+  },
+  "vitalsModal": {
+    "title": "Vital Signs Entry",
+    "warningAbnormal": "Warning: One or more vitals are out of normal range!",
+    "allNormal": "All vital signs are within reference ranges.",
+    "tensionLabel": "Blood Pressure (Sys / Dia)",
+    "tempLabel": "Temperature (°C)",
+    "pulseLabel": "Pulse (BPM)",
+    "spO2Label": "Saturation SpO2 (%)",
+    "weightLabel": "Weight (kg)",
+    "nurseNotesLabel": "Observations / Symptoms Observed",
+    "nurseNotesPlaceholder": "E.g. Patient conscious, reported headaches. Mild fatigue upon walking...",
+    "cancel": "Cancel",
+    "submit": "Record Vitals"
+  },
+  "consultationModal": {
+    "title": "Clinical Consultation Entry",
+    "sub": "Patient: {{patientName}} ({{code}}) • Doctor: {{doctorName}}",
+    "chiefComplaint": "Chief Complaint *",
+    "chiefComplaintPlaceholder": "E.g. Chest pain, mild fever...",
+    "diagnoses": "Diagnoses (ICD-10)",
+    "diagnosesPlaceholder": "E.g. I10 - Essential hypertension...",
+    "noDiagnoses": "No diagnoses recorded.",
+    "clinicalNotes": "Clinical Observations & Physical Examination",
+    "clinicalNotesPlaceholder": "Enter complete clinical exam, auscultation, abdominal palpation, etc...",
+    "labOrders": "Laboratory Test Requests",
+    "labOrdersPlaceholder": "E.g. Complete Blood Count, Blood Glucose, Creatinine...",
+    "requestLabBtn": "Order",
     "prescriptions": "Prescriptions",
-    "labOrders": "Lab orders",
-    "drug": "Drug",
-    "dosage": "Dosage",
-    "frequency": "Frequency",
-    "duration": "Duration"
+    "drugPlaceholder": "Medication (E.g. Amlodipine 5mg)",
+    "dosagePlaceholder": "Dosage (E.g. 1 tablet)",
+    "frequencyPlaceholder": "Frequency (E.g. Morning / Evening)",
+    "durationPlaceholder": "Duration (E.g. 30 days)",
+    "noPrescriptions": "No prescriptions written.",
+    "cancel": "Close without saving",
+    "submit": "Validate & Transmit Consultation",
+    "requiredWarning": "Please enter the chief complaint for consultation.",
+    "requiredTitle": "Required Field"
   },
-  "careTasks": {
-    "title": "Care & Tasks",
-    "types": {
-      "injection": "Injection",
-      "pansement": "Dressing",
-      "medicament": "Medication",
-      "perfusion": "Infusion"
+  "detailsModal": {
+    "title": "Clinical Consultation Record",
+    "recordedDate": "Recorded on: {{date}}",
+    "patient": "Patient",
+    "doctor": "Consulting Doctor",
+    "chiefComplaint": "Chief Complaint",
+    "diagnoses": "Diagnoses (ICD-10)",
+    "noDiagnoses": "No codified diagnoses.",
+    "clinicalNotes": "Clinical Observations & Report",
+    "noNotes": "No detailed report written.",
+    "labOrders": "Laboratory Tests Ordered",
+    "prescriptions": "Treatment & Prescription Written",
+    "table": {
+      "drug": "Medication",
+      "dose": "Dose",
+      "frequency": "Frequency",
+      "duration": "Duration"
     },
-    "statuses": {
-      "pending": "Pending",
-      "administered": "Administered"
-    },
-    "prescribed": "Prescribed by",
-    "scheduled": "Scheduled at",
-    "bed": "Bed"
+    "noPrescriptions": "No associated prescriptions.",
+    "close": "Close Record"
   },
   "ai": {
     "title": "AI Diagnostic",
-    "selectModel": "Select model",
-    "selectPatient": "Select patient",
+    "selectModel": "Select a model",
+    "selectPatient": "Select a patient",
     "analyze": "Analyze",
     "analyzing": "Analyzing...",
-    "result": "Diagnostic result",
+    "result": "Diagnostic Result",
     "confidence": "Confidence",
     "recommendations": "Recommendations",
-    "riskLevel": "Risk level",
-    "history": "Diagnostic history"
+    "riskLevel": "Risk Level",
+    "history": "Diagnostic History"
+  },
+  "consultationPage": {
+    "title": "Medical Consultation Space",
+    "subtitle": "360° Electronic Health Record, prescribing and AI assistance module",
+    "activePatientLabel": "Active Patient:",
+    "noPatientAvailableTitle": "No patient available",
+    "noPatientAvailableSub": "Please add or select a patient first.",
+    "tabs": {
+      "todayVitals": "Today's Vitals",
+      "history": "History",
+      "prescriptions": "Prescriptions",
+      "labs": "Lab Tests ({{count}})"
+    },
+    "formTitle": "Consultation & Prescription Entry",
+    "addDiagnosisBtn": "Add",
+    "prescriptionTitle": "Medication Prescription (Pharmacy Auto-completion)",
+    "prescribeBtn": "Prescribe",
+    "submitConsultation": "Close Consultation & Send to Pharmacy/Cashier",
+    "aiTitle": "AI Medical Assistant",
+    "aiSubtitle": "Diagnostic assistance & drug interactions",
+    "aiInputLabel": "Enter or analyze symptoms",
+    "aiSuggestionsTitle": "Suggested Diagnostic Paths",
+    "aiInteractionTitle": "Interaction Check",
+    "saveSuccess": "Consultation saved successfully for {{name}}!",
+    "saveSuccessTitle": "Consultation Saved",
+    "aiNotification": "Symptom analysis updated by AI!"
+  },
+  "aiDiagnosticPage": {
+    "title": "Clinical Analysis & Diagnostic Support",
+    "subtitle": "Assisted evaluation of patient vitals and medical profile.",
+    "serverConnected": "Server Connected",
+    "offlineMode": "Standalone Mode",
+    "clinicalEvaluation": "Clinical Evaluation",
+    "historyTab": "History ({{count}})",
+    "copyReport": "Copy Text Report",
+    "reportCopied": "Report Copied!",
+    "archivedSuccess": "Saved to patient file!",
+    "archiveToRecord": "Archive to Patient Medical Record"
   }
 }

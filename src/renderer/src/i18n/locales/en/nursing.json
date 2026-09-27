@@ -1,0 +1,57 @@
+{
+  "title": "Nursing & Vitals Space",
+  "subtitle": "Rapid entry of vital parameters, anomaly alerts, and care plan administration",
+  "tabs": {
+    "worklist": "Vitals Entry ({{count}})",
+    "vitalsHistory": "Vitals History ({{count}})",
+    "carePlan": "Care Plan ({{count}})"
+  },
+  "worklist": {
+    "waitingTitle": "Waiting Patients ({{count}})",
+    "noPatients": "No patients waiting for vitals intake.",
+    "yearsOld": "{{age}} y/o",
+    "selectPatientPrompt": "Select a patient from the left list",
+    "formTitle": "Vitals Recording for:",
+    "patientCode": "Patient Code: {{code}}",
+    "assignedDoctor": "Doctor: {{doctor}}",
+    "abnormalAlert": "Abnormal Vitals Alert!",
+    "normalAlert": "Vitals Within Normal Range",
+    "tensionLabel": "Blood Pressure (mmHg)",
+    "tensionRef": "Ref: 120/80",
+    "tempLabel": "Temperature (°C)",
+    "tempRef": "Ref: 36.5 - 37.5",
+    "pulseLabel": "Pulse (BPM)",
+    "pulseRef": "Ref: 60 - 100",
+    "weightLabel": "Body Weight (kg)",
+    "spO2Label": "SpO2 Saturation (%)",
+    "spO2Ref": "Ref: 95 - 100%",
+    "nurseNotesLabel": "Nurse Observations",
+    "nurseNotesPlaceholder": "Clinical signs observed, reported symptoms...",
+    "submitBtn": "Save & Send to Doctor",
+    "successNotification": "Vitals recorded for {{name}}. Status updated!",
+    "notificationTitle": "Vitals Recording"
+  },
+  "history": {
+    "title": "Vitals Intake History",
+    "columns": {
+      "timestamp": "Timestamp",
+      "patient": "Patient",
+      "tension": "Blood Pressure",
+      "temperature": "Temperature",
+      "pulse": "Pulse",
+      "weight": "Weight",
+      "spO2": "SpO2",
+      "visualDiagnostic": "Visual Diagnostic",
+      "observations": "Observations"
+    },
+    "abnormalTag": "Abnormal / Alert",
+    "normalTag": "Normal"
+  },
+  "carePlan": {
+    "title": "Care Plan (Injections & Dressings)",
+    "subtitle": "List of prescribed medical procedures to administer to patients",
+    "prescribedBy": "Prescribed by {{doctor}} • Scheduled at {{time}}",
+    "administeredAt": "Administered at {{time}}",
+    "toAdminister": "To administer"
+  }
+}

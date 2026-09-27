@@ -1,8 +1,121 @@
 {
   "title": "Caisse & Factures",
-  "tabs": { "invoices": "Factures", "create": "Nouvelle facture" },
-  "columns": { "code": "N° Facture", "patient": "Patient", "date": "Date", "items": "Prestations", "subtotal": "Sous-total", "insurance": "Assurance", "share": "Part patient", "status": "Statut", "actions": "Actions" },
-  "statuses": { "unpaid": "Non payé", "paid": "Payé" },
-  "paymentMethods": { "cash": "Espèces", "card": "Carte Bancaire", "mobile": "Mobile Money" },
-  "create": { "title": "Nouvelle facture", "selectPatient": "Sélectionner un patient", "addItem": "Ajouter une prestation", "description": "Description", "category": "Catégorie", "amount": "Montant", "insuranceName": "Assurance", "coveragePercent": "Couverture (%)", "paymentMethod": "Mode de paiement", "markPaid": "Marquer comme payé", "submit": "Créer la facture", "categories": { "consultation": "Consultation", "laboratoire": "Laboratoire", "pharmacie": "Pharmacie", "soins": "Soins" } }
+  "headerTitle": "Espace Caisse & Facturation Sécurisée",
+  "headerSub": "Encaissement des actes, prise en charge mutuelle/assurance et clôture de caisse quotidienne",
+  "tabs": {
+    "pos": "Point d'Encaissement ({{count}})",
+    "history": "Historique Reçus ({{count}})",
+    "closure": "Clôture de Caisse"
+  },
+  "pos": {
+    "unpaidTitle": "Actes Non Payés en Attente ({{count}})",
+    "newInvoice": "Facture",
+    "actsCount": "{{count}} acte(s)",
+    "noUnpaid": "Aucune facture en attente d'encaissement",
+    "noSelected": "Sélectionnez une facture dans la liste de gauche ou créez-en une nouvelle.",
+    "hospitalName": "CENTRE HOSPITALIER WILLO",
+    "receiptTitle": "Reçu & Facture d'Acquittement Médical",
+    "location": "Dakar, Sénégal • Tel: +221 33 800 00 00",
+    "date": "Date: {{date}}",
+    "patientName": "Nom du Patient :",
+    "insuranceCoverage": "Prise en Charge Mutuelle :",
+    "table": {
+      "description": "Description des Actes",
+      "category": "Catégorie",
+      "amount": "Montant (F CFA)"
+    },
+    "subtotalBrut": "Sous-total Actes Brut :",
+    "insuranceCoverPercent": "Couverture Mutuelle / Assurance ({{percent}}%) :",
+    "patientShareRemaining": "RESTE À PAYER PATIENT :",
+    "paymentModeTitle": "Sélectionner le Mode de Règlement",
+    "payAndPrintBtn": "Enregistrer le Paiement & Imprimer Reçu",
+    "alreadyPaid": "Facture déjà réglée par {{method}} à {{time}}",
+    "printTicketBtn": "Imprimer Ticket"
+  },
+  "history": {
+    "title": "Historique & Registre Général des Factures ({{count}})",
+    "sub": "Consulter, filtrer et réimprimer l'intégralité des factures de la base de données",
+    "searchPlaceholder": "Rechercher patient ou code FAC-...",
+    "showReceiptBtn": "Afficher Reçu",
+    "noInvoices": "Aucune facture enregistrée dans la base de données.",
+    "columns": {
+      "code": "N° Facture",
+      "patient": "Patient",
+      "items": "Actes Facturés",
+      "subtotal": "Total Brut",
+      "insurance": "Part Mutuelle",
+      "patientShare": "A Payer Patient",
+      "status": "Statut",
+      "dateReg": "Date / Règlement",
+      "action": "Action"
+    }
+  },
+  "closure": {
+    "title": "Clôture de Caisse Quotidienne & Réconciliation",
+    "sub": "Synthèse journalière des encaissements par mode de paiement",
+    "lockBtn": "Verrouiller & Clôturer la Caisse",
+    "closedStatus": "Caisse Clôturée",
+    "cashTotal": "Total Espèces",
+    "cardTotal": "Total Carte Bancaire",
+    "mobileTotal": "Total Mobile Money",
+    "grandTotal": "Recette Totale du Jour"
+  },
+  "statuses": {
+    "unpaid": "Non payé",
+    "paid": "Payé",
+    "pending": "En Attente"
+  },
+  "paymentMethods": {
+    "cash": "Espèces",
+    "card": "Carte Bancaire",
+    "mobile": "Mobile Money"
+  },
+  "modal": {
+    "title": "Enregistrer une Nouvelle Facture",
+    "patientLabel": "Patient Facturé",
+    "selectPatientPlaceholder": "-- Sélectionner un patient --",
+    "noInsurance": "Sans Mutuelle",
+    "insuranceLabel": "Assurance / Mutuelle",
+    "insurancePlaceholder": "Ex: NSIA Assurance, Gras Savoye...",
+    "coverageRate": "Taux de Prise en Charge",
+    "actsSection": "Saisie des Actes Facturables",
+    "itemDescPlaceholder": "Libellé de l'acte...",
+    "itemPricePlaceholder": "Prix (F CFA)...",
+    "addActBtn": "Ajouter l'Acte Facturable",
+    "table": {
+      "description": "Description",
+      "category": "Catégorie",
+      "price": "Prix",
+      "action": "Action"
+    },
+    "subtotalBrut": "Sous-total Actes Brut :",
+    "coveragePercent": "Prise en charge ({{percent}}%) :",
+    "patientRemaining": "Reste à payer Patient :",
+    "cancel": "Annuler",
+    "submit": "Créer la Facture",
+    "notifications": {
+      "requiredTitle": "Champ requis",
+      "selectPatientWarning": "Veuillez sélectionner un patient.",
+      "addActWarning": "Veuillez ajouter au moins un acte facturable."
+    }
+  },
+  "create": {
+    "title": "Créer une Nouvelle Facture Médicale",
+    "selectPatient": "Sélectionner un patient",
+    "addItem": "Ajouter une prestation",
+    "description": "Description",
+    "category": "Catégorie",
+    "amount": "Montant (F CFA)",
+    "insuranceName": "Organisme Mutuelle / Assurance",
+    "coveragePercent": "Couverture Mutuelle (%)",
+    "paymentMethod": "Mode de règlement immédiat (Optionnel)",
+    "markPaid": "Marquer directement comme payé",
+    "submit": "Valider & Générer la Facture",
+    "categories": {
+      "consultation": "Consultation",
+      "laboratoire": "Laboratoire",
+      "pharmacie": "Pharmacie",
+      "soins": "Soins"
+    }
+  }
 }

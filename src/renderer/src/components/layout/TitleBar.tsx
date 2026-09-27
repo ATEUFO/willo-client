@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Minus, Square, Copy, X, Settings, LogOut, ChevronDown } from 'lucide-react'
 import willoLogo from '../../assets/willo_logo1.png'
 import { useHospitalStore } from '../../pages/store/hospitalStore'
-import { ROLE_CONFIGS } from '../../config/permissions'
 
 export const TitleBar: React.FC = () => {
+  const { t } = useTranslation('layout')
+  const { t: tc } = useTranslation('common')
   const [isMaximized, setIsMaximized] = useState(false)
   const [isMac, setIsMac] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -89,7 +91,7 @@ export const TitleBar: React.FC = () => {
             <button
               onClick={() => setShowSettingsModal(true)}
               className="h-6 w-6 rounded flex items-center justify-center text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 transition-colors"
-              title="Préférences & Paramètres"
+              title={t('titlebar.settings')}
             >
               <Settings className="w-3.5 h-3.5" />
             </button>
@@ -116,7 +118,7 @@ export const TitleBar: React.FC = () => {
                   <div className="px-3 py-2 border-b border-slate-800">
                     <p className="font-bold text-slate-100 text-xs truncate">{currentUser.name}</p>
                     <p className="text-[10px] text-emerald-400 font-medium">
-                      {ROLE_CONFIGS[currentUser.role]?.label || currentUser.role}
+                      {tc(`roles.${currentUser.role}`, { defaultValue: currentUser.role })}
                     </p>
                   </div>
 
@@ -129,7 +131,7 @@ export const TitleBar: React.FC = () => {
                       className="w-full px-3 py-2 text-left text-slate-300 hover:text-white hover:bg-slate-800/80 flex items-center gap-2 transition-colors text-xs cursor-pointer"
                     >
                       <Settings className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Préférences & Paramètres</span>
+                      <span>{t('titlebar.settings')}</span>
                     </button>
 
                     <button
@@ -140,7 +142,7 @@ export const TitleBar: React.FC = () => {
                       className="w-full px-3 py-2 text-left text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 flex items-center gap-2 transition-colors text-xs cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>Se déconnecter</span>
+                      <span>{t('titlebar.logout')}</span>
                     </button>
                   </div>
                 </div>
@@ -156,7 +158,7 @@ export const TitleBar: React.FC = () => {
             <button
               onClick={handleMinimize}
               className="w-10 h-full flex items-center justify-center hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-default"
-              title="Réduire"
+              title={tc('window.minimize')}
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
@@ -165,7 +167,7 @@ export const TitleBar: React.FC = () => {
             <button
               onClick={handleMaximize}
               className="w-10 h-full flex items-center justify-center hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-default"
-              title={isMaximized ? 'Restaurer' : 'Agrandir'}
+              title={isMaximized ? tc('window.restore') : tc('window.maximize')}
             >
               {isMaximized ? (
                 <Copy className="w-3 h-3 rotate-180" />
@@ -178,7 +180,7 @@ export const TitleBar: React.FC = () => {
             <button
               onClick={handleClose}
               className="w-10 h-full flex items-center justify-center hover:bg-rose-600 text-slate-400 hover:text-white transition-colors cursor-default"
-              title="Fermer"
+              title={tc('window.close')}
             >
               <X className="w-3.5 h-3.5" />
             </button>

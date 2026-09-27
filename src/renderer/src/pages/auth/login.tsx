@@ -1,15 +1,8 @@
 import React, { useState } from 'react'
-import {
-  User,
-  Lock,
-  Eye,
-  EyeOff,
-  ShieldCheck,
-  ArrowRight,
-  AlertCircle
-} from 'lucide-react'
+import { User, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react'
 import { useHospitalStore } from '../store/hospitalStore'
 import willoLogo from '../../assets/willo_logo1.png'
+import { useTranslation } from 'react-i18next'
 
 interface LoginPageProps {
   onSwitchToSignin?: () => void
@@ -19,6 +12,7 @@ interface LoginPageProps {
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginSuccess }) => {
   const { login, showNotification } = useHospitalStore()
+  const { t } = useTranslation('auth')
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -32,12 +26,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
     setErrorMessage('')
 
     if (!username.trim()) {
-      setErrorMessage("Veuillez saisir votre nom d'utilisateur.")
+      setErrorMessage(t('errors.usernameRequired'))
       return
     }
 
     if (!password) {
-      setErrorMessage('Veuillez saisir votre mot de passe.')
+      setErrorMessage(t('errors.passwordRequired'))
       return
     }
 
@@ -48,18 +42,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
       setIsLoading(false)
 
       if (result.success) {
-        if (onLoginSuccess) {
-          onLoginSuccess()
-        }
+        if (onLoginSuccess) onLoginSuccess()
       } else {
-        setErrorMessage(result.message || 'Échec de la connexion. Vérifiez vos identifiants.')
+        setErrorMessage(result.message || t('errors.failed'))
       }
     } catch (err) {
       setIsLoading(false)
       const message =
         err instanceof Error
           ? err.message
-          : (err as { message?: string })?.message || 'Une erreur est survenue lors de la connexion.'
+          : (err as { message?: string })?.message || t('errors.generic')
       setErrorMessage(message)
     }
   }
@@ -73,12 +65,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
             <img src={willoLogo} alt="WILLO" className="h-14 w-auto object-contain" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-medical-dark tracking-tight">
-              WILLO HOSPITAL
-            </h1>
-            <p className="text-xs text-slate-500 font-medium">
-              Système d'Information Hospitalier
-            </p>
+            <h1 className="text-2xl font-extrabold text-medical-dark tracking-tight">WILLO HOSPITAL</h1>
+            <p className="text-xs text-slate-500 font-medium">{t('..', { ns: 'common', defaultValue: "Système d'Information Hospitalier" })}</p>
           </div>
         </div>
 
@@ -87,7 +75,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
           <div className="border-b border-medical-border pb-3">
             <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-medical-primary" />
-              Connexion Utilisateur
+              {t('title')}
             </h2>
           </div>
 
@@ -99,46 +87,37 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Username / Email Field */}
+            {/* Username */}
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-slate-700">
-                Identifiant Utilisateur
-              </label>
+              <label className="block text-xs font-bold text-slate-700">{t('username')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
-                  type="text"
-                  value={username}
+                  type="text" value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Nom d'utilisateur"
+                  placeholder={t('usernamePlaceholder')}
                   className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-slate-700">
-                Mot de passe
-              </label>
+              <label className="block text-xs font-bold text-slate-700">{t('password')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
+                  type={showPassword ? 'text' : 'password'} value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-medical-border rounded-xl text-xs text-slate-900 focus:outline-none focus:border-medical-primary focus:bg-white transition-all font-medium"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -147,62 +126,46 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSwitchToSignin, onLoginS
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between text-xs pt-1">
               <label className="flex items-center gap-2 text-slate-600 cursor-pointer font-medium">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-medical-border text-medical-primary focus:ring-medical-primary accent-medical-primary"
-                />
-                <span>Se souvenir de ce poste</span>
+                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-medical-border text-medical-primary focus:ring-medical-primary accent-medical-primary" />
+                <span>{t('rememberMe')}</span>
               </label>
-
-              <button
-                type="button"
-                onClick={() => showNotification("Veuillez contacter l'administrateur de l'hôpital pour réinitialiser votre mot de passe.", { title: 'Mot de passe oublié', type: 'info' })}
-                className="text-medical-primary hover:underline font-semibold"
-              >
-                Mot de passe oublié ?
+              <button type="button"
+                onClick={() => showNotification(t('forgotPasswordMsg'), { title: t('forgotPasswordTitle'), type: 'info' })}
+                className="text-medical-primary hover:underline font-semibold">
+                {t('forgotPassword')}
               </button>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-medical-primary hover:bg-medical-hover text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
+            {/* Submit */}
+            <button type="submit" disabled={isLoading}
+              className="w-full bg-medical-primary hover:bg-medical-hover text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50">
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Connexion en cours...
+                  {t('loading')}
                 </span>
               ) : (
                 <>
-                  <span>Se Connecter</span>
+                  <span>{t('submit')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Switch to Signin Link */}
+          {/* Switch to Signin */}
           <div className="text-center pt-2 border-t border-medical-border">
             <p className="text-xs text-slate-600">
-              Nouveau membre du personnel ?{' '}
-              <button
-                onClick={onSwitchToSignin}
-                className="text-medical-primary font-bold hover:underline"
-              >
-                Créer un compte
+              {t('newMember')}{' '}
+              <button onClick={onSwitchToSignin} className="text-medical-primary font-bold hover:underline">
+                {t('createAccount')}
               </button>
             </p>
           </div>
         </div>
 
-        {/* Footer info */}
-        <p className="text-center text-[11px] text-slate-400 font-medium">
-          WILLO • Plateforme Hospitalière
-        </p>
+        <p className="text-center text-[11px] text-slate-400 font-medium">{t('footer')}</p>
       </div>
     </div>
   )

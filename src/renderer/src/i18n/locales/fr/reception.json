@@ -1,52 +1,51 @@
 {
   "title": "Accueil & Triage",
+  "headerTitle": "Accueil, Triage & File d'Attente",
+  "headerSub": "Rapidité de saisie, prise de rendez-vous et enregistrement des dossiers patients",
+  "searchPlaceholder": "Rechercher par nom, téléphone ou ID...",
+  "newPatient": "Nouveau Patient",
   "tabs": {
-    "queue": "File d'attente",
-    "register": "Enregistrer un patient",
-    "appointments": "Rendez-vous"
+    "queue": "File d'Attente Temps Réel ({{count}})",
+    "calendar": "Planning & Rendez-vous ({{count}})",
+    "registry": "Annuaire des Patients ({{count}})"
   },
   "queue": {
-    "title": "File d'attente du jour",
+    "title": "File d'Attente Générale de l'Accueil",
     "empty": "Aucun patient en attente",
-    "queueNumber": "N°",
-    "arrival": "Arrivée",
-    "doctor": "Médecin assigné",
+    "ticket": "TICKET",
+    "arrivedAt": "Arrivé à {{time}}",
+    "sendToVitals": "Envoyer aux Constantes",
+    "cards": {
+      "waiting": "Patients en Salle d'Attente",
+      "vitals": "Prise de Constantes en Cours",
+      "consultation": "En Consultation Médicale",
+      "count": "{{count}} Patients"
+    },
     "statuses": {
-      "waiting": "En attente",
-      "vitalsTaken": "Constantes prises",
-      "inConsultation": "En consultation",
-      "labPending": "Labo en attente",
-      "pharmacyPending": "Pharmacie en attente",
+      "waiting": "En Attente",
+      "vitalsTaken": "Constantes Prises",
+      "inConsultation": "En Consultation",
+      "labPending": "Labo en Attente",
+      "pharmacyPending": "Pharmacie en Attente",
       "completed": "Terminé"
     }
   },
-  "register": {
-    "title": "Enregistrement nouveau patient",
-    "editTitle": "Modifier le patient",
-    "fullName": "Nom complet",
-    "age": "Âge",
-    "gender": "Sexe",
-    "male": "Masculin",
-    "female": "Féminin",
-    "phone": "Téléphone",
-    "address": "Adresse",
-    "bloodType": "Groupe sanguin",
-    "emergencyContact": "Contact d'urgence",
-    "assignedDoctor": "Médecin assigné",
-    "submit": "Enregistrer",
-    "success": "Patient enregistré avec succès"
-  },
   "appointments": {
-    "title": "Rendez-vous",
-    "schedule": "Planifier un RDV",
+    "title": "Planning Interactif des Rendez-Vous",
+    "sub": "Prise, modification et annulation de consultations programmées",
+    "book": "Fixer un Rendez-vous",
+    "modalTitle": "Fixer un Rendez-vous Médical",
+    "confirmBook": "Confirmer le Rendez-vous",
+    "selectPatient": "-- Sélectionner un patient --",
+    "selectDoctor": "-- Sélectionner un médecin --",
     "columns": {
       "patient": "Patient",
       "doctor": "Médecin",
-      "date": "Date",
-      "time": "Heure",
-      "department": "Service",
-      "type": "Type",
-      "status": "Statut"
+      "department": "Département",
+      "dateTime": "Date & Heure",
+      "type": "Motif / Type",
+      "status": "Statut",
+      "actions": "Actions"
     },
     "types": {
       "consultation": "Consultation",
@@ -55,10 +54,24 @@
       "controle": "Contrôle"
     },
     "statuses": {
-      "scheduled": "Planifié",
+      "scheduled": "Programmé",
       "confirmed": "Confirmé",
       "completed": "Terminé",
       "cancelled": "Annulé"
     }
+  },
+  "registry": {
+    "title": "Annuaire des Dossiers Patients",
+    "ageGender": "Âge / Sexe",
+    "years": "ans"
+  },
+  "modal": {
+    "createTitle": "Création Rapide de Dossier Patient",
+    "namePlaceholder": "Ex: Ibrahima Faye",
+    "phonePlaceholder": "+221 77 000 00 00",
+    "addressPlaceholder": "Dakar, Sacré-Cœur",
+    "emergencyPlaceholder": "Nom et numéro de téléphone du proche",
+    "noDoctor": "Aucun (File générale)",
+    "submitAdd": "Enregistrer & Ajouter à la File"
   }
 }

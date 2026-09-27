@@ -20,11 +20,13 @@ import {
   Phone
 } from 'lucide-react'
 import { useHospitalStore, Patient, ConsultationRecord } from '../store/hospitalStore'
+import { useTranslation } from 'react-i18next'
 import { VitalsFormModal } from './components/VitalsFormModal'
 import { ConsultationFormModal } from './components/ConsultationFormModal'
 import { ConsultationDetailsModal } from './components/ConsultationDetailsModal'
 
 export const MedicalPage: React.FC = () => {
+  const { t } = useTranslation('medical')
   const {
     patients,
     vitals,
@@ -41,7 +43,7 @@ export const MedicalPage: React.FC = () => {
   const [layoutMode, setLayoutMode] = useState<'grid' | 'list'>('list')
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  
+
   // Collapsed doctor sections
   const [collapsedDoctors, setCollapsedDoctors] = useState<Record<string, boolean>>({})
 
@@ -86,26 +88,26 @@ export const MedicalPage: React.FC = () => {
       if (!matchesSearch) return false
 
       if (selectedDoctorFilter !== 'all') {
-        const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : 'Sans médecin affecté (File générale)'
+        const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : t('directory.noDoctor')
         return doc === selectedDoctorFilter
       }
 
       return true
     })
-  }, [patients, searchQuery, selectedDoctorFilter])
+  }, [patients, searchQuery, selectedDoctorFilter, t])
 
   // Group filtered patients by their assigned doctor
   const groupedPatients = useMemo(() => {
     const groups: Record<string, Patient[]> = {}
     filteredPatients.forEach((p) => {
-      const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : 'Sans médecin affecté (File générale)'
+      const doc = p.assignedDoctor && p.assignedDoctor.trim() !== '' ? p.assignedDoctor : t('directory.noDoctor')
       if (!groups[doc]) {
         groups[doc] = []
       }
       groups[doc].push(p)
     })
     return groups
-  }, [filteredPatients])
+  }, [filteredPatients, t])
 
   // Toggle doctor collapse
   const toggleDoctorCollapse = (docName: string) => {
@@ -140,12 +142,12 @@ export const MedicalPage: React.FC = () => {
   // Status Badge styling helper
   const getStatusBadge = (status: Patient['status']) => {
     const configs: Record<Patient['status'], { bg: string; text: string; label: string }> = {
-      Waiting: { bg: 'bg-amber-50 border-amber-200 text-amber-800', text: 'text-amber-600', label: 'En attente' },
-      'Vitals Taken': { bg: 'bg-blue-50 border-blue-200 text-blue-800', text: 'text-blue-600', label: 'Constantes Prises' },
-      'In Consultation': { bg: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'text-emerald-600', label: 'En Consultation' },
-      'Lab Pending': { bg: 'bg-purple-50 border-purple-200 text-purple-800', text: 'text-purple-600', label: 'Labo en cours' },
-      'Pharmacy Pending': { bg: 'bg-pink-50 border-pink-200 text-pink-800', text: 'text-pink-600', label: 'Pharma en cours' },
-      Completed: { bg: 'bg-slate-100 border-slate-300 text-slate-700', text: 'text-slate-500', label: 'Clôturé' }
+      Waiting: { bg: 'bg-amber-50 border-amber-200 text-amber-800', text: 'text-amber-600', label: t('statuses.waiting') },
+      'Vitals Taken': { bg: 'bg-blue-50 border-blue-200 text-blue-800', text: 'text-blue-600', label: t('statuses.vitalsTaken') },
+      'In Consultation': { bg: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'text-emerald-600', label: t('statuses.inConsultation') },
+      'Lab Pending': { bg: 'bg-purple-50 border-purple-200 text-purple-800', text: 'text-purple-600', label: t('statuses.labPending') },
+      'Pharmacy Pending': { bg: 'bg-pink-50 border-pink-200 text-pink-800', text: 'text-pink-600', label: t('statuses.pharmacyPending') },
+      Completed: { bg: 'bg-slate-100 border-slate-300 text-slate-700', text: 'text-slate-500', label: t('statuses.completed') }
     }
     const conf = configs[status] || { bg: 'bg-slate-50 border-slate-200 text-slate-800', text: 'text-slate-600', label: status }
     return (
@@ -164,28 +166,26 @@ export const MedicalPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <User className="w-4 h-4 text-medical-primary" />
-              Répertoire Patients
+              {t('directory.title')}
             </h2>
             <div className="flex items-center bg-white rounded-lg border border-medical-border p-0.5 shadow-xs">
               <button
                 onClick={() => setLayoutMode('grid')}
-                className={`p-1.5 rounded-md transition-all cursor-pointer ${
-                  layoutMode === 'grid'
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${layoutMode === 'grid'
                     ? 'bg-medical-primary text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Mode Mosaïque"
+                  }`}
+                title={t('directory.gridTooltip')}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setLayoutMode('list')}
-                className={`p-1.5 rounded-md transition-all cursor-pointer ${
-                  layoutMode === 'list'
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${layoutMode === 'list'
                     ? 'bg-medical-primary text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Mode Liste"
+                  }`}
+                title={t('directory.listTooltip')}
               >
                 <List className="w-3.5 h-3.5" />
               </button>
@@ -197,7 +197,7 @@ export const MedicalPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Rechercher par nom ou code..."
+              placeholder={t('directory.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-white border border-medical-border rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary focus:ring-1 focus:ring-medical-primary transition-all shadow-2xs"
@@ -206,19 +206,19 @@ export const MedicalPage: React.FC = () => {
 
           {/* Doctor Filter Selector */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium whitespace-nowrap">Filtrer par médecin:</span>
+            <span className="text-slate-500 font-medium whitespace-nowrap">{t('directory.filterDoctorLabel')}</span>
             <select
               value={selectedDoctorFilter}
               onChange={(e) => setSelectedDoctorFilter(e.target.value)}
               className="flex-1 bg-white border border-medical-border rounded-lg p-1.5 text-slate-700 focus:outline-none focus:border-medical-primary text-[11px] font-semibold"
             >
-              <option value="all">Tous les médecins</option>
+              <option value="all">{t('directory.allDoctors')}</option>
               {doctorList.map((doc) => (
                 <option key={doc} value={doc}>
                   {doc}
                 </option>
               ))}
-              <option value="Sans médecin affecté (File générale)">Sans médecin affecté</option>
+              <option value={t('directory.noDoctor')}>{t('directory.noDoctor')}</option>
             </select>
           </div>
         </div>
@@ -266,17 +266,16 @@ export const MedicalPage: React.FC = () => {
                           <div
                             key={p.id}
                             onClick={() => setSelectedPatientId(p.id)}
-                            className={`rounded-xl border p-2.5 cursor-pointer text-left transition-all ${
-                              isActive
+                            className={`rounded-xl border p-2.5 cursor-pointer text-left transition-all ${isActive
                                 ? 'bg-medical-subtle border-emerald-300 shadow-xs'
                                 : 'bg-white border-medical-border hover:border-slate-300 hover:bg-slate-50/50'
-                            }`}
+                              }`}
                           >
                             <h4 className="font-bold text-xs text-slate-800 truncate" title={p.name}>
                               {p.name}
                             </h4>
                             <div className="text-[10px] text-slate-500 mt-0.5">
-                              {p.gender === 'M' ? 'Homme' : 'Femme'}, {p.age} ans
+                              {p.gender === 'M' ? t('directory.male') : t('directory.female')}, {t('directory.yearsOld', { age: p.age })}
                             </div>
                           </div>
                         )
@@ -289,7 +288,7 @@ export const MedicalPage: React.FC = () => {
           ) : (
             <div className="text-center py-12 text-slate-400 space-y-2">
               <User className="w-8 h-8 mx-auto stroke-1" />
-              <p className="text-xs">Aucun patient correspondant</p>
+              <p className="text-xs">{t('directory.noPatients')}</p>
             </div>
           )}
         </div>
@@ -302,7 +301,7 @@ export const MedicalPage: React.FC = () => {
             {/* EHR Header / Patient Info Strip */}
             <div className="bg-medical-cardBg rounded-2xl border border-medical-border p-5 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
               <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-medical-primary via-emerald-400 to-medical-primary" />
-              
+
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-medical-subtle border border-emerald-200 text-medical-primary font-bold text-lg flex items-center justify-center shadow-2xs">
                   {activePatient.gender}
@@ -317,9 +316,9 @@ export const MedicalPage: React.FC = () => {
                       Code: <strong className="text-slate-800 font-mono">{activePatient.patientCode}</strong>
                     </span>
                     <span>•</span>
-                    <span>{activePatient.age} ans</span>
+                    <span>{t('directory.yearsOld', { age: activePatient.age })}</span>
                     <span>•</span>
-                    <span>Groupe Sanguin: <strong className="text-emerald-700 font-semibold">{activePatient.bloodType}</strong></span>
+                    <span><strong className="text-emerald-700 font-semibold">{t('ehr.bloodType', { type: activePatient.bloodType })}</strong></span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
                       <Phone className="w-3 h-3" /> {activePatient.phone}
@@ -335,21 +334,21 @@ export const MedicalPage: React.FC = () => {
                   className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                 >
                   <Brain className="w-4 h-4 text-emerald-200" />
-                  Diagnostic IA
+                  {t('ehr.aiBtn')}
                 </button>
                 <button
                   onClick={() => setIsVitalsModalOpen(true)}
                   className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 hover:text-slate-800 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   <Activity className="w-4 h-4 text-medical-primary" />
-                  Prendre Constantes
+                  {t('ehr.vitalsBtn')}
                 </button>
                 <button
                   onClick={() => setIsConsultationModalOpen(true)}
                   className="px-3.5 py-2 bg-medical-primary hover:bg-medical-hover text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   <Stethoscope className="w-4 h-4" />
-                  Nouvelle Consultation
+                  {t('ehr.newConsultationBtn')}
                 </button>
               </div>
             </div>
@@ -359,11 +358,11 @@ export const MedicalPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-medical-border pb-3">
                 <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                   <Activity className="w-4 h-4 text-medical-primary" />
-                  Paramètres Personnels & Constantes Vitales
+                  {t('vitalsSection.title')}
                 </h3>
                 {latestVitals && (
                   <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" /> Relevé du {latestVitals.timestamp}
+                    <Clock className="w-3.5 h-3.5" /> {t('vitalsSection.lastRecorded', { time: latestVitals.timestamp })}
                   </span>
                 )}
               </div>
@@ -373,14 +372,13 @@ export const MedicalPage: React.FC = () => {
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
                     {/* Tension */}
                     <div
-                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                        latestVitals.systolic > 140 || latestVitals.diastolic > 90 || latestVitals.systolic < 90
+                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${latestVitals.systolic > 140 || latestVitals.diastolic > 90 || latestVitals.systolic < 90
                           ? 'bg-red-50/70 border-red-200 text-red-900 shadow-2xs'
                           : 'bg-slate-50 border-medical-border'
-                      }`}
+                        }`}
                     >
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <Heart className="w-3.5 h-3.5 text-medical-danger" /> Tension
+                        <Heart className="w-3.5 h-3.5 text-medical-danger" /> {t('vitalsSection.tension')}
                       </span>
                       <div className="mt-2.5">
                         <span className="text-base font-bold font-mono">
@@ -392,14 +390,13 @@ export const MedicalPage: React.FC = () => {
 
                     {/* Température */}
                     <div
-                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                        latestVitals.temperature > 38.0 || latestVitals.temperature < 35.5
+                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${latestVitals.temperature > 38.0 || latestVitals.temperature < 35.5
                           ? 'bg-amber-50/70 border-amber-200 text-amber-900 shadow-2xs'
                           : 'bg-slate-50 border-medical-border'
-                      }`}
+                        }`}
                     >
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <Thermometer className="w-3.5 h-3.5 text-amber-500" /> Température
+                        <Thermometer className="w-3.5 h-3.5 text-amber-500" /> {t('vitalsSection.temp')}
                       </span>
                       <div className="mt-2.5">
                         <span className="text-base font-bold font-mono">
@@ -411,14 +408,13 @@ export const MedicalPage: React.FC = () => {
 
                     {/* Pouls */}
                     <div
-                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                        latestVitals.pulse > 100 || latestVitals.pulse < 55
+                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${latestVitals.pulse > 100 || latestVitals.pulse < 55
                           ? 'bg-red-50/70 border-red-200 text-red-900 shadow-2xs'
                           : 'bg-slate-50 border-medical-border'
-                      }`}
+                        }`}
                     >
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <Activity className="w-3.5 h-3.5 text-medical-primary" /> Pouls
+                        <Activity className="w-3.5 h-3.5 text-medical-primary" /> {t('vitalsSection.pulse')}
                       </span>
                       <div className="mt-2.5">
                         <span className="text-base font-bold font-mono">
@@ -430,14 +426,13 @@ export const MedicalPage: React.FC = () => {
 
                     {/* Saturation SpO2 */}
                     <div
-                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                        latestVitals.spO2 < 95
+                      className={`p-3.5 rounded-xl border flex flex-col justify-between ${latestVitals.spO2 < 95
                           ? 'bg-red-50/70 border-red-200 text-red-900 shadow-2xs'
                           : 'bg-slate-50 border-medical-border'
-                      }`}
+                        }`}
                     >
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <Activity className="w-3.5 h-3.5 text-cyan-600" /> Saturation
+                        <Activity className="w-3.5 h-3.5 text-cyan-600" /> {t('vitalsSection.spO2')}
                       </span>
                       <div className="mt-2.5">
                         <span className="text-base font-bold font-mono">
@@ -450,7 +445,7 @@ export const MedicalPage: React.FC = () => {
                     {/* Poids */}
                     <div className="p-3.5 rounded-xl border border-medical-border bg-slate-50 flex flex-col justify-between">
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                        <Weight className="w-3.5 h-3.5 text-blue-500" /> Poids
+                        <Weight className="w-3.5 h-3.5 text-blue-500" /> {t('vitalsSection.weight')}
                       </span>
                       <div className="mt-2.5">
                         <span className="text-base font-bold font-mono">
@@ -465,7 +460,7 @@ export const MedicalPage: React.FC = () => {
                   {latestVitals.nurseNotes && (
                     <div className="bg-slate-50 border border-medical-border p-3.5 rounded-xl text-xs space-y-1">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                        Observations Cliniques de l'Infirmier(ère)
+                        {t('vitalsSection.nurseNotes')}
                       </span>
                       <p className="text-slate-700 italic font-medium leading-relaxed">
                         "{latestVitals.nurseNotes}"
@@ -477,13 +472,13 @@ export const MedicalPage: React.FC = () => {
                 <div className="p-6 text-center border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-2">
                   <Activity className="w-8 h-8 text-slate-400 mx-auto stroke-1" />
                   <p className="text-xs text-slate-500 font-semibold">
-                    Aucune constante n'a été saisie aujourd'hui pour ce patient.
+                    {t('vitalsSection.noVitalsRecorded')}
                   </p>
                   <button
                     onClick={() => setIsVitalsModalOpen(true)}
                     className="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all shadow-3xs cursor-pointer"
                   >
-                    Enregistrer les Constantes
+                    {t('vitalsSection.addVitalsBtn')}
                   </button>
                 </div>
               )}
@@ -495,32 +490,32 @@ export const MedicalPage: React.FC = () => {
               <div className="bg-medical-cardBg rounded-2xl border border-medical-border p-5 space-y-4 shadow-xs">
                 <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-medical-border pb-3">
                   <FileText className="w-4 h-4 text-medical-primary" />
-                  Dossier Médical & Antécédents
+                  {t('historySection.title')}
                 </h3>
-                
+
                 <div className="space-y-3.5">
                   {/* Allergies Card */}
                   <div className="p-3 bg-red-50/50 border border-red-200/70 rounded-xl space-y-1">
                     <span className="text-[10px] font-bold text-medical-danger uppercase tracking-wider flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 animate-pulse" /> Allergies Signalées
+                      <AlertTriangle className="w-3.5 h-3.5 animate-pulse" /> {t('historySection.allergiesTitle')}
                     </span>
                     <p className="text-xs text-slate-700 font-bold pl-5">
                       {activePatient.emergencyContact?.toLowerCase().includes('allergie')
                         ? activePatient.emergencyContact
-                        : 'Pénicilline (réaction cutanée forte)'}
+                        : t('historySection.allergiesDefault')}
                     </p>
                   </div>
 
                   {/* Medical History */}
                   <div className="p-3 bg-slate-50 border border-medical-border rounded-xl space-y-1.5">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                      Antécédents & Pathologies Chroniques
+                      {t('historySection.historyTitle')}
                     </span>
                     <ul className="text-xs text-slate-700 list-disc pl-4 space-y-1 font-medium">
-                      <li>Hypertension artérielle essentielle (suivie depuis 2021)</li>
-                      <li>Pas d'antécédents chirurgicaux cardiaques</li>
-                      <li>Adresse du patient : {activePatient.address || 'Non spécifiée'}</li>
-                      <li>Contact urgence : {activePatient.emergencyContact || 'Non spécifié'}</li>
+                      <li>{t('historySection.htn')}</li>
+                      <li>{t('historySection.cardio')}</li>
+                      <li>{t('historySection.address', { address: activePatient.address || 'Non spécifiée' })}</li>
+                      <li>{t('historySection.contact', { contact: activePatient.emergencyContact || 'Non spécifié' })}</li>
                     </ul>
                   </div>
                 </div>
@@ -530,7 +525,7 @@ export const MedicalPage: React.FC = () => {
               <div className="bg-medical-cardBg rounded-2xl border border-medical-border p-5 space-y-4 shadow-xs">
                 <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-medical-border pb-3">
                   <Syringe className="w-4 h-4 text-medical-primary" />
-                  Analyses & Prescriptions de Laboratoire ({activePatientLabs.length})
+                  {t('labsSection.title', { count: activePatientLabs.length })}
                 </h3>
 
                 <div className="space-y-2 overflow-y-auto max-h-[170px] pr-1">
@@ -549,19 +544,18 @@ export const MedicalPage: React.FC = () => {
                           </span>
                         </div>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                            lab.status === 'Completed'
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${lab.status === 'Completed'
                               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                               : 'bg-amber-50 text-amber-800 border border-amber-200'
-                          }`}
+                            }`}
                         >
-                          {lab.status === 'Completed' ? 'Validé' : 'En attente'}
+                          {lab.status === 'Completed' ? t('labsSection.validated') : t('labsSection.pending')}
                         </span>
                       </div>
                     ))
                   ) : (
                     <div className="text-center py-8 text-slate-400 text-xs">
-                      Aucune analyse demandée pour le moment.
+                      {t('labsSection.noLabs')}
                     </div>
                   )}
                 </div>
@@ -573,13 +567,13 @@ export const MedicalPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-medical-border pb-3">
                 <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                   <Stethoscope className="w-4 h-4 text-medical-primary" />
-                  Historique des Consultations & Fiches Cliniques
+                  {t('consultationsSection.title')}
                 </h3>
                 <button
                   onClick={() => setIsConsultationModalOpen(true)}
                   className="px-2.5 py-1 bg-medical-subtle border border-emerald-200 hover:bg-emerald-200/50 text-emerald-800 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" /> Nouvelle
+                  <Plus className="w-3.5 h-3.5" /> {t('consultationsSection.newBtn')}
                 </button>
               </div>
 
@@ -588,11 +582,11 @@ export const MedicalPage: React.FC = () => {
                   <table className="w-full text-left text-xs border-collapse">
                     <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                       <tr>
-                        <th className="p-3">Date</th>
-                        <th className="p-3">Médecin</th>
-                        <th className="p-3">Motif Principal</th>
-                        <th className="p-3">Diagnostic (CIM-10)</th>
-                        <th className="p-3 text-right">Fiche Clinique</th>
+                        <th className="p-3">{t('consultationsSection.columns.date')}</th>
+                        <th className="p-3">{t('consultationsSection.columns.doctor')}</th>
+                        <th className="p-3">{t('consultationsSection.columns.chiefComplaint')}</th>
+                        <th className="p-3">{t('consultationsSection.columns.diagnosis')}</th>
+                        <th className="p-3 text-right">{t('consultationsSection.columns.details')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-medical-border text-slate-700 font-medium">
@@ -625,7 +619,7 @@ export const MedicalPage: React.FC = () => {
                               className="px-2 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-800 text-[11px] font-bold rounded-lg flex items-center gap-1 transition-all cursor-pointer ml-auto"
                             >
                               <FileText className="w-3.5 h-3.5 text-medical-primary" />
-                              Détails
+                              {t('consultationsSection.detailsBtn')}
                             </button>
                           </td>
                         </tr>
@@ -637,7 +631,7 @@ export const MedicalPage: React.FC = () => {
                 <div className="p-10 text-center border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-2">
                   <Stethoscope className="w-8 h-8 text-slate-400 mx-auto stroke-1" />
                   <p className="text-xs text-slate-500 font-semibold">
-                    Aucune consultation n'a été enregistrée pour le moment.
+                    {t('consultationsSection.noConsultations')}
                   </p>
                 </div>
               )}
@@ -647,9 +641,9 @@ export const MedicalPage: React.FC = () => {
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-400 space-y-4">
             <Brain className="w-16 h-16 text-slate-300 animate-pulse stroke-1" />
             <div>
-              <h2 className="text-base font-bold text-slate-700">Dossier Médical Non Sélectionné</h2>
+              <h2 className="text-base font-bold text-slate-700">{t('ehr.noPatientSelectedTitle')}</h2>
               <p className="text-xs text-slate-500 mt-1 max-w-md">
-                Veuillez sélectionner un patient dans la liste de gauche pour afficher son dossier complet, son historique de soins et ses consultations.
+                {t('ehr.noPatientSelectedSub')}
               </p>
             </div>
           </div>

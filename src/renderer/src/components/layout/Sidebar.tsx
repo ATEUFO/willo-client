@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ShieldAlert,
   UserCheck,
@@ -14,22 +15,22 @@ import { hasModuleAccess } from '../../config/permissions'
 
 interface RoleConfig {
   id: Role
-  label: string
   icon: React.ElementType
 }
 
 const allRoles: RoleConfig[] = [
-  { id: 'admin', label: 'Admin Système', icon: ShieldAlert },
-  { id: 'reception', label: 'Accueil & Triage', icon: UserCheck },
-  { id: 'consultation', label: 'Médecin / Clinique', icon: Stethoscope },
-  { id: 'ai-diagnostic', label: 'Diagnostic IA', icon: Brain },
-  { id: 'laboratory', label: 'Laboratoire', icon: TestTube },
-  { id: 'pharmacy', label: 'Pharmacie', icon: Pill },
-  { id: 'billing', label: 'Caisse & Factures', icon: CreditCard },
-  { id: 'management', label: 'Direction & Rapports', icon: BarChart3 }
+  { id: 'admin', icon: ShieldAlert },
+  { id: 'reception', icon: UserCheck },
+  { id: 'consultation', icon: Stethoscope },
+  { id: 'ai-diagnostic', icon: Brain },
+  { id: 'laboratory', icon: TestTube },
+  { id: 'pharmacy', icon: Pill },
+  { id: 'billing', icon: CreditCard },
+  { id: 'management', icon: BarChart3 }
 ]
 
 export const Sidebar: React.FC = () => {
+  const { t } = useTranslation('common')
   const { currentRole, currentUser, setRole } = useHospitalStore()
 
   const userRole = currentUser?.role || currentRole
@@ -43,6 +44,7 @@ export const Sidebar: React.FC = () => {
         {visibleRoles.map((r) => {
           const Icon = r.icon
           const isActive = currentRole === r.id
+          const label = t(`roles.${r.id}`)
           return (
             <div key={r.id} className="relative group flex items-center justify-center w-full">
               <button
@@ -52,14 +54,14 @@ export const Sidebar: React.FC = () => {
                     ? 'bg-medical-primary text-white shadow-md shadow-emerald-500/30 font-bold scale-105'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
                 }`}
-                aria-label={r.label}
+                aria-label={label}
               >
                 <Icon className="w-5 h-5" />
               </button>
 
               {/* Hover Floating Tooltip */}
               <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-[#071325] text-white text-xs font-semibold rounded-xl shadow-xl border border-slate-700/80 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 flex items-center gap-2">
-                <span>{r.label}</span>
+                <span>{label}</span>
                 {isActive && <span className="w-2 h-2 rounded-full bg-medical-primary shadow-xs" />}
               </div>
             </div>
@@ -69,3 +71,4 @@ export const Sidebar: React.FC = () => {
     </aside>
   )
 }
+

@@ -8,6 +8,7 @@ import {
   CheckCircle,
   X
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Patient } from '../../store/hospitalStore'
 
 interface VitalsFormModalProps {
@@ -26,6 +27,7 @@ interface VitalsFormModalProps {
 }
 
 export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClose, onSave }) => {
+  const { t } = useTranslation('medical')
   const [systolic, setSystolic] = useState<number>(120)
   const [diastolic, setDiastolic] = useState<number>(80)
   const [temperature, setTemperature] = useState<number>(37.0)
@@ -69,7 +71,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
           <div>
             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
               <Activity className="w-5 h-5 text-medical-primary" />
-              Saisie des Constantes Vitales
+              {t('vitalsModal.title')}
             </h3>
             <p className="text-[11px] text-slate-500 font-medium">
               Patient : {patient.name} ({patient.patientCode})
@@ -89,12 +91,12 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
           {isAbnormal ? (
             <div className="flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 text-medical-danger rounded-xl text-xs font-bold animate-pulse">
               <AlertTriangle className="w-4 h-4" />
-              Attention: Une ou plusieurs constantes sortent de la norme !
+              {t('vitalsModal.warningAbnormal')}
             </div>
           ) : (
             <div className="flex items-center gap-2 px-3 py-2 bg-medical-subtle border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold">
               <CheckCircle className="w-4 h-4 text-medical-primary" />
-              Toutes les constantes sont dans les plages de référence.
+              {t('vitalsModal.allNormal')}
             </div>
           )}
 
@@ -109,7 +111,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
               }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <Heart className="w-3.5 h-3.5 text-medical-danger" /> Tension (Sys / Dia)
+                <Heart className="w-3.5 h-3.5 text-medical-danger" /> {t('vitalsModal.tensionLabel')}
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -141,7 +143,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
               }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <Thermometer className="w-3.5 h-3.5 text-amber-500" /> Température (°C)
+                <Thermometer className="w-3.5 h-3.5 text-amber-500" /> {t('vitalsModal.tempLabel')}
               </label>
               <input
                 type="number"
@@ -162,7 +164,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
               }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <Activity className="w-3.5 h-3.5 text-medical-primary" /> Pouls (BPM)
+                <Activity className="w-3.5 h-3.5 text-medical-primary" /> {t('vitalsModal.pulseLabel')}
               </label>
               <input
                 type="number"
@@ -180,7 +182,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
               }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <Activity className="w-3.5 h-3.5 text-cyan-600" /> Saturation SpO2 (%)
+                <Activity className="w-3.5 h-3.5 text-cyan-600" /> {t('vitalsModal.spO2Label')}
               </label>
               <input
                 type="number"
@@ -194,7 +196,7 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
             {/* Poids corporel */}
             <div className="p-3 bg-slate-50 border border-medical-border rounded-xl space-y-1.5">
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                <Weight className="w-3.5 h-3.5 text-blue-500" /> Poids (kg)
+                <Weight className="w-3.5 h-3.5 text-blue-500" /> {t('vitalsModal.weightLabel')}
               </label>
               <input
                 type="number"
@@ -210,13 +212,13 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
           {/* Nurse notes */}
           <div className="space-y-1.5">
             <label className="block text-[11px] font-bold text-slate-700">
-              Observations / Symptômes Observés
+              {t('vitalsModal.nurseNotesLabel')}
             </label>
             <textarea
               rows={3}
               value={nurseNotes}
               onChange={(e) => setNurseNotes(e.target.value)}
-              placeholder="Ex: Patient conscient, céphalées signalées. Légère fatigue à la marche..."
+              placeholder={t('vitalsModal.nurseNotesPlaceholder')}
               className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
             />
           </div>
@@ -228,13 +230,13 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
               onClick={onClose}
               className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Annuler
+              {t('vitalsModal.cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-medical-primary hover:bg-medical-hover text-white rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer"
             >
-              Enregistrer les Constantes
+              {t('vitalsModal.submit')}
             </button>
           </div>
         </form>

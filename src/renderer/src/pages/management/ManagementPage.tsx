@@ -28,9 +28,11 @@ import {
   Cell,
   Legend
 } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { useHospitalStore } from '../store/hospitalStore'
 
 export const ManagementPage: React.FC = () => {
+  const { t } = useTranslation('management')
   const {
     users,
     patients,
@@ -160,9 +162,9 @@ export const ManagementPage: React.FC = () => {
     const total = patients.length
     if (total === 0) {
       return [
-        { name: 'Guéris / Sorties', value: 0, color: '#00C853' },
-        { name: 'En Traitement', value: 0, color: '#3B82F6' },
-        { name: 'En Attente', value: 0, color: '#F59E0B' }
+        { name: t('charts.statusLabels.cured'), value: 0, color: '#00C853' },
+        { name: t('charts.statusLabels.inTreatment'), value: 0, color: '#3B82F6' },
+        { name: t('charts.statusLabels.waiting'), value: 0, color: '#F59E0B' }
       ]
     }
 
@@ -177,11 +179,11 @@ export const ManagementPage: React.FC = () => {
     const waitingCount = patients.filter((p) => p.status === 'Waiting').length
 
     return [
-      { name: 'Guéris / Sorties', value: completedCount, color: '#00C853' },
-      { name: 'En Traitement', value: inProgressCount, color: '#3B82F6' },
-      { name: 'En Attente', value: waitingCount, color: '#F59E0B' }
+      { name: t('charts.statusLabels.cured'), value: completedCount, color: '#00C853' },
+      { name: t('charts.statusLabels.inTreatment'), value: inProgressCount, color: '#3B82F6' },
+      { name: t('charts.statusLabels.waiting'), value: waitingCount, color: '#F59E0B' }
     ]
-  }, [patients])
+  }, [patients, t])
 
   const recoveryRate = useMemo(() => {
     if (patients.length === 0) return '0.0'
@@ -242,11 +244,11 @@ export const ManagementPage: React.FC = () => {
       return list
     }
 
-    const MONTH_NAMES = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
+    const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
     const formatPeriodToMonthName = (periodCode: string) => {
       const parts = periodCode.split('-')
       const m = parseInt(parts[1])
-      return MONTH_NAMES[m - 1]
+      return t(`months.${MONTH_KEYS[m - 1]}`)
     }
 
     const pastPeriods = getPastMonths(selectedPeriod, 6)
@@ -266,7 +268,7 @@ export const ManagementPage: React.FC = () => {
         consultations: periodConsultationsCount
       }
     })
-  }, [invoices, consultations, selectedPeriod])
+  }, [invoices, consultations, selectedPeriod, t])
 
   // --- Chart 2: Fréquentation par Service Médical ---
   const departmentAttendanceData = useMemo(() => {
@@ -366,10 +368,10 @@ export const ManagementPage: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
             <BarChart3 className="w-7 h-7 text-medical-primary" />
-            Espace Décisionnel & Direction Hospitalière
+            {t('headerTitle')}
           </h2>
           <p className="text-sm text-slate-500">
-            Tableaux de bord analytiques, indicateurs de performance et générateur de rapports statistiques
+            {t('headerSub')}
           </p>
         </div>
 
@@ -377,7 +379,7 @@ export const ManagementPage: React.FC = () => {
         <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-medical-border flex-wrap shadow-sm">
           <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
             <Calendar className="w-3.5 h-3.5 text-medical-primary" />
-            <span>Période :</span>
+            <span>{t('controls.period')}</span>
             <input
               type="month"
               value={selectedPeriod}
@@ -390,14 +392,14 @@ export const ManagementPage: React.FC = () => {
             onClick={handleExportPDF}
             className="bg-medical-primary hover:bg-medical-hover text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
           >
-            <FileText className="w-3.5 h-3.5" /> Export PDF
+            <FileText className="w-3.5 h-3.5" /> {t('controls.exportPdf')}
           </button>
 
           <button
             onClick={handleExportExcel}
             className="bg-medical-subtle text-emerald-800 border border-emerald-200 hover:bg-emerald-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <FileSpreadsheet className="w-3.5 h-3.5" /> Export Excel
+            <FileSpreadsheet className="w-3.5 h-3.5" /> {t('controls.exportExcel')}
           </button>
         </div>
       </div>
@@ -407,7 +409,7 @@ export const ManagementPage: React.FC = () => {
         {/* Card 1: Revenue */}
         <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
           <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
-            <span>Revenu Mensuel Cumulé</span>
+            <span>{t('kpi.revenueTitle')}</span>
             <DollarSign className="w-4 h-4 text-medical-primary" />
           </div>
           <p className="text-2xl font-bold text-slate-900 font-mono">
@@ -422,48 +424,48 @@ export const ManagementPage: React.FC = () => {
               className={`w-3 h-3 ${revenueEvolutionPercent >= 0 ? 'text-medical-primary' : 'text-red-500'}`}
             />
             {revenueEvolutionPercent >= 0 ? '+' : ''}
-            {revenueEvolutionPercent.toFixed(1)}% vs mois précédent
+            {revenueEvolutionPercent.toFixed(1)}% {t('kpi.vsPreviousMonth')}
           </span>
         </div>
 
         {/* Card 2: Attendance */}
         <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
           <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
-            <span>Fréquentation Mensuelle</span>
+            <span>{t('kpi.attendanceTitle')}</span>
             <Users className="w-4 h-4 text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-slate-900 font-mono">{currentMonthAttendance} Patients</p>
+          <p className="text-2xl font-bold text-slate-900 font-mono">{t('kpi.patientsCount', { count: currentMonthAttendance })}</p>
           <span
             className={`text-[11px] font-semibold ${
               attendanceEvolutionPercent >= 0 ? 'text-blue-700' : 'text-red-700'
             }`}
           >
             {attendanceEvolutionPercent >= 0 ? '+' : ''}
-            {attendanceEvolutionPercent.toFixed(1)}% vs mois précédent
+            {attendanceEvolutionPercent.toFixed(1)}% {t('kpi.vsPreviousMonth')}
           </span>
         </div>
 
         {/* Card 3: Recovery Rate */}
         <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
           <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
-            <span>Taux de Guérison / Sorties</span>
+            <span>{t('kpi.recoveryTitle')}</span>
             <HeartPulse className="w-4 h-4 text-medical-primary" />
           </div>
           <p className="text-2xl font-bold text-emerald-800 font-mono">{recoveryRate}%</p>
           <span className="text-[11px] text-slate-500">
-            Dossiers clôturés sur {patients.length} patient(s)
+            {t('kpi.recoverySub', { count: patients.length })}
           </span>
         </div>
 
         {/* Card 4: Wait Time */}
         <div className="bg-medical-cardBg border border-medical-border p-4 rounded-xl space-y-1 shadow-sm">
           <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
-            <span>Temps d'Attente Moyen</span>
+            <span>{t('kpi.waitTimeTitle')}</span>
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
-          <p className="text-2xl font-bold text-amber-700 font-mono">{averageWaitingTime} min</p>
+          <p className="text-2xl font-bold text-amber-700 font-mono">{t('kpi.waitTimeVal', { time: averageWaitingTime })}</p>
           <span className="text-[11px] font-semibold text-slate-600">
-            {waitingPatients.length} patient(s) en attente
+            {t('kpi.waitingCount', { count: waitingPatients.length })}
           </span>
         </div>
       </div>
@@ -473,8 +475,8 @@ export const ManagementPage: React.FC = () => {
         {/* Chart 1: Revenue Evolution Curve */}
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-bold text-medical-dark text-base">Évolution des Revenus Hospitaliers (F CFA)</h3>
-            <p className="text-xs text-slate-500">Progression mensuelle des encaissements réels</p>
+            <h3 className="font-bold text-medical-dark text-base">{t('charts.revenueChartTitle')}</h3>
+            <p className="text-xs text-slate-500">{t('charts.revenueChartSub')}</p>
           </div>
 
           <div className="h-64 w-full">
@@ -497,7 +499,7 @@ export const ManagementPage: React.FC = () => {
                     fontSize: '12px',
                     color: '#0F172A'
                   }}
-                  formatter={(value: any) => [`${Number(value).toLocaleString('fr-FR')} F CFA`, 'Revenu']}
+                  formatter={(value: any) => [`${Number(value).toLocaleString('fr-FR')} F CFA`, t('charts.revenueLegend')]}
                 />
                 <Area
                   type="monotone"
@@ -515,8 +517,8 @@ export const ManagementPage: React.FC = () => {
         {/* Chart 2: Attendance per Department BarChart */}
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-bold text-medical-dark text-base">Fréquentation par Service Médical</h3>
-            <p className="text-xs text-slate-500">Volume de consultations enregistrées par département</p>
+            <h3 className="font-bold text-medical-dark text-base">{t('charts.attendanceChartTitle')}</h3>
+            <p className="text-xs text-slate-500">{t('charts.attendanceChartSub')}</p>
           </div>
 
           <div className="h-64 w-full">
@@ -547,8 +549,8 @@ export const ManagementPage: React.FC = () => {
         {/* Chart 3: Recovery vs Mortality PieChart */}
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div>
-            <h3 className="font-bold text-medical-dark text-base">Issue des Patients (Statut des Dossiers)</h3>
-            <p className="text-xs text-slate-500">Répartition réelle des séjours hospitaliers</p>
+            <h3 className="font-bold text-medical-dark text-base">{t('charts.statusChartTitle')}</h3>
+            <p className="text-xs text-slate-500">{t('charts.statusChartSub')}</p>
           </div>
 
           <div className="h-64 w-full flex items-center justify-center">
@@ -591,35 +593,35 @@ export const ManagementPage: React.FC = () => {
           <div>
             <h3 className="font-bold text-medical-dark text-base flex items-center gap-2">
               <Activity className="w-5 h-5 text-medical-primary" />
-              Synthèse Exécutive pour le Conseil d'Administration
+              {t('summary.title')}
             </h3>
-            <p className="text-xs text-slate-500">Point de vue global basé sur la base de données réelle</p>
+            <p className="text-xs text-slate-500">{t('summary.sub')}</p>
           </div>
 
           <div className="space-y-3 text-xs text-slate-700">
             <div className="bg-slate-50 p-3.5 rounded-xl border border-medical-border">
-              <strong className="text-medical-dark block mb-1">Occupation de la Capacité Lits :</strong>
-              L'établissement enregistre {activePatientsCount} patient(s) actif(s) sur {hospitalSettings.totalBeds || 100} lits de capacité ({bedOccupancyPercent}% de taux d'occupation).
+              <strong className="text-medical-dark block mb-1">{t('summary.bedOccupancyTitle')}</strong>
+              {t('summary.bedOccupancyBody', { active: activePatientsCount, total: hospitalSettings.totalBeds || 100, percent: bedOccupancyPercent })}
             </div>
 
             <div className="bg-medical-subtle p-3.5 rounded-xl border border-emerald-200">
-              <strong className="text-emerald-900 block mb-1">Rendement Pharmaceutique & Labo :</strong>
-              La pharmacie et le laboratoire génèrent {pharmLabRevenueShare}% du chiffre d'affaires récurrent encaissé.
+              <strong className="text-emerald-900 block mb-1">{t('summary.pharmLabTitle')}</strong>
+              {t('summary.pharmLabBody', { percent: pharmLabRevenueShare })}
             </div>
 
             <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
               <strong className="text-amber-800 block mb-1 flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                Alertes & Recommandations d'Amélioration :
+                {t('summary.alertsTitle')}
               </strong>
               {lowStockItems.length > 0 ? (
                 <span>
-                  Alerte Stock : {lowStockItems.map((item) => item.name).join(', ')} en seuil critique. Réapprovisionnement recommandé.
+                  {t('summary.stockAlert', { items: lowStockItems.map((item) => item.name).join(', ') })}
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-emerald-800">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  Tous les stocks de pharmacie et consommables sont à un niveau optimal.
+                  {t('summary.stockOptimal')}
                 </span>
               )}
             </div>

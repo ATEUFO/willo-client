@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   Check
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { LabRequest, LabResultItem } from '../../store/hospitalStore'
 
 // Helper to check if a result value is abnormal compared to its reference range
@@ -102,6 +103,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
   onBack,
   getUrgencyLevel
 }) => {
+  const { t } = useTranslation('laboratory')
   const [resultItems, setResultItems] = useState<LabResultItem[]>([])
   const [clinicalNotes, setClinicalNotes] = useState('')
   
@@ -182,22 +184,22 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
           <button
             onClick={onBack}
             className="p-2 hover:bg-slate-100 rounded-xl border border-slate-200 transition-all cursor-pointer"
-            title="Retour au Kanban"
+            title={t('form.backTooltip')}
           >
             <ChevronLeft className="w-4 h-4 text-slate-600" />
           </button>
           <div>
             <h3 className="font-bold text-slate-800 text-sm">
-              Grille de saisie : <span className="text-medical-primary font-bold">{request.patientName}</span>
+              {t('form.gridTitle')} <span className="text-medical-primary font-bold">{request.patientName}</span>
             </h3>
             <p className="text-[11px] text-slate-500 font-mono">
-              N° Prescription : {request.requestCode} • Examen : {request.testName}
+              {t('form.prescriptionNo', { code: request.requestCode, test: request.testName })}
             </p>
           </div>
         </div>
 
         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase ${urgency.bg}`}>
-          Urgence : {urgency.label}
+          {t('form.urgencyLabel', { label: urgency.label })}
         </span>
       </div>
 
@@ -207,12 +209,12 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
               <tr>
-                <th className="p-3">Paramètre</th>
-                <th className="p-3">Valeur</th>
-                <th className="p-3">Unité</th>
-                <th className="p-3">Normes (Réf)</th>
-                <th className="p-3">Statut</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3">{t('form.table.parameter')}</th>
+                <th className="p-3">{t('form.table.value')}</th>
+                <th className="p-3">{t('form.table.unit')}</th>
+                <th className="p-3">{t('form.table.refRange')}</th>
+                <th className="p-3">{t('form.table.status')}</th>
+                <th className="p-3 text-right">{t('form.table.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-medical-border text-slate-700">
@@ -227,7 +229,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
                   <td className="p-3">
                     <input
                       type="text"
-                      placeholder="Mesure..."
+                      placeholder={t('form.table.measurePlaceholder')}
                       value={item.value}
                       onChange={(e) => handleValueChange(idx, e.target.value)}
                       className={`w-28 px-2.5 py-1.5 bg-white border rounded-lg font-mono font-bold text-xs text-slate-800 focus:outline-none focus:ring-1 transition-all ${
@@ -242,14 +244,14 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
                   <td className="p-3">
                     {item.isAbnormal ? (
                       <span className="px-2 py-0.5 rounded bg-red-100 text-red-700 border border-red-200 text-[9px] font-bold flex items-center gap-1 w-fit">
-                        <AlertTriangle className="w-3 h-3" /> Hors Norme
+                        <AlertTriangle className="w-3 h-3" /> {t('form.table.abnormal')}
                       </span>
                     ) : item.value ? (
                       <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200 text-[9px] font-bold flex items-center gap-1 w-fit">
-                        <Check className="w-3 h-3" /> Conforme
+                        <Check className="w-3 h-3" /> {t('form.table.conforming')}
                       </span>
                     ) : (
-                      <span className="text-[10px] text-slate-400 italic">Vide</span>
+                      <span className="text-[10px] text-slate-400 italic">{t('form.table.empty')}</span>
                     )}
                   </td>
                   <td className="p-3 text-right">
@@ -257,7 +259,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
                       type="button"
                       onClick={() => handleDeleteParam(idx)}
                       className="p-1 hover:bg-slate-100 text-slate-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
-                      title="Supprimer ce paramètre"
+                      title={t('form.table.deleteTooltip')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -271,33 +273,33 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
         {/* Add parameter row builder */}
         <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-            Ajouter un paramètre sur-mesure (Optionnel)
+            {t('form.customParamSection')}
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             <input
               type="text"
-              placeholder="Nom paramètre..."
+              placeholder={t('form.paramNamePlaceholder')}
               value={newParamName}
               onChange={(e) => setNewParamName(e.target.value)}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
             />
             <input
               type="text"
-              placeholder="Valeur..."
+              placeholder={t('form.valPlaceholder')}
               value={newParamVal}
               onChange={(e) => setNewParamVal(e.target.value)}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
             />
             <input
               type="text"
-              placeholder="Unité (ex: g/L)..."
+              placeholder={t('form.unitPlaceholder')}
               value={newParamUnit}
               onChange={(e) => setNewParamUnit(e.target.value)}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
             />
             <input
               type="text"
-              placeholder="Norme (ex: 0.7 - 1.1)..."
+              placeholder={t('form.refPlaceholder')}
               value={newParamRef}
               onChange={(e) => setNewParamRef(e.target.value)}
               className="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
@@ -307,7 +309,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
               onClick={handleAddCustomParam}
               className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer col-span-2 sm:col-span-1"
             >
-              <Plus className="w-3.5 h-3.5" /> Ajouter
+              <Plus className="w-3.5 h-3.5" /> {t('form.addBtn')}
             </button>
           </div>
         </div>
@@ -316,11 +318,11 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
       {/* Clinical Notes */}
       <div className="space-y-1.5">
         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-          Observations & Remarques Cliniques
+          {t('form.clinicalNotesLabel')}
         </label>
         <textarea
           rows={3}
-          placeholder="Saisir des remarques sur la qualité de l'échantillon (ex: échantillon hémolysé) ou la technique utilisée..."
+          placeholder={t('form.clinicalNotesPlaceholder')}
           value={clinicalNotes}
           onChange={(e) => setClinicalNotes(e.target.value)}
           className="w-full bg-slate-50/50 border border-slate-300 rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
@@ -334,7 +336,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
           onClick={() => onSaveDraft(resultItems, clinicalNotes)}
           className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
         >
-          Enregistrer en Brouillon
+          {t('form.saveDraft')}
         </button>
         <button
           type="button"
@@ -342,7 +344,7 @@ export const ResultsEntryForm: React.FC<ResultsEntryFormProps> = ({
           className="w-full sm:w-auto px-5 py-2.5 bg-medical-primary hover:bg-medical-hover text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
         >
           <Check className="w-4 h-4" />
-          Valider et Transmettre
+          {t('form.validateAndTransmit')}
         </button>
       </div>
     </div>

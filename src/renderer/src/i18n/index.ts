@@ -14,6 +14,7 @@ import frLaboratory from './locales/fr/laboratory.json'
 import frPharmacy from './locales/fr/pharmacy.json'
 import frBilling from './locales/fr/billing.json'
 import frManagement from './locales/fr/management.json'
+import frNursing from './locales/fr/nursing.json'
 
 // ── EN locales ──
 import enCommon from './locales/en/common.json'
@@ -28,6 +29,7 @@ import enLaboratory from './locales/en/laboratory.json'
 import enPharmacy from './locales/en/pharmacy.json'
 import enBilling from './locales/en/billing.json'
 import enManagement from './locales/en/management.json'
+import enNursing from './locales/en/nursing.json'
 
 // Persist language preference
 const savedLang = localStorage.getItem('willo-lang') || 'fr'
@@ -36,7 +38,7 @@ i18n.use(initReactI18next).init({
   lng: savedLang,
   fallbackLng: 'fr',
   defaultNS: 'common',
-  ns: ['common', 'auth', 'server', 'connections', 'layout', 'admin', 'reception', 'medical', 'laboratory', 'pharmacy', 'billing', 'management'],
+  ns: ['common', 'auth', 'server', 'connections', 'layout', 'admin', 'reception', 'medical', 'laboratory', 'pharmacy', 'billing', 'management', 'nursing'],
   interpolation: {
     escapeValue: false // React already escapes by default
   },
@@ -53,7 +55,8 @@ i18n.use(initReactI18next).init({
       laboratory: frLaboratory,
       pharmacy: frPharmacy,
       billing: frBilling,
-      management: frManagement
+      management: frManagement,
+      nursing: frNursing
     },
     en: {
       common: enCommon,
@@ -67,7 +70,8 @@ i18n.use(initReactI18next).init({
       laboratory: enLaboratory,
       pharmacy: enPharmacy,
       billing: enBilling,
-      management: enManagement
+      management: enManagement,
+      nursing: enNursing
     }
   }
 })

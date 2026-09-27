@@ -11,9 +11,11 @@ import {
   CheckCircle,
   FileText
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useHospitalStore } from '../store/hospitalStore'
 
 export const NursingPage: React.FC = () => {
+  const { t } = useTranslation('nursing')
   const {
     patients,
     vitals,
@@ -63,8 +65,8 @@ export const NursingPage: React.FC = () => {
       nurseNotes
     })
 
-    showNotification(`Constantes enregistrées pour ${selectedPatient.name}. Statut mis à jour!`, {
-      title: 'Prise de Constantes',
+    showNotification(t('worklist.successNotification', { name: selectedPatient.name }), {
+      title: t('worklist.notificationTitle'),
       type: 'success'
     })
     setNurseNotes('')
@@ -78,10 +80,10 @@ export const NursingPage: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
             <Activity className="w-7 h-7 text-medical-primary" />
-            Espace Soins & Prise de Constantes
+            {t('title')}
           </h2>
           <p className="text-sm text-slate-500">
-            Saisie rapide des paramètres vitaux, alertes d'anomalie et plan d'administration des soins
+            {t('subtitle')}
           </p>
         </div>
 
@@ -94,7 +96,7 @@ export const NursingPage: React.FC = () => {
               }`}
           >
             <Activity className="w-3.5 h-3.5" />
-            Saisie Constantes ({waitingPatients.length})
+            {t('tabs.worklist', { count: waitingPatients.length })}
           </button>
           <button
             onClick={() => setActiveTab('vitals_history')}
@@ -104,7 +106,7 @@ export const NursingPage: React.FC = () => {
               }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            Historique Relevés ({vitals.length})
+            {t('tabs.vitalsHistory', { count: vitals.length })}
           </button>
           <button
             onClick={() => setActiveTab('care_plan')}
@@ -114,7 +116,7 @@ export const NursingPage: React.FC = () => {
               }`}
           >
             <Syringe className="w-3.5 h-3.5" />
-            Plan de Soins ({careTasks.filter((t) => t.status === 'Pending').length})
+            {t('tabs.carePlan', { count: careTasks.filter((t) => t.status === 'Pending').length })}
           </button>
         </div>
       </div>
@@ -126,13 +128,13 @@ export const NursingPage: React.FC = () => {
           <div className="bg-medical-cardBg border border-medical-border rounded-xl p-4 space-y-3 shadow-sm">
             <h3 className="font-bold text-medical-dark text-sm flex items-center gap-2 border-b border-medical-border pb-2">
               <User className="w-4 h-4 text-medical-primary" />
-              Patients en Attente ({waitingPatients.length})
+              {t('worklist.waitingTitle', { count: waitingPatients.length })}
             </h3>
 
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
               {waitingPatients.length === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  Aucun patient en attente de prise de constantes.
+                  {t('worklist.noPatients')}
                 </div>
               ) : (
                 waitingPatients.map((p) => (
@@ -151,7 +153,7 @@ export const NursingPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-                      <span>{p.gender}, {p.age} ans • {p.bloodType}</span>
+                      <span>{p.gender}, {t('worklist.yearsOld', { age: p.age })} • {p.bloodType}</span>
                       <span className="text-slate-400 font-mono">{p.arrivalTime}</span>
                     </div>
                   </div>
@@ -167,10 +169,10 @@ export const NursingPage: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-medical-border pb-3">
                   <div>
                     <h3 className="font-bold text-medical-dark text-base">
-                      Prise de Constantes pour : <span className="text-medical-primary">{selectedPatient.name}</span>
+                      {t('worklist.formTitle')} <span className="text-medical-primary">{selectedPatient.name}</span>
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Code Patient : {selectedPatient.patientCode} • Médecin : {selectedPatient.assignedDoctor}
+                      {t('worklist.patientCode', { code: selectedPatient.patientCode })} • {t('worklist.assignedDoctor', { doctor: selectedPatient.assignedDoctor })}
                     </p>
                   </div>
 
@@ -178,12 +180,12 @@ export const NursingPage: React.FC = () => {
                   {isAbnormal ? (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 text-medical-danger rounded-xl text-xs font-bold animate-pulse">
                       <AlertTriangle className="w-4 h-4" />
-                      Alerte Constantes Anormales !
+                      {t('worklist.abnormalAlert')}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-medical-subtle border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold">
                       <CheckCircle className="w-4 h-4 text-medical-primary" />
-                      Constantes dans la Norme
+                      {t('worklist.normalAlert')}
                     </div>
                   )}
                 </div>
@@ -195,9 +197,9 @@ export const NursingPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <Heart className="w-4 h-4 text-medical-danger" />
-                        Tension Artérielle (mmHg)
+                        {t('worklist.tensionLabel')}
                       </label>
-                      <span className="text-[10px] text-slate-400">Réf: 120/80</span>
+                      <span className="text-[10px] text-slate-400">{t('worklist.tensionRef')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
@@ -223,9 +225,9 @@ export const NursingPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <Thermometer className="w-4 h-4 text-amber-500" />
-                        Température (°C)
+                        {t('worklist.tempLabel')}
                       </label>
-                      <span className="text-[10px] text-slate-400">Réf: 36.5 - 37.5</span>
+                      <span className="text-[10px] text-slate-400">{t('worklist.tempRef')}</span>
                     </div>
                     <input
                       type="number"
@@ -241,9 +243,9 @@ export const NursingPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <Activity className="w-4 h-4 text-medical-primary" />
-                        Pouls (BPM)
+                        {t('worklist.pulseLabel')}
                       </label>
-                      <span className="text-[10px] text-slate-400">Réf: 60 - 100</span>
+                      <span className="text-[10px] text-slate-400">{t('worklist.pulseRef')}</span>
                     </div>
                     <input
                       type="number"
@@ -258,7 +260,7 @@ export const NursingPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <Weight className="w-4 h-4 text-blue-500" />
-                        Poids Corporel (kg)
+                        {t('worklist.weightLabel')}
                       </label>
                     </div>
                     <input
@@ -275,9 +277,9 @@ export const NursingPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <Activity className="w-4 h-4 text-cyan-600" />
-                        Saturation SpO2 (%)
+                        {t('worklist.spO2Label')}
                       </label>
-                      <span className="text-[10px] text-slate-400">Réf: 95 - 100%</span>
+                      <span className="text-[10px] text-slate-400">{t('worklist.spO2Ref')}</span>
                     </div>
                     <input
                       type="number"
@@ -290,12 +292,12 @@ export const NursingPage: React.FC = () => {
 
                 {/* Nurse Notes */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Observations Infirmier(ère)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{t('worklist.nurseNotesLabel')}</label>
                   <textarea
                     rows={3}
                     value={nurseNotes}
                     onChange={(e) => setNurseNotes(e.target.value)}
-                    placeholder="Signes cliniques observés, symptômes rapportés..."
+                    placeholder={t('worklist.nurseNotesPlaceholder')}
                     className="w-full bg-white border border-medical-border rounded-xl p-3 text-xs text-slate-800 focus:outline-none focus:border-medical-primary"
                   />
                 </div>
@@ -304,14 +306,14 @@ export const NursingPage: React.FC = () => {
                   type="submit"
                   className="w-full bg-medical-primary hover:bg-medical-hover text-white font-semibold py-3 rounded-xl transition-all shadow-sm"
                 >
-                  Valider & Transmettre au Médecin
+                  {t('worklist.submitBtn')}
                 </button>
               </form>
             ) : (
               <div className="p-12 text-center text-slate-400 font-medium text-sm">
                 {waitingPatients.length === 0
-                  ? 'Aucun patient en attente de prise de constantes.'
-                  : 'Sélectionnez un patient dans la liste de gauche'}
+                  ? t('worklist.noPatients')
+                  : t('worklist.selectPatientPrompt')}
               </div>
             )}
           </div>
@@ -321,21 +323,21 @@ export const NursingPage: React.FC = () => {
       {/* Tab 2: Vitals History */}
       {activeTab === 'vitals_history' && (
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
-          <h3 className="font-bold text-medical-dark text-base">Historique des Prises de Constantes</h3>
+          <h3 className="font-bold text-medical-dark text-base">{t('history.title')}</h3>
 
           <div className="overflow-x-auto rounded-xl border border-medical-border">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                 <tr>
-                  <th className="p-3">Horodatage</th>
-                  <th className="p-3">Patient</th>
-                  <th className="p-3">Tension</th>
-                  <th className="p-3">Température</th>
-                  <th className="p-3">Pouls</th>
-                  <th className="p-3">Poids</th>
-                  <th className="p-3">SpO2</th>
-                  <th className="p-3">Diagnostic Visuel</th>
-                  <th className="p-3">Observations</th>
+                  <th className="p-3">{t('history.columns.timestamp')}</th>
+                  <th className="p-3">{t('history.columns.patient')}</th>
+                  <th className="p-3">{t('history.columns.tension')}</th>
+                  <th className="p-3">{t('history.columns.temperature')}</th>
+                  <th className="p-3">{t('history.columns.pulse')}</th>
+                  <th className="p-3">{t('history.columns.weight')}</th>
+                  <th className="p-3">{t('history.columns.spO2')}</th>
+                  <th className="p-3">{t('history.columns.visualDiagnostic')}</th>
+                  <th className="p-3">{t('history.columns.observations')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-medical-border font-mono text-slate-700">
@@ -353,11 +355,11 @@ export const NursingPage: React.FC = () => {
                     <td className="p-3">
                       {v.isAbnormal ? (
                         <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-medical-danger border border-red-200">
-                          Anormal / Alerte
+                          {t('history.abnormalTag')}
                         </span>
                       ) : (
                         <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-medical-subtle text-emerald-800 border border-emerald-200">
-                          Normal
+                          {t('history.normalTag')}
                         </span>
                       )}
                     </td>
@@ -375,8 +377,8 @@ export const NursingPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between border-b border-medical-border pb-3">
             <div>
-              <h3 className="font-bold text-medical-dark text-base">Plan de Soins (Injections & Pansements)</h3>
-              <p className="text-xs text-slate-500">Liste des actes médicaux prescrits à administrer aux patients</p>
+              <h3 className="font-bold text-medical-dark text-base">{t('carePlan.title')}</h3>
+              <p className="text-xs text-slate-500">{t('carePlan.subtitle')}</p>
             </div>
           </div>
 
@@ -411,18 +413,18 @@ export const NursingPage: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-xs text-slate-700 font-medium">{task.description}</p>
-                    <p className="text-[11px] text-slate-500">Prescrit par {task.prescribedBy} • Prévu à {task.timeScheduled}</p>
+                    <p className="text-[11px] text-slate-500">{t('carePlan.prescribedBy', { doctor: task.prescribedBy, time: task.timeScheduled })}</p>
                   </div>
                 </div>
 
                 <div>
                   {task.status === 'Administered' ? (
                     <span className="text-xs text-emerald-800 font-semibold flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5 text-medical-primary" /> Administré à {task.administeredAt}
+                      <CheckCircle className="w-3.5 h-3.5 text-medical-primary" /> {t('carePlan.administeredAt', { time: task.administeredAt })}
                     </span>
                   ) : (
                     <span className="text-xs text-amber-700 font-semibold flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 animate-pulse text-amber-500" /> À administrer
+                      <Clock className="w-3.5 h-3.5 animate-pulse text-amber-500" /> {t('carePlan.toAdminister')}
                     </span>
                   )}
                 </div>
@@ -434,3 +436,4 @@ export const NursingPage: React.FC = () => {
     </div>
   )
 }
+

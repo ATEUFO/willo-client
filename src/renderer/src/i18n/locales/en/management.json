@@ -1,7 +1,64 @@
 {
   "title": "Management & Reports",
+  "headerTitle": "Executive Decision & Hospital Management Workspace",
+  "headerSub": "Analytical dashboards, performance indicators, and statistical report generator",
+  "controls": {
+    "period": "Period:",
+    "exportPdf": "Export PDF",
+    "exportExcel": "Export Excel"
+  },
+  "kpi": {
+    "revenueTitle": "Cumulative Monthly Revenue",
+    "attendanceTitle": "Monthly Patient Visits",
+    "patientsCount": "{{count}} Patients",
+    "vsPreviousMonth": "vs previous month",
+    "recoveryTitle": "Recovery Rate / Discharges",
+    "recoverySub": "Closed records out of {{count}} patient(s)",
+    "waitTimeTitle": "Average Wait Time",
+    "waitTimeVal": "{{time}} min",
+    "waitingCount": "{{count}} patient(s) waiting"
+  },
+  "charts": {
+    "revenueChartTitle": "Hospital Revenue Trend (F CFA)",
+    "revenueChartSub": "Monthly progress of actual collections",
+    "revenueLegend": "Revenue",
+    "attendanceChartTitle": "Attendance by Medical Department",
+    "attendanceChartSub": "Volume of recorded consultations by department",
+    "statusChartTitle": "Patient Outcome (Record Status)",
+    "statusChartSub": "Actual distribution of hospital stays",
+    "statusLabels": {
+      "cured": "Cured / Discharged",
+      "inTreatment": "In Treatment",
+      "waiting": "Waiting"
+    }
+  },
+  "summary": {
+    "title": "Executive Summary for the Board of Directors",
+    "sub": "Global overview based on active database",
+    "bedOccupancyTitle": "Bed Capacity Occupancy:",
+    "bedOccupancyBody": "The facility records {{active}} active patient(s) out of {{total}} capacity beds ({{percent}}% occupancy rate).",
+    "pharmLabTitle": "Pharmacy & Lab Yield:",
+    "pharmLabBody": "Pharmacy and laboratory generate {{percent}}% of collected recurring revenue.",
+    "alertsTitle": "Alerts & Improvement Recommendations:",
+    "stockAlert": "Stock Alert: {{items}} at critical threshold. Restock recommended.",
+    "stockOptimal": "All pharmacy stocks and consumables are at optimal levels."
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
   "tabs": { "overview": "Overview", "stats": "Statistics", "reports": "Reports" },
-  "overview": { "totalPatients": "Total patients", "todayVisits": "Today's visits", "revenue": "Monthly revenue", "pendingInvoices": "Pending invoices" },
-  "stats": { "patientsByDay": "Patients per day", "revenueByMonth": "Revenue per month", "topDiagnoses": "Common diagnoses", "labActivity": "Lab activity" },
-  "reports": { "generate": "Generate report", "period": "Period", "type": "Report type", "export": "Export" }
+  "overview": { "totalPatients": "Total Patients", "todayVisits": "Today's Visits", "revenue": "Monthly Revenue", "pendingInvoices": "Pending Invoices" },
+  "stats": { "patientsByDay": "Patients per Day", "revenueByMonth": "Revenue by Month", "topDiagnoses": "Top Diagnoses", "labActivity": "Laboratory Activity" },
+  "reports": { "generate": "Generate Report", "period": "Period", "type": "Report Type", "export": "Export" }
 }

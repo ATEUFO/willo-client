@@ -1,5 +1,6 @@
 import React from 'react'
 import { Brain, Zap, History } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { HealthStatusResponse } from '../../../../services/aiDiagnosticService'
 
 interface AIHeaderProps {
@@ -15,6 +16,8 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
   setActiveTab,
   historyCount
 }) => {
+  const { t } = useTranslation('medical')
+
   return (
     <div className="bg-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-lg border border-slate-800 relative overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
@@ -25,11 +28,11 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="text-lg font-black tracking-tight text-white">
-                Analyse & Aide au Diagnostic Clinique
+                {t('aiDiagnosticPage.title')}
               </h1>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Évaluation assistée des constantes et du profil médical du patient.
+              {t('aiDiagnosticPage.subtitle')}
             </p>
           </div>
         </div>
@@ -42,7 +45,7 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
               }`}
             />
             <span className="font-semibold text-slate-200">
-              {healthStatus?.online ? 'Serveur Connecté' : 'Mode Autonome'}
+              {healthStatus?.online ? t('aiDiagnosticPage.serverConnected') : t('aiDiagnosticPage.offlineMode')}
             </span>
           </div>
 
@@ -55,7 +58,7 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Zap className="w-3.5 h-3.5" /> Évaluation Clinique
+              <Zap className="w-3.5 h-3.5" /> {t('aiDiagnosticPage.clinicalEvaluation')}
             </button>
             <button
               onClick={() => setActiveTab('history')}
@@ -65,7 +68,7 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <History className="w-3.5 h-3.5" /> Historique ({historyCount})
+              <History className="w-3.5 h-3.5" /> {t('aiDiagnosticPage.historyTab', { count: historyCount })}
             </button>
           </div>
         </div>

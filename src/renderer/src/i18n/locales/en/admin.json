@@ -1,69 +1,108 @@
 {
-  "title": "System Admin",
+  "title": "System Administrator",
+  "subtitle": "Technical supervision, user access management, global settings and backups",
   "tabs": {
-    "users": "User Management",
-    "logs": "System Logs",
-    "backup": "Backup & Restore",
-    "metrics": "System Metrics"
+    "supervision": "Supervision",
+    "users": "Access Management ({{count}})",
+    "settings": "Global Settings",
+    "backups": "Backups"
+  },
+  "supervision": {
+    "serverStatus": "Server Status",
+    "operational": "Operational",
+    "uptime": "Uptime",
+    "connectedUsers": "Connected Users",
+    "connected": "Connected",
+    "session": "Session",
+    "totalAccounts": "Total accounts",
+    "active": "active",
+    "serverLoad": "Server Load / RAM",
+    "alerts": "Alerts / Error Logs",
+    "errors": "Errors",
+    "lastScan": "Last scan",
+    "today": "Today",
+    "logsTitle": "System Supervision Log",
+    "logsSubtitle": "Technical events, authentication and real-time errors",
+    "filter": "Filter",
+    "logCols": {
+      "timestamp": "Timestamp",
+      "level": "Level",
+      "service": "Module / Service",
+      "message": "Message"
+    }
   },
   "users": {
-    "title": "User Management",
-    "add": "Add user",
-    "search": "Search user...",
-    "columns": {
-      "name": "Name",
+    "title": "User Access & Roles Management",
+    "subtitle": "Create accounts, reset access and assign privileges",
+    "createAccount": "Create Account",
+    "resetPwd": "Reset password",
+    "resetPwdMsg": "Password reset for {{name}}",
+    "resetPwdTitle": "Password Reset",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "active": "Active",
+    "inactive": "Inactive",
+    "cols": {
+      "user": "User",
       "username": "Username",
-      "role": "Role",
+      "role": "Assigned Role",
       "department": "Department",
+      "lastLogin": "Last Login",
       "status": "Status",
-      "lastLogin": "Last login",
       "actions": "Actions"
     },
-    "statusActive": "Active",
-    "statusInactive": "Inactive",
-    "editUser": "Edit user",
-    "deleteUser": "Delete user",
-    "confirmDelete": "Are you sure you want to delete this user?"
-  },
-  "logs": {
-    "title": "System Logs",
-    "level": "Level",
-    "service": "Service",
-    "message": "Message",
-    "timestamp": "Timestamp",
-    "levels": {
-      "info": "Info",
-      "warning": "Warning",
-      "error": "Error",
-      "critical": "Critical"
+    "modal": {
+      "title": "Create a new user account",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Ex: Dr. John Doe",
+      "username": "Username",
+      "usernamePlaceholder": "Ex: jdoe",
+      "role": "System Role",
+      "department": "Department",
+      "roles": {
+        "consultation": "Doctor / Clinic",
+        "nursing": "Nurse",
+        "reception": "Receptionist",
+        "laboratory": "Lab Technician",
+        "pharmacy": "Pharmacist",
+        "billing": "Cashier",
+        "management": "Director",
+        "admin": "System Admin"
+      }
     }
   },
-  "backup": {
-    "title": "Backup & Restore",
-    "createBackup": "Create backup",
-    "restoreBackup": "Restore",
-    "columns": {
-      "filename": "File",
+  "settings": {
+    "generalTitle": "Facility General Information",
+    "facilityName": "Facility Name",
+    "facilityCode": "Facility Code",
+    "totalBeds": "Total Bed Capacity",
+    "address": "Physical Address",
+    "phone": "Phone",
+    "email": "Contact email",
+    "saveBtn": "Save Changes",
+    "saveSuccess": "Settings saved successfully!",
+    "saveTitle": "Configuration",
+    "servicesTitle": "Services & Medical Specialties",
+    "activeServices": "Active Services ({{count}})",
+    "specialties": "Available Specialties ({{count}})"
+  },
+  "backups": {
+    "title": "Backup & Restore Console",
+    "subtitle": "Trigger a full database dump and view the history",
+    "triggerDump": "Trigger DB Dump",
+    "history": "Backup History",
+    "download": "Download",
+    "downloadSuccess": "Backup file downloaded successfully to:\n{{path}}",
+    "downloadTitle": "Download Dump",
+    "downloadSimulated": "Download of {{filename}} simulated.",
+    "downloadError": "Download error: {{error}}",
+    "cols": {
+      "file": "Dump File",
       "size": "Size",
-      "timestamp": "Date",
       "type": "Type",
-      "status": "Status"
-    },
-    "types": {
-      "automatic": "Automatic",
-      "manual": "Manual"
-    },
-    "statuses": {
-      "completed": "Completed",
-      "failed": "Failed",
-      "inProgress": "In Progress"
+      "datetime": "Date / Time",
+      "status": "Status",
+      "action": "Action"
     }
-  },
-  "metrics": {
-    "title": "System Metrics",
-    "cpu": "CPU",
-    "ram": "RAM Memory",
-    "db": "Database",
-    "uptime": "Uptime"
   }
 }

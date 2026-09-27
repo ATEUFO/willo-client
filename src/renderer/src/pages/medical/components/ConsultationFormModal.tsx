@@ -7,6 +7,7 @@ import {
   Trash2,
   X
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Patient, useHospitalStore } from '../../store/hospitalStore'
 
 interface ConsultationFormModalProps {
@@ -29,6 +30,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
   onClose,
   onSave
 }) => {
+  const { t } = useTranslation('medical')
   const { showNotification } = useHospitalStore()
   // Form State
   const [chiefComplaint, setChiefComplaint] = useState('')
@@ -96,7 +98,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!chiefComplaint.trim()) {
-      showNotification('Veuillez renseigner le motif principal de consultation.', { title: 'Champ requis', type: 'warning' })
+      showNotification(t('consultationModal.requiredWarning'), { title: t('consultationModal.requiredTitle'), type: 'warning' })
       return
     }
     onSave({
@@ -117,10 +119,10 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
           <div className="text-left">
             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
               <Stethoscope className="w-5 h-5 text-medical-primary" />
-              Saisie de la Consultation Clinique
+              {t('consultationModal.title')}
             </h3>
             <p className="text-[11px] text-slate-500 font-medium">
-              Patient : {patient.name} ({patient.patientCode}) • Médecin : {doctorName}
+              {t('consultationModal.sub', { patientName: patient.name, code: patient.patientCode, doctorName })}
             </p>
           </div>
           <button
@@ -138,11 +140,11 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
             {/* Motif */}
             <div className="space-y-1.5">
               <label className="block text-[11px] font-bold text-slate-700">
-                Motif Principal de Consultation <span className="text-medical-danger">*</span>
+                {t('consultationModal.chiefComplaint')}
               </label>
               <input
                 type="text"
-                placeholder="Ex: Douleurs thoraciques, fièvre modérée..."
+                placeholder={t('consultationModal.chiefComplaintPlaceholder')}
                 value={chiefComplaint}
                 onChange={(e) => setChiefComplaint(e.target.value)}
                 className="w-full bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
@@ -153,12 +155,12 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
             {/* CIM-10 Diagnosis builder */}
             <div className="space-y-1.5">
               <label className="block text-[11px] font-bold text-slate-700">
-                Diagnostics Retenus (CIM-10)
+                {t('consultationModal.diagnoses')}
               </label>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Ex: I10 - Hypertension artérielle..."
+                  placeholder={t('consultationModal.diagnosesPlaceholder')}
                   value={diagnosisInput}
                   onChange={(e) => setDiagnosisInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -197,7 +199,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
                     </span>
                   ))
                 ) : (
-                  <span className="text-[10px] text-slate-400 italic">Aucun diagnostic enregistré.</span>
+                  <span className="text-[10px] text-slate-400 italic">{t('consultationModal.noDiagnoses')}</span>
                 )}
               </div>
             </div>
@@ -206,11 +208,11 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
           {/* Clinical observations notes */}
           <div className="space-y-1.5">
             <label className="block text-[11px] font-bold text-slate-700">
-              Observations Cliniques & Signes Cardinaux (Examen Physique)
+              {t('consultationModal.clinicalNotes')}
             </label>
             <textarea
               rows={4}
-              placeholder="Saisir l'examen clinique complet, auscultation, palpation abdominale, etc..."
+              placeholder={t('consultationModal.clinicalNotesPlaceholder')}
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
               className="w-full bg-white border border-medical-border rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary font-medium"
@@ -220,12 +222,12 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
           {/* Lab Orders builder */}
           <div className="border-t border-medical-border pt-4 space-y-3">
             <label className="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-              <Syringe className="w-4 h-4 text-purple-600" /> Requests d'Analyses Biologiques
+              <Syringe className="w-4 h-4 text-purple-600" /> {t('consultationModal.labOrders')}
             </label>
             <div className="flex gap-2 max-w-md">
               <input
                 type="text"
-                placeholder="Ex: NFS Complète, Glycémie, Créatinine..."
+                placeholder={t('consultationModal.labOrdersPlaceholder')}
                 value={newLabOrder}
                 onChange={(e) => setNewLabOrder(e.target.value)}
                 onKeyDown={(e) => {
@@ -241,7 +243,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
                 onClick={handleAddLab}
                 className="px-3 py-2 bg-slate-100 border border-slate-300 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1 hover:bg-slate-200 transition-colors cursor-pointer"
               >
-                Demander
+                {t('consultationModal.requestLabBtn')}
               </button>
             </div>
 
@@ -267,27 +269,27 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
           {/* Prescription builder */}
           <div className="border-t border-medical-border pt-4 space-y-3">
             <label className="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-              <Pill className="w-4 h-4 text-emerald-600" /> Prescriptions Médicamenteuses
+              <Pill className="w-4 h-4 text-emerald-600" /> {t('consultationModal.prescriptions')}
             </label>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
               <input
                 type="text"
-                placeholder="Médicament (Ex: Amlodipine 5mg)"
+                placeholder={t('consultationModal.drugPlaceholder')}
                 value={newDrug.drugName}
                 onChange={(e) => setNewDrug({ ...newDrug, drugName: e.target.value })}
                 className="bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
               />
               <input
                 type="text"
-                placeholder="Posologie (Ex: 1 comprimé)"
+                placeholder={t('consultationModal.dosagePlaceholder')}
                 value={newDrug.dosage}
                 onChange={(e) => setNewDrug({ ...newDrug, dosage: e.target.value })}
                 className="bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
               />
               <input
                 type="text"
-                placeholder="Fréquence (Ex: Matin / Soir)"
+                placeholder={t('consultationModal.frequencyPlaceholder')}
                 value={newDrug.frequency}
                 onChange={(e) => setNewDrug({ ...newDrug, frequency: e.target.value })}
                 className="bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
@@ -295,7 +297,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Durée (Ex: 30 jours)"
+                  placeholder={t('consultationModal.durationPlaceholder')}
                   value={newDrug.duration}
                   onChange={(e) => setNewDrug({ ...newDrug, duration: e.target.value })}
                   className="flex-1 bg-white border border-medical-border rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-medical-primary"
@@ -316,10 +318,10 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="bg-slate-100/80 text-slate-600 font-mono border-b border-medical-border">
                     <tr>
-                      <th className="p-2.5 font-bold">Médicament</th>
-                      <th className="p-2.5 font-bold">Dose</th>
-                      <th className="p-2.5 font-bold">Fréquence</th>
-                      <th className="p-2.5 font-bold">Durée</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.drug')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.dose')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.frequency')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.duration')}</th>
                       <th className="p-2.5 text-right font-bold">Action</th>
                     </tr>
                   </thead>
@@ -345,7 +347,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
                 </table>
               </div>
             ) : (
-              <p className="text-[10px] text-slate-400 italic">Aucune prescription rédigée.</p>
+              <p className="text-[10px] text-slate-400 italic">{t('consultationModal.noPrescriptions')}</p>
             )}
           </div>
 
@@ -356,13 +358,13 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Fermer sans enregistrer
+              {t('consultationModal.cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-medical-primary hover:bg-medical-hover text-white rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer"
             >
-              Valider & Transmettre la Consultation
+              {t('consultationModal.submit')}
             </button>
           </div>
         </form>

@@ -1,7 +1,9 @@
+import React from 'react'
 import {
   FileText,
   X
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ConsultationRecord } from '../../store/hospitalStore'
 
 interface ConsultationDetailsModalProps {
@@ -13,6 +15,8 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
   consultation,
   onClose
 }) => {
+  const { t } = useTranslation('medical')
+
   return (
     <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
       <div className="bg-white border border-slate-800/20 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative overflow-hidden">
@@ -21,10 +25,10 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           <div className="text-left">
             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
               <FileText className="w-5 h-5 text-medical-primary" />
-              Dossier de Consultation Clinique
+              {t('detailsModal.title')}
             </h3>
             <p className="text-[11px] text-slate-500 font-mono">
-              Enregistré le : {consultation.date}
+              {t('detailsModal.recordedDate', { date: consultation.date })}
             </p>
           </div>
           <button
@@ -40,11 +44,11 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {/* Metadata Block */}
           <div className="grid grid-cols-2 gap-4 text-xs bg-slate-50 border border-medical-border p-3.5 rounded-xl">
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold">Patient</span>
+              <span className="text-slate-400 block text-[10px] uppercase font-bold">{t('detailsModal.patient')}</span>
               <strong className="text-slate-800 text-sm font-semibold">{consultation.patientName}</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold">Médecin Consultant</span>
+              <span className="text-slate-400 block text-[10px] uppercase font-bold">{t('detailsModal.doctor')}</span>
               <strong className="text-slate-800 text-sm font-semibold">{consultation.doctorName}</strong>
             </div>
           </div>
@@ -52,7 +56,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {/* Chief Complaint Motif */}
           <div className="space-y-1">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-              Motif Principal de Consultation
+              {t('detailsModal.chiefComplaint')}
             </span>
             <p className="text-sm font-bold text-slate-900 pl-1">{consultation.chiefComplaint}</p>
           </div>
@@ -60,7 +64,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {/* Diagnostics Pills */}
           <div className="space-y-1.5">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-              Diagnostics Retenus (CIM-10)
+              {t('detailsModal.diagnoses')}
             </span>
             <div className="flex flex-wrap gap-1.5 pl-1">
               {consultation.diagnoses && consultation.diagnoses.length > 0 ? (
@@ -73,7 +77,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-slate-500 italic">Aucun diagnostic codifié.</span>
+                <span className="text-xs text-slate-500 italic">{t('detailsModal.noDiagnoses')}</span>
               )}
             </div>
           </div>
@@ -81,10 +85,10 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {/* Clinical Examination Notes */}
           <div className="space-y-1.5">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-              Observations Cliniques & Compte-Rendu
+              {t('detailsModal.clinicalNotes')}
             </span>
             <div className="bg-slate-50/50 border border-medical-border rounded-xl p-3 text-xs text-slate-800 font-medium whitespace-pre-wrap leading-relaxed">
-              {consultation.clinicalNotes || 'Aucun compte rendu détaillé rédigé.'}
+              {consultation.clinicalNotes || t('detailsModal.noNotes')}
             </div>
           </div>
 
@@ -92,7 +96,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {consultation.labOrders && consultation.labOrders.length > 0 && (
             <div className="space-y-1.5">
               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                Examens Biologiques Demandés
+                {t('detailsModal.labOrders')}
               </span>
               <div className="flex flex-wrap gap-1.5 pl-1">
                 {consultation.labOrders.map((lab, index) => (
@@ -110,17 +114,17 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
           {/* Prescriptions Items Details */}
           <div className="space-y-2">
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-              Traitement & Prescription Rédigée
+              {t('detailsModal.prescriptions')}
             </span>
             {consultation.prescriptions && consultation.prescriptions.length > 0 ? (
               <div className="bg-white border border-medical-border rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                     <tr>
-                      <th className="p-2.5 font-bold">Médicament</th>
-                      <th className="p-2.5 font-bold">Dose</th>
-                      <th className="p-2.5 font-bold">Fréquence</th>
-                      <th className="p-2.5 font-bold">Durée</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.drug')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.dose')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.frequency')}</th>
+                      <th className="p-2.5 font-bold">{t('detailsModal.table.duration')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-medical-border text-slate-700 font-medium">
@@ -136,7 +140,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
                 </table>
               </div>
             ) : (
-              <p className="text-xs text-slate-500 italic pl-1">Aucune prescription associée.</p>
+              <p className="text-xs text-slate-500 italic pl-1">{t('detailsModal.noPrescriptions')}</p>
             )}
           </div>
         </div>
@@ -147,7 +151,7 @@ export const ConsultationDetailsModal: React.FC<ConsultationDetailsModalProps> =
             onClick={onClose}
             className="px-4 py-2 bg-medical-primary hover:bg-medical-hover text-white rounded-xl text-xs font-bold shadow-sm transition-colors cursor-pointer"
           >
-            Fermer le Dossier
+            {t('detailsModal.close')}
           </button>
         </div>
       </div>

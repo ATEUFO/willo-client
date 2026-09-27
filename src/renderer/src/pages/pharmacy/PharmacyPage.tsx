@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Pill,
   Search,
@@ -11,6 +12,8 @@ import {
 import { useHospitalStore, StockItem } from '../store/hospitalStore'
 
 export const PharmacyPage: React.FC = () => {
+  const { t } = useTranslation('pharmacy')
+  const { t: tc } = useTranslation('common')
   const {
     inventory,
     dispenses,
@@ -59,7 +62,7 @@ export const PharmacyPage: React.FC = () => {
   const handleDispense = (id: string) => {
     dispensePrescription(id)
     showNotification("Délivrance de l'ordonnance validée et stock mis à jour!", {
-      title: 'Délivrance Validée',
+      title: t('dispense.dispensed'),
       type: 'success'
     })
   }
@@ -80,7 +83,7 @@ export const PharmacyPage: React.FC = () => {
       batchNumber: ''
     })
     showNotification("Nouveau produit ajouté à l'inventaire de la pharmacie!", {
-      title: 'Stock mis à jour',
+      title: t('inventory.addProduct'),
       type: 'success'
     })
   }
@@ -94,7 +97,7 @@ export const PharmacyPage: React.FC = () => {
     })
     setShowAddPOModal(false)
     showNotification('Bon de commande généré et transmis!', {
-      title: 'Bon de Commande',
+      title: t('orders.title'),
       type: 'success'
     })
   }
@@ -106,37 +109,37 @@ export const PharmacyPage: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-medical-dark flex items-center gap-2">
             <Pill className="w-7 h-7 text-medical-primary" />
-            Espace Pharmacie & Gestion des Médicaments
+            {t('headerTitle')}
           </h2>
           <p className="text-sm text-slate-500">
-            Comptoir de délivrance rapide, suivi des péremptions / ruptures et re-commandes
+            {t('headerSub')}
           </p>
         </div>
 
         <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-medical-border shadow-sm">
           <button
             onClick={() => setActiveTab('dispense')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'dispense' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'dispense' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
               }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            Comptoir Délivrance
+            {t('tabs.dispense')}
           </button>
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'inventory' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'inventory' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
               }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            Gestion des Stocks ({inventory.length})
+            {t('tabs.inventory', { count: inventory.length })}
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'orders' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${activeTab === 'orders' ? 'bg-medical-primary text-white shadow-sm' : 'text-slate-600 hover:text-slate-900 bg-white'
               }`}
           >
             <FilePlus className="w-3.5 h-3.5" />
-            Bons de Commande ({purchaseOrders.length})
+            {t('tabs.orders', { count: purchaseOrders.length })}
           </button>
         </div>
       </div>
@@ -146,15 +149,15 @@ export const PharmacyPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-6 shadow-sm">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-medical-border pb-4">
             <div>
-              <h3 className="font-bold text-medical-dark text-base">Comptoir de Délivrance des Ordonnances</h3>
-              <p className="text-xs text-slate-500">Saisir le code d'ordonnance pour afficher la liste des médicaments</p>
+              <h3 className="font-bold text-medical-dark text-base">{t('dispense.title')}</h3>
+              <p className="text-xs text-slate-500">{t('dispense.sub')}</p>
             </div>
 
             <div className="relative w-full md:w-80">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Saisir le code d'ordonnance (ex: ORD-2026-001)..."
+                placeholder={t('dispense.searchPlaceholder')}
                 value={rxSearchCode}
                 onChange={(e) => setRxSearchCode(e.target.value)}
                 className="w-full bg-white border border-medical-border rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-slate-800 focus:outline-none focus:border-medical-primary"
@@ -169,8 +172,8 @@ export const PharmacyPage: React.FC = () => {
                   <span className="font-mono text-xs text-emerald-800 bg-medical-subtle px-2 py-0.5 rounded border border-emerald-200 font-bold">
                     {currentDispense.prescriptionCode}
                   </span>
-                  <h4 className="font-bold text-slate-900 text-lg mt-1">Patient : {currentDispense.patientName}</h4>
-                  <p className="text-xs text-slate-500">Ordonnance rédigée par {currentDispense.prescribedBy} le {currentDispense.date}</p>
+                  <h4 className="font-bold text-slate-900 text-lg mt-1">{t('dispense.patient', { name: currentDispense.patientName })}</h4>
+                  <p className="text-xs text-slate-500">{t('dispense.prescribedBy', { doctor: currentDispense.prescribedBy, date: currentDispense.date })}</p>
                 </div>
 
                 <span
@@ -179,7 +182,7 @@ export const PharmacyPage: React.FC = () => {
                       : 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
                     }`}
                 >
-                  {currentDispense.status === 'Dispensed' ? 'Délivré' : 'En Attente de Délivrance'}
+                  {currentDispense.status === 'Dispensed' ? t('dispense.dispensed') : t('dispense.pending')}
                 </span>
               </div>
 
@@ -188,23 +191,23 @@ export const PharmacyPage: React.FC = () => {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                     <tr>
-                      <th className="p-3">Médicament Prescrit</th>
-                      <th className="p-3">Quantité à Délivrer</th>
-                      <th className="p-3">Prix Unitaire</th>
-                      <th className="p-3">Total F CFA</th>
-                      <th className="p-3">Vérification Stock</th>
+                      <th className="p-3">{t('dispense.table.drug')}</th>
+                      <th className="p-3">{t('dispense.table.qty')}</th>
+                      <th className="p-3">{t('dispense.table.unitPrice')}</th>
+                      <th className="p-3">{t('dispense.table.total')}</th>
+                      <th className="p-3">{t('dispense.table.stockCheck')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-medical-border text-slate-700">
                     {currentDispense.items.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/80">
                         <td className="p-3 font-bold text-slate-900">{item.drugName}</td>
-                        <td className="p-3 font-bold text-medical-dark">{item.quantity} boîte(s)</td>
+                        <td className="p-3 font-bold text-medical-dark">{item.quantity} {t('dispense.table.boxes')}</td>
                         <td className="p-3 text-slate-500 font-mono">{item.unitPrice} F CFA</td>
                         <td className="p-3 font-bold text-slate-900 font-mono">{item.quantity * item.unitPrice} F CFA</td>
                         <td className="p-3">
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-medical-subtle text-emerald-800 border border-emerald-200 font-bold">
-                            En Stock (Disponibilité OK)
+                            {t('dispense.table.inStock')}
                           </span>
                         </td>
                       </tr>
@@ -215,22 +218,22 @@ export const PharmacyPage: React.FC = () => {
 
               <div className="flex items-center justify-between pt-3">
                 <div className="text-sm">
-                  <span className="text-slate-500 font-medium">Montant Total Médicaments : </span>
+                  <span className="text-slate-500 font-medium">{t('dispense.totalAmount')} </span>
                   <span className="font-bold text-slate-900 font-mono text-base">{currentDispense.totalAmount} F CFA</span>
                 </div>
 
                 {currentDispense.status !== 'Dispensed' && (
                   <button
                     onClick={() => handleDispense(currentDispense.id)}
-                    className="bg-medical-primary hover:bg-medical-hover text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2"
+                    className="bg-medical-primary hover:bg-medical-hover text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                   >
-                    <PackageCheck className="w-4 h-4" /> Valider la Délivrance
+                    <PackageCheck className="w-4 h-4" /> {t('dispense.validateBtn')}
                   </button>
                 )}
               </div>
             </div>
           ) : (
-            <div className="p-12 text-center text-slate-400">Aucune ordonnance en attente de délivrance. Saisissez un code d'ordonnance ci-dessus.</div>
+            <div className="p-12 text-center text-slate-400">{t('dispense.noPrescription')}</div>
           )}
         </div>
       )}
@@ -240,8 +243,8 @@ export const PharmacyPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h3 className="font-bold text-medical-dark text-base">Inventaire & Suivi des Péremptions</h3>
-              <p className="text-xs text-slate-500">Filtres de péremption imminente et ruptures de stock</p>
+              <h3 className="font-bold text-medical-dark text-base">{t('inventory.title')}</h3>
+              <p className="text-xs text-slate-500">{t('inventory.sub')}</p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -250,10 +253,10 @@ export const PharmacyPage: React.FC = () => {
                   <button
                     key={f}
                     onClick={() => setStockFilter(f)}
-                    className={`px-3 py-1 rounded-lg transition-all font-mono text-xs ${stockFilter === f ? 'bg-medical-primary text-white font-bold' : 'text-slate-600 hover:text-slate-900'
+                    className={`px-3 py-1 rounded-lg transition-all font-mono text-xs cursor-pointer ${stockFilter === f ? 'bg-medical-primary text-white font-bold' : 'text-slate-600 hover:text-slate-900'
                       }`}
                   >
-                    {f === 'ALL' ? 'Tous' : f === 'Expiring Soon' ? 'Péremption <30j' : f === 'Low Stock' ? 'Stock Faible' : 'Rupture'}
+                    {f === 'ALL' ? t('inventory.filters.all') : f === 'Expiring Soon' ? t('inventory.filters.expiring') : f === 'Low Stock' ? t('inventory.filters.low') : t('inventory.filters.out')}
                   </button>
                 ))}
               </div>
@@ -262,7 +265,7 @@ export const PharmacyPage: React.FC = () => {
                 onClick={() => setShowAddStockModal(true)}
                 className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer"
               >
-                <Plus className="w-4 h-4" /> Ajouter Produit
+                <Plus className="w-4 h-4" /> {t('inventory.addProduct')}
               </button>
             </div>
           </div>
@@ -271,15 +274,15 @@ export const PharmacyPage: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                 <tr>
-                  <th className="p-3">Code</th>
-                  <th className="p-3">Nom du Médicament</th>
-                  <th className="p-3">Catégorie</th>
-                  <th className="p-3">Stock Actuel</th>
-                  <th className="p-3">Seuil Min.</th>
-                  <th className="p-3">Prix Unitaire</th>
-                  <th className="p-3">N° Lot</th>
-                  <th className="p-3">Date Péremption</th>
-                  <th className="p-3">Statut</th>
+                  <th className="p-3">{t('inventory.columns.code')}</th>
+                  <th className="p-3">{t('inventory.columns.name')}</th>
+                  <th className="p-3">{t('inventory.columns.category')}</th>
+                  <th className="p-3">{t('inventory.columns.currentStock')}</th>
+                  <th className="p-3">{t('inventory.columns.minThresh')}</th>
+                  <th className="p-3">{t('inventory.columns.unitPrice')}</th>
+                  <th className="p-3">{t('inventory.columns.batch')}</th>
+                  <th className="p-3">{t('inventory.columns.expiry')}</th>
+                  <th className="p-3">{t('inventory.columns.status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-medical-border text-slate-700">
@@ -302,7 +305,7 @@ export const PharmacyPage: React.FC = () => {
                               : 'bg-red-50 text-medical-danger border border-red-200'
                           }`}
                       >
-                        {item.status === 'Normal' ? 'Normal' : item.status === 'Expiring Soon' ? 'Péremption Proche' : item.status === 'Low Stock' ? 'Stock Bas' : 'Rupture'}
+                        {item.status === 'Normal' ? t('inventory.statuses.normal') : item.status === 'Expiring Soon' ? t('inventory.statuses.expiringSoon') : item.status === 'Low Stock' ? t('inventory.statuses.lowStock') : t('inventory.statuses.outOfStock')}
                       </span>
                     </td>
                   </tr>
@@ -310,7 +313,7 @@ export const PharmacyPage: React.FC = () => {
                 {filteredInventory.length === 0 && (
                   <tr>
                     <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
-                      Aucun produit enregistré dans l'inventaire de la pharmacie.
+                      {t('inventory.empty')}
                     </td>
                   </tr>
                 )}
@@ -325,15 +328,15 @@ export const PharmacyPage: React.FC = () => {
         <div className="bg-medical-cardBg border border-medical-border rounded-xl p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-3 border-b border-medical-border pb-3">
             <div>
-              <h3 className="font-bold text-medical-dark text-base">Bons de Commande de Réapprovisionnement</h3>
-              <p className="text-xs text-slate-500">Générer les demandes d'achat pour la centrale pharmaceutique</p>
+              <h3 className="font-bold text-medical-dark text-base">{t('orders.title')}</h3>
+              <p className="text-xs text-slate-500">{t('orders.sub')}</p>
             </div>
 
             <button
               onClick={() => setShowAddPOModal(true)}
               className="bg-medical-primary hover:bg-medical-hover text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Générer un Bon de Commande
+              <Plus className="w-4 h-4" /> {t('orders.generateBtn')}
             </button>
           </div>
 
@@ -341,12 +344,12 @@ export const PharmacyPage: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-600 font-mono border-b border-medical-border">
                 <tr>
-                  <th className="p-3">N° Bon</th>
-                  <th className="p-3">Fournisseur</th>
-                  <th className="p-3">Articles Commandés</th>
-                  <th className="p-3">Montant Estimé</th>
-                  <th className="p-3">Date</th>
-                  <th className="p-3">Statut</th>
+                  <th className="p-3">{t('orders.columns.code')}</th>
+                  <th className="p-3">{t('orders.columns.supplier')}</th>
+                  <th className="p-3">{t('orders.columns.items')}</th>
+                  <th className="p-3">{t('orders.columns.estimatedCost')}</th>
+                  <th className="p-3">{t('orders.columns.date')}</th>
+                  <th className="p-3">{t('orders.columns.status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-medical-border text-slate-700">
@@ -371,7 +374,7 @@ export const PharmacyPage: React.FC = () => {
                 {purchaseOrders.length === 0 && (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-slate-400 font-sans">
-                      Aucun bon de commande enregistré pour le moment.
+                      {t('orders.empty')}
                     </td>
                   </tr>
                 )}
@@ -385,12 +388,12 @@ export const PharmacyPage: React.FC = () => {
       {showAddStockModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-medical-border rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-medical-dark">Ajouter un produit en stock</h3>
+            <h3 className="text-lg font-bold text-medical-dark">{t('modal.addStockTitle')}</h3>
 
             <form onSubmit={handleAddStockSubmit} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Code Produit</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.codeLabel')}</label>
                   <input
                     type="text"
                     required
@@ -401,7 +404,7 @@ export const PharmacyPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Prix Unitaire (F CFA)</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.unitPriceLabel')}</label>
                   <input
                     type="number"
                     required
@@ -413,7 +416,7 @@ export const PharmacyPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Nom du Médicament / Article</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('modal.nameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -426,7 +429,7 @@ export const PharmacyPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Quantité Initiale</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.initQtyLabel')}</label>
                   <input
                     type="number"
                     value={newStock.stockQuantity}
@@ -435,7 +438,7 @@ export const PharmacyPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Seuil Alerte Min.</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.minQtyLabel')}</label>
                   <input
                     type="number"
                     value={newStock.minQuantity}
@@ -449,15 +452,15 @@ export const PharmacyPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddStockModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium cursor-pointer"
                 >
-                  Annuler
+                  {tc('actions.cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm"
+                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm cursor-pointer"
                 >
-                  Ajouter au Stock
+                  {t('modal.addStockBtn')}
                 </button>
               </div>
             </form>
@@ -469,11 +472,11 @@ export const PharmacyPage: React.FC = () => {
       {showAddPOModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-medical-border rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-medical-dark">Nouveau Bon de Commande</h3>
+            <h3 className="text-lg font-bold text-medical-dark">{t('modal.addPOTitle')}</h3>
 
             <form onSubmit={handleCreatePOSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Fournisseur</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('modal.supplierLabel')}</label>
                 <input
                   type="text"
                   required
@@ -484,7 +487,7 @@ export const PharmacyPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-600 font-medium mb-1">Médicament à commander</label>
+                <label className="block text-slate-600 font-medium mb-1">{t('modal.drugNameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -496,7 +499,7 @@ export const PharmacyPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Quantité</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.qtyLabel')}</label>
                   <input
                     type="number"
                     value={newPO.quantity}
@@ -505,7 +508,7 @@ export const PharmacyPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-medium mb-1">Coût Estimé (F CFA)</label>
+                  <label className="block text-slate-600 font-medium mb-1">{t('modal.costLabel')}</label>
                   <input
                     type="number"
                     value={newPO.estimatedCost}
@@ -519,15 +522,15 @@ export const PharmacyPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddPOModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium cursor-pointer"
                 >
-                  Annuler
+                  {tc('actions.cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm"
+                  className="px-4 py-2 rounded-xl bg-medical-primary hover:bg-medical-hover text-white font-semibold shadow-sm cursor-pointer"
                 >
-                  Émettre la Commande
+                  {t('modal.emitPOBtn')}
                 </button>
               </div>
             </form>

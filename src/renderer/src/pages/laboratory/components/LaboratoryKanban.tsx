@@ -11,6 +11,7 @@ import {
   Check,
   FileCheck
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { LabRequest } from '../../store/hospitalStore'
 
 interface LaboratoryKanbanProps {
@@ -34,13 +35,15 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
   onPrintReport,
   getUrgencyLevel
 }) => {
+  const { t } = useTranslation('laboratory')
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-start print:hidden">
       {/* COLUMN 1: A Prélever (To Do) */}
       <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex flex-col gap-3 min-h-[450px]">
         <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
           <span className="font-bold text-slate-700 text-xs flex items-center gap-1.5 uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-slate-400" /> A Prélever ({todoList.length})
+            <span className="w-2 h-2 rounded-full bg-slate-400" /> {t('kanban.todoCol', { count: todoList.length })}
           </span>
         </div>
         <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
@@ -67,13 +70,13 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
                 </div>
                 <div className="text-[10px] text-slate-400 space-y-0.5 pt-1 border-t border-dashed border-slate-100">
                   <p className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {req.dateRequested}</p>
-                  <p>Dr: {req.requestedBy}</p>
+                  <p>{t('kanban.doctor', { name: req.requestedBy })}</p>
                 </div>
                 <button
                   onClick={() => onStartAnalysis(req.id)}
                   className="w-full bg-slate-800 hover:bg-slate-900 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer"
                 >
-                  Prélever & Analyser <ArrowRight className="w-3 h-3" />
+                  {t('kanban.sampleAndAnalyze')} <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
             )
@@ -81,7 +84,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
           {todoList.length === 0 && (
             <div className="text-center py-10 text-slate-400 space-y-1">
               <Clock className="w-6 h-6 mx-auto stroke-1" />
-              <p className="text-[11px] font-semibold">Aucun prélèvement en attente</p>
+              <p className="text-[11px] font-semibold">{t('kanban.noTodo')}</p>
             </div>
           )}
         </div>
@@ -91,7 +94,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
       <div className="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-4 flex flex-col gap-3 min-h-[450px]">
         <div className="flex items-center justify-between border-b border-amber-200/60 pb-2.5">
           <span className="font-bold text-amber-700 text-xs flex items-center gap-1.5 uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" /> En Analyse ({inProgressList.length})
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" /> {t('kanban.inProgressCol', { count: inProgressList.length })}
           </span>
         </div>
         <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
@@ -123,7 +126,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
                   onClick={() => onSelectRequest(req)}
                   className="w-full bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer shadow-3xs"
                 >
-                  Saisir Résultats <FileCheck className="w-3.5 h-3.5" />
+                  {t('kanban.enterResults')} <FileCheck className="w-3.5 h-3.5" />
                 </button>
               </div>
             )
@@ -131,7 +134,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
           {inProgressList.length === 0 && (
             <div className="text-center py-10 text-amber-600/60 space-y-1">
               <FlaskConical className="w-6 h-6 mx-auto stroke-1" />
-              <p className="text-[11px] font-semibold">Aucune analyse active</p>
+              <p className="text-[11px] font-semibold">{t('kanban.noInProgress')}</p>
             </div>
           )}
         </div>
@@ -141,7 +144,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
       <div className="bg-blue-50/30 border border-blue-200/50 rounded-2xl p-4 flex flex-col gap-3 min-h-[450px]">
         <div className="flex items-center justify-between border-b border-blue-200 pb-2.5">
           <span className="font-bold text-blue-700 text-xs flex items-center gap-1.5 uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-blue-500" /> A Valider ({pendingValList.length})
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> {t('kanban.pendingValCol', { count: pendingValList.length })}
           </span>
         </div>
         <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
@@ -173,7 +176,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
                   onClick={() => onSelectRequest(req)}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer shadow-3xs"
                 >
-                  Vérifier & Valider <Check className="w-3.5 h-3.5" />
+                  {t('kanban.checkAndValidate')} <Check className="w-3.5 h-3.5" />
                 </button>
               </div>
             )
@@ -181,7 +184,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
           {pendingValList.length === 0 && (
             <div className="text-center py-10 text-blue-600/60 space-y-1">
               <Activity className="w-6 h-6 mx-auto stroke-1" />
-              <p className="text-[11px] font-semibold">Aucun bilan à valider</p>
+              <p className="text-[11px] font-semibold">{t('kanban.noPendingVal')}</p>
             </div>
           )}
         </div>
@@ -191,7 +194,7 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
       <div className="bg-emerald-50/20 border border-emerald-200/50 rounded-2xl p-4 flex flex-col gap-3 min-h-[450px]">
         <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2.5">
           <span className="font-bold text-emerald-800 text-xs flex items-center gap-1.5 uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-medical-primary" /> Validés ({completedList.length})
+            <span className="w-2 h-2 rounded-full bg-medical-primary" /> {t('kanban.completedCol', { count: completedList.length })}
           </span>
         </div>
         <div className="space-y-3 overflow-y-auto max-h-[600px] pr-1">
@@ -205,26 +208,26 @@ export const LaboratoryKanban: React.FC<LaboratoryKanbanProps> = ({
                   {req.requestCode}
                 </span>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full font-bold text-[9px] flex items-center gap-0.5">
-                  <Check className="w-2.5 h-2.5" /> Fini
+                  <Check className="w-2.5 h-2.5" /> {t('kanban.finished')}
                 </span>
               </div>
               <div className="space-y-0.5">
                 <h4 className="font-bold text-slate-800 text-xs line-clamp-1">{req.testName}</h4>
                 <p className="text-[11px] text-slate-600 font-medium">Patient: {req.patientName}</p>
-                <p className="text-[9px] text-emerald-700 font-bold">Validé par : {req.validatedBy || 'Biologiste'}</p>
+                <p className="text-[9px] text-emerald-700 font-bold">{t('kanban.validatedBy', { name: req.validatedBy || t('kanban.defaultBiologist') })}</p>
               </div>
               <button
                 onClick={() => onPrintReport(req)}
                 className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-[10px] font-bold py-1.5 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer shadow-3xs"
               >
-                Imprimer / PDF <Printer className="w-3.5 h-3.5 text-medical-primary" />
+                {t('kanban.printPdf')} <Printer className="w-3.5 h-3.5 text-medical-primary" />
               </button>
             </div>
           ))}
           {completedList.length === 0 && (
             <div className="text-center py-10 text-slate-400 space-y-1">
               <CheckCircle className="w-6 h-6 mx-auto stroke-1" />
-              <p className="text-[11px] font-semibold">Aucun rapport complété</p>
+              <p className="text-[11px] font-semibold">{t('kanban.noCompleted')}</p>
             </div>
           )}
         </div>

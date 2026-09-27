@@ -1,69 +1,108 @@
 {
-  "title": "Admin Système",
+  "title": "Espace Administrateur Système",
+  "subtitle": "Supervision technique, gestion des accès utilisateur, paramètres globaux et sauvegardes",
   "tabs": {
-    "users": "Gestion Utilisateurs",
-    "logs": "Journaux Système",
-    "backup": "Sauvegarde & Restauration",
-    "metrics": "Métriques Système"
+    "supervision": "Supervision",
+    "users": "Gestion Accès ({{count}})",
+    "settings": "Paramètres Globaux",
+    "backups": "Sauvegardes"
+  },
+  "supervision": {
+    "serverStatus": "État du Serveur",
+    "operational": "Opérationnel",
+    "uptime": "Uptime",
+    "connectedUsers": "Utilisateurs Connectés",
+    "connected": "Connecté(s)",
+    "session": "Session",
+    "totalAccounts": "Total comptes",
+    "active": "actifs",
+    "serverLoad": "Charge Serveur / RAM",
+    "alerts": "Alertes / Logs Erreurs",
+    "errors": "Erreurs",
+    "lastScan": "Dernier scan",
+    "today": "Aujourd'hui",
+    "logsTitle": "Journal de Supervision Système (Logs)",
+    "logsSubtitle": "Événements techniques, authentifications et erreurs en temps réel",
+    "filter": "Filtrer",
+    "logCols": {
+      "timestamp": "Horodatage",
+      "level": "Niveau",
+      "service": "Module / Service",
+      "message": "Message"
+    }
   },
   "users": {
-    "title": "Gestion des Utilisateurs",
-    "add": "Ajouter un utilisateur",
-    "search": "Rechercher un utilisateur...",
-    "columns": {
-      "name": "Nom",
+    "title": "Gestion des Accès & Rôles Utilisateurs",
+    "subtitle": "Créer des comptes, réinitialiser les accès et assigner les privilèges",
+    "createAccount": "Créer un Compte",
+    "resetPwd": "Réinitialiser le mot de passe",
+    "resetPwdMsg": "Mot de passe réinitialisé pour {{name}}",
+    "resetPwdTitle": "Réinitialisation Mot de passe",
+    "deactivate": "Désactiver",
+    "activate": "Activer",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "cols": {
+      "user": "Utilisateur",
       "username": "Identifiant",
-      "role": "Rôle",
-      "department": "Département",
+      "role": "Rôle Assigné",
+      "department": "Service / Département",
+      "lastLogin": "Dernière Connexion",
       "status": "Statut",
-      "lastLogin": "Dernière connexion",
       "actions": "Actions"
     },
-    "statusActive": "Actif",
-    "statusInactive": "Inactif",
-    "editUser": "Modifier l'utilisateur",
-    "deleteUser": "Supprimer l'utilisateur",
-    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
-  },
-  "logs": {
-    "title": "Journaux Système",
-    "level": "Niveau",
-    "service": "Service",
-    "message": "Message",
-    "timestamp": "Horodatage",
-    "levels": {
-      "info": "Info",
-      "warning": "Avertissement",
-      "error": "Erreur",
-      "critical": "Critique"
+    "modal": {
+      "title": "Créer un nouveau compte utilisateur",
+      "fullName": "Nom & Prénom",
+      "fullNamePlaceholder": "Ex: Dr. Moussa Camara",
+      "username": "Identifiant (Username)",
+      "usernamePlaceholder": "Ex: mcamara",
+      "role": "Rôle Système",
+      "department": "Département",
+      "roles": {
+        "consultation": "Médecin / Clinique",
+        "nursing": "Infirmier(ère)",
+        "reception": "Réceptionniste",
+        "laboratory": "Laborantin",
+        "pharmacy": "Pharmacien",
+        "billing": "Caissier",
+        "management": "Directeur",
+        "admin": "Admin Système"
+      }
     }
   },
-  "backup": {
-    "title": "Sauvegarde & Restauration",
-    "createBackup": "Créer une sauvegarde",
-    "restoreBackup": "Restaurer",
-    "columns": {
-      "filename": "Fichier",
+  "settings": {
+    "generalTitle": "Informations Générales de l'Établissement",
+    "facilityName": "Nom de l'Établissement",
+    "facilityCode": "Code Établissement",
+    "totalBeds": "Capacité Totale de Lits",
+    "address": "Adresse Physique",
+    "phone": "Téléphone",
+    "email": "Email de contact",
+    "saveBtn": "Enregistrer les Modifications",
+    "saveSuccess": "Paramètres sauvegardés avec succès!",
+    "saveTitle": "Configuration",
+    "servicesTitle": "Services & Spécialités Médicales",
+    "activeServices": "Services Actifs ({{count}})",
+    "specialties": "Spécialités Disponibles ({{count}})"
+  },
+  "backups": {
+    "title": "Console de Sauvegarde & Restauration",
+    "subtitle": "Déclencher un dump complet de la base de données et consulter l'historique",
+    "triggerDump": "Déclencher un Dump de BDD",
+    "history": "Historique des Sauvegardes",
+    "download": "Télécharger",
+    "downloadSuccess": "Fichier de sauvegarde téléchargé avec succès sous:\n{{path}}",
+    "downloadTitle": "Téléchargement Dump",
+    "downloadSimulated": "Téléchargement de {{filename}} simulé.",
+    "downloadError": "Erreur lors du téléchargement: {{error}}",
+    "cols": {
+      "file": "Fichier Dump",
       "size": "Taille",
-      "timestamp": "Date",
       "type": "Type",
-      "status": "Statut"
-    },
-    "types": {
-      "automatic": "Automatique",
-      "manual": "Manuel"
-    },
-    "statuses": {
-      "completed": "Terminée",
-      "failed": "Échouée",
-      "inProgress": "En cours"
+      "datetime": "Date / Heure",
+      "status": "Statut",
+      "action": "Action"
     }
-  },
-  "metrics": {
-    "title": "Métriques Système",
-    "cpu": "CPU",
-    "ram": "Mémoire RAM",
-    "db": "Base de Données",
-    "uptime": "Temps de fonctionnement"
   }
 }

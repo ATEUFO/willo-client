@@ -1,8 +1,121 @@
 {
   "title": "Billing & Invoices",
-  "tabs": { "invoices": "Invoices", "create": "New Invoice" },
-  "columns": { "code": "Invoice No.", "patient": "Patient", "date": "Date", "items": "Services", "subtotal": "Subtotal", "insurance": "Insurance", "share": "Patient share", "status": "Status", "actions": "Actions" },
-  "statuses": { "unpaid": "Unpaid", "paid": "Paid" },
-  "paymentMethods": { "cash": "Cash", "card": "Bank Card", "mobile": "Mobile Money" },
-  "create": { "title": "New Invoice", "selectPatient": "Select patient", "addItem": "Add service", "description": "Description", "category": "Category", "amount": "Amount", "insuranceName": "Insurance", "coveragePercent": "Coverage (%)", "paymentMethod": "Payment method", "markPaid": "Mark as paid", "submit": "Create invoice", "categories": { "consultation": "Consultation", "laboratoire": "Laboratory", "pharmacie": "Pharmacy", "soins": "Care" } }
+  "headerTitle": "Billing & Secure Payment Portal",
+  "headerSub": "Procedure billing, insurance/health fund coverage, and daily cash register closure",
+  "tabs": {
+    "pos": "Payment Terminal ({{count}})",
+    "history": "Receipt History ({{count}})",
+    "closure": "Cash Closure"
+  },
+  "pos": {
+    "unpaidTitle": "Pending Unpaid Bills ({{count}})",
+    "newInvoice": "Invoice",
+    "actsCount": "{{count}} item(s)",
+    "noUnpaid": "No invoices awaiting payment",
+    "noSelected": "Select an invoice from the left list or create a new one.",
+    "hospitalName": "WILLO HOSPITAL CENTER",
+    "receiptTitle": "Medical Receipt & Settlement Invoice",
+    "location": "Dakar, Senegal • Tel: +221 33 800 00 00",
+    "date": "Date: {{date}}",
+    "patientName": "Patient Name:",
+    "insuranceCoverage": "Insurance Coverage:",
+    "table": {
+      "description": "Procedure Description",
+      "category": "Category",
+      "amount": "Amount (F CFA)"
+    },
+    "subtotalBrut": "Gross Subtotal:",
+    "insuranceCoverPercent": "Insurance Coverage ({{percent}}%):",
+    "patientShareRemaining": "REMAINING PATIENT SHARE:",
+    "paymentModeTitle": "Select Payment Method",
+    "payAndPrintBtn": "Record Payment & Print Receipt",
+    "alreadyPaid": "Invoice already settled by {{method}} at {{time}}",
+    "printTicketBtn": "Print Receipt"
+  },
+  "history": {
+    "title": "History & General Invoice Register ({{count}})",
+    "sub": "View, filter, and reprint all database invoices",
+    "searchPlaceholder": "Search patient or code FAC-...",
+    "showReceiptBtn": "View Receipt",
+    "noInvoices": "No invoices registered in the database.",
+    "columns": {
+      "code": "Invoice No.",
+      "patient": "Patient",
+      "items": "Billed Items",
+      "subtotal": "Gross Total",
+      "insurance": "Insurance Share",
+      "patientShare": "Patient Share",
+      "status": "Status",
+      "dateReg": "Date / Payment",
+      "action": "Action"
+    }
+  },
+  "closure": {
+    "title": "Daily Cash Register Closure & Reconciliation",
+    "sub": "Daily collection summary by payment method",
+    "lockBtn": "Lock & Close Cash Register",
+    "closedStatus": "Register Closed",
+    "cashTotal": "Total Cash",
+    "cardTotal": "Total Credit Card",
+    "mobileTotal": "Total Mobile Money",
+    "grandTotal": "Total Daily Revenue"
+  },
+  "statuses": {
+    "unpaid": "Unpaid",
+    "paid": "Paid",
+    "pending": "Pending"
+  },
+  "paymentMethods": {
+    "cash": "Cash",
+    "card": "Credit Card",
+    "mobile": "Mobile Money"
+  },
+  "modal": {
+    "title": "Register New Invoice",
+    "patientLabel": "Billed Patient",
+    "selectPatientPlaceholder": "-- Select a patient --",
+    "noInsurance": "No Insurance",
+    "insuranceLabel": "Insurance / Health Fund",
+    "insurancePlaceholder": "E.g. NSIA Insurance, Gras Savoye...",
+    "coverageRate": "Coverage Rate",
+    "actsSection": "Billable Procedures Entry",
+    "itemDescPlaceholder": "Procedure description...",
+    "itemPricePlaceholder": "Price (F CFA)...",
+    "addActBtn": "Add Billable Procedure",
+    "table": {
+      "description": "Description",
+      "category": "Category",
+      "price": "Price",
+      "action": "Action"
+    },
+    "subtotalBrut": "Gross Subtotal:",
+    "coveragePercent": "Insurance Coverage ({{percent}}%):",
+    "patientRemaining": "Remaining Patient Share:",
+    "cancel": "Cancel",
+    "submit": "Create Invoice",
+    "notifications": {
+      "requiredTitle": "Required Field",
+      "selectPatientWarning": "Please select a patient.",
+      "addActWarning": "Please add at least one billable procedure."
+    }
+  },
+  "create": {
+    "title": "Create New Medical Invoice",
+    "selectPatient": "Select a patient",
+    "addItem": "Add procedure/item",
+    "description": "Description",
+    "category": "Category",
+    "amount": "Amount (F CFA)",
+    "insuranceName": "Insurance Provider / Health Fund",
+    "coveragePercent": "Insurance Coverage (%)",
+    "paymentMethod": "Immediate Payment Method (Optional)",
+    "markPaid": "Mark directly as paid",
+    "submit": "Validate & Generate Invoice",
+    "categories": {
+      "consultation": "Consultation",
+      "laboratoire": "Laboratory",
+      "pharmacie": "Pharmacy",
+      "soins": "Care / Nursing"
+    }
+  }
 }

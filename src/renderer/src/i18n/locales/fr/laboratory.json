@@ -1,43 +1,121 @@
 {
   "title": "Laboratoire",
-  "tabs": {
-    "requests": "Demandes",
-    "kanban": "Kanban"
+  "headerTitle": "Espace Laboratoire & Biologie Clinique",
+  "headerSub": "Pipeline des prélèvements, saisie biologique instantanée et validation de comptes-rendus.",
+  "views": {
+    "kanban": "Pipeline Kanban ({{count}})",
+    "resultsEntry": "Saisie de Résultats"
   },
-  "columns": {
-    "requestCode": "Code",
-    "patient": "Patient",
-    "test": "Examen",
-    "category": "Catégorie",
-    "requestedBy": "Demandé par",
-    "date": "Date",
-    "status": "Statut",
-    "actions": "Actions"
-  },
-  "statuses": {
-    "todo": "À faire",
-    "inProgress": "En cours",
-    "pendingValidation": "En attente de validation",
-    "completed": "Terminé"
-  },
+  "searchPlaceholder": "Rechercher par patient, ID ou analyse...",
+  "categoryFilterLabel": "Catégorie :",
+  "allCategories": "Toutes les disciplines",
+  "scanPlaceholder": "Scanner ou saisir code échantillon (Ex: LAB-2026-088)...",
+  "scanBtn": "Scan",
   "categories": {
-    "hematologie": "Hématologie",
     "biochimie": "Biochimie",
+    "hematologie": "Hématologie",
     "microbiologie": "Microbiologie",
     "immunologie": "Immunologie"
   },
-  "results": {
-    "title": "Saisie des résultats",
-    "parameter": "Paramètre",
-    "value": "Valeur",
-    "unit": "Unité",
-    "refRange": "Référence",
-    "abnormal": "Anormal",
-    "validate": "Valider les résultats",
-    "validatedBy": "Validé par"
+  "urgency": {
+    "urgent": "Urgent",
+    "priority": "Prioritaire",
+    "normal": "Normal"
   },
-  "print": {
-    "title": "Rapport de laboratoire",
-    "print": "Imprimer"
+  "kanban": {
+    "todoCol": "A Prélever ({{count}})",
+    "inProgressCol": "En Analyse ({{count}})",
+    "pendingValCol": "A Valider ({{count}})",
+    "completedCol": "Validés ({{count}})",
+    "noTodo": "Aucun prélèvement en attente",
+    "noInProgress": "Aucune analyse active",
+    "noPendingVal": "Aucun bilan à valider",
+    "noCompleted": "Aucun rapport complété",
+    "sampleAndAnalyze": "Prélever & Analyser",
+    "enterResults": "Saisir Résultats",
+    "checkAndValidate": "Vérifier & Valider",
+    "printPdf": "Imprimer / PDF",
+    "finished": "Fini",
+    "doctor": "Dr: {{name}}",
+    "validatedBy": "Validé par : {{name}}",
+    "defaultBiologist": "Biologiste"
+  },
+  "sidebar": {
+    "pendingTitle": "Dossiers en attente de saisie",
+    "draft": "Brouillon",
+    "toSample": "À prélever",
+    "patient": "Patient : {{name}}",
+    "noPending": "Aucune saisie en attente"
+  },
+  "emptyState": {
+    "noSelectionTitle": "Aucun échantillon sélectionné",
+    "noSelectionSub": "Sélectionnez une demande dans la barre latérale gauche ou scannez un code d'analyse pour ouvrir sa grille de saisie biologique."
+  },
+  "form": {
+    "gridTitle": "Grille de saisie :",
+    "prescriptionNo": "N° Prescription : {{code}} • Examen : {{test}}",
+    "urgencyLabel": "Urgence : {{label}}",
+    "backTooltip": "Retour au Kanban",
+    "table": {
+      "parameter": "Paramètre",
+      "value": "Valeur",
+      "unit": "Unité",
+      "refRange": "Normes (Réf)",
+      "status": "Statut",
+      "actions": "Actions",
+      "measurePlaceholder": "Mesure...",
+      "abnormal": "Hors Norme",
+      "conforming": "Conforme",
+      "empty": "Vide",
+      "deleteTooltip": "Supprimer ce paramètre"
+    },
+    "customParamSection": "Ajouter un paramètre sur-mesure (Optionnel)",
+    "paramNamePlaceholder": "Nom paramètre...",
+    "valPlaceholder": "Valeur...",
+    "unitPlaceholder": "Unité (ex: g/L)...",
+    "refPlaceholder": "Norme (ex: 0.7 - 1.1)...",
+    "addBtn": "Ajouter",
+    "clinicalNotesLabel": "Observations & Remarques Cliniques",
+    "clinicalNotesPlaceholder": "Saisir des remarques sur la qualité de l'échantillon (ex: échantillon hémolysé) ou la technique utilisée...",
+    "saveDraft": "Enregistrer en Brouillon",
+    "validateAndTransmit": "Valider et Transmettre"
+  },
+  "report": {
+    "modalTitle": "Impression Compte-Rendu Clinique",
+    "printBtn": "Lancer l'Impression / PDF",
+    "chuHeader": "CENTRE HOSPITALIER UNIVERSITAIRE WILLO",
+    "department": "Département de Biologie Médicale & Analyses Cliniques",
+    "refNo": "N° Réf: {{code}}",
+    "postID": "Poste ID: {{dept}}",
+    "docTitle": "COMPTE-RENDU D'ANALYSES BIOLOGIQUES",
+    "patientLabel": "Patient",
+    "patientIdLabel": "ID Patient : {{id}}",
+    "prescriptionLabel": "Prescription",
+    "prescribedBy": "Prescrit par: Dr. {{name}}",
+    "dateLabel": "Date : {{date}}",
+    "analyzedParams": "Paramètres Analysés ({{count}})",
+    "table": {
+      "examParam": "Examen / Paramètre",
+      "value": "Valeur",
+      "units": "Unités",
+      "refRanges": "Valeurs de Référence",
+      "status": "Statut",
+      "abnormal": "* ANORMAL",
+      "conforming": "CONFORME"
+    },
+    "clinicalNotes": "Observations Cliniques du Laborantin",
+    "docFooter": "Document généré de façon sécurisée par le système d'information de Willo Hospital.",
+    "biologistSignature": "Signature du Biologiste",
+    "defaultDoctor": "Dr. Jean Biologiste",
+    "biologistTitle": "Biologiste Clinicien",
+    "validatedOn": "Validé le: {{date}}"
+  },
+  "notifications": {
+    "draftSaved": "Brouillon enregistré localement pour {{patient}}.",
+    "draftTitle": "Brouillon Enregistré",
+    "validated": "Bilan d'analyses validé avec succès. Transmis au médecin traitant!",
+    "validatedTitle": "Bilan Validé",
+    "noSampleFound": "Aucun échantillon ne correspond au code : \"{{code}}\"",
+    "sampleSearchTitle": "Recherche Échantillon"
   }
 }

@@ -17,10 +17,12 @@ import { AIFactorsTable } from './components/ai/AIFactorsTable'
 import { AIRecommendations } from './components/ai/AIRecommendations'
 import { AIFhirDrawer } from './components/ai/AIFhirDrawer'
 import { AILoadingState } from './components/ai/AILoadingState'
+import { useTranslation } from 'react-i18next'
 import { AIEmptyState } from './components/ai/AIEmptyState'
 import { AIHistoryTable } from './components/ai/AIHistoryTable'
 
 export const AIDiagnosticPage: React.FC = () => {
+  const { t } = useTranslation('medical')
   const {
     patients,
     vitals,
@@ -287,13 +289,13 @@ ${p.recommandations.map((r) => `- ${r}`).join('\n')}
                       className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer"
                     >
                       <Copy className="w-3.5 h-3.5" />
-                      {copiedSuccess ? 'Rapport Copié !' : 'Copier le Rapport Textuel'}
+                      {copiedSuccess ? t('aiDiagnosticPage.reportCopied') : t('aiDiagnosticPage.copyReport')}
                     </button>
 
                     <div className="flex items-center gap-3">
                       {saveSuccess && (
                         <span className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-fade-in">
-                          <Check className="w-4 h-4" /> Enregistré au dossier patient !
+                          <Check className="w-4 h-4" /> {t('aiDiagnosticPage.archivedSuccess')}
                         </span>
                       )}
                       <button
@@ -302,7 +304,7 @@ ${p.recommandations.map((r) => `- ${r}`).join('\n')}
                         className="px-5 py-2.5 bg-medical-primary hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
                       >
                         <Plus className="w-4 h-4" />
-                        Archiver au Dossier Médical Patient
+                        {t('aiDiagnosticPage.archiveToRecord')}
                       </button>
                     </div>
                   </div>
