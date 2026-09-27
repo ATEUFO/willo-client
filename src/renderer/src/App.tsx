@@ -8,6 +8,7 @@ import { useHospitalStore } from './pages/store/hospitalStore'
 import { LoginPage } from './pages/auth/login'
 import { SigninPage } from './pages/auth/signin'
 import { ConnectionsPage } from './pages/connections/ConnectionsPage'
+import { ServerDiscoveryPage } from './pages/server/ServerDiscoveryPage'
 import { AdminPage } from './pages/admin/AdminPage'
 import { ReceptionPage } from './pages/reception/ReceptionPage'
 import { MedicalPage } from './pages/medical/MedicalPage'
@@ -45,6 +46,7 @@ function App(): React.JSX.Element {
     showSettingsModal
   } = useHospitalStore()
   const [authView, setAuthView] = useState<'login' | 'signin' | 'connections'>('login')
+  const [appView, setAppView] = useState<'serverDiscovery' | 'auth'>('serverDiscovery')
 
   useEffect(() => {
     checkAuthSession()
@@ -75,6 +77,19 @@ function App(): React.JSX.Element {
   }
 
   if (!isAuthenticated) {
+    // Step 1 — Server discovery (shown at every startup)
+    if (appView === 'serverDiscovery') {
+      return (
+        <div className="h-screen flex flex-col overflow-hidden">
+          <TitleBar />
+          <div className="flex-1 overflow-y-auto">
+            <ServerDiscoveryPage onServerSelected={() => setAppView('auth')} />
+          </div>
+        </div>
+      )
+    }
+
+    // Step 2 — Authentication
     let content: React.ReactNode
     if (authView === 'signin') {
       content = <SigninPage onSwitchToLogin={() => setAuthView('login')} />
