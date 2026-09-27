@@ -1,0 +1,60 @@
+{
+  "title": "Médecin / Clinique",
+  "tabs": {
+    "patients": "Patients",
+    "vitals": "Constantes",
+    "consultations": "Consultations",
+    "careTasks": "Soins"
+  },
+  "vitals": {
+    "title": "Saisie des constantes",
+    "systolic": "Systolique (mmHg)",
+    "diastolic": "Diastolique (mmHg)",
+    "temperature": "Température (°C)",
+    "pulse": "Pouls (bpm)",
+    "weight": "Poids (kg)",
+    "spO2": "SpO2 (%)",
+    "abnormal": "Valeur anormale",
+    "nurseNotes": "Notes infirmier"
+  },
+  "consultation": {
+    "title": "Consultation médicale",
+    "chiefComplaint": "Motif de consultation",
+    "clinicalNotes": "Notes cliniques",
+    "diagnoses": "Diagnostics",
+    "prescriptions": "Prescriptions",
+    "labOrders": "Examens demandés",
+    "drug": "Médicament",
+    "dosage": "Posologie",
+    "frequency": "Fréquence",
+    "duration": "Durée"
+  },
+  "careTasks": {
+    "title": "Soins & Tâches",
+    "types": {
+      "injection": "Injection",
+      "pansement": "Pansement",
+      "medicament": "Médicament",
+      "perfusion": "Perfusion"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "administered": "Administré"
+    },
+    "prescribed": "Prescrit par",
+    "scheduled": "Prévu à",
+    "bed": "Lit"
+  },
+  "ai": {
+    "title": "Diagnostic IA",
+    "selectModel": "Sélectionner un modèle",
+    "selectPatient": "Sélectionner un patient",
+    "analyze": "Analyser",
+    "analyzing": "Analyse en cours...",
+    "result": "Résultat du diagnostic",
+    "confidence": "Confiance",
+    "recommendations": "Recommandations",
+    "riskLevel": "Niveau de risque",
+    "history": "Historique des diagnostics"
+  }
+}

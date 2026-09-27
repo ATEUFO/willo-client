@@ -1,0 +1,60 @@
+{
+  "title": "Doctor / Clinic",
+  "tabs": {
+    "patients": "Patients",
+    "vitals": "Vitals",
+    "consultations": "Consultations",
+    "careTasks": "Care Tasks"
+  },
+  "vitals": {
+    "title": "Record vitals",
+    "systolic": "Systolic (mmHg)",
+    "diastolic": "Diastolic (mmHg)",
+    "temperature": "Temperature (°C)",
+    "pulse": "Pulse (bpm)",
+    "weight": "Weight (kg)",
+    "spO2": "SpO2 (%)",
+    "abnormal": "Abnormal value",
+    "nurseNotes": "Nurse notes"
+  },
+  "consultation": {
+    "title": "Medical consultation",
+    "chiefComplaint": "Chief complaint",
+    "clinicalNotes": "Clinical notes",
+    "diagnoses": "Diagnoses",
+    "prescriptions": "Prescriptions",
+    "labOrders": "Lab orders",
+    "drug": "Drug",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "duration": "Duration"
+  },
+  "careTasks": {
+    "title": "Care & Tasks",
+    "types": {
+      "injection": "Injection",
+      "pansement": "Dressing",
+      "medicament": "Medication",
+      "perfusion": "Infusion"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "administered": "Administered"
+    },
+    "prescribed": "Prescribed by",
+    "scheduled": "Scheduled at",
+    "bed": "Bed"
+  },
+  "ai": {
+    "title": "AI Diagnostic",
+    "selectModel": "Select model",
+    "selectPatient": "Select patient",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "result": "Diagnostic result",
+    "confidence": "Confidence",
+    "recommendations": "Recommendations",
+    "riskLevel": "Risk level",
+    "history": "Diagnostic history"
+  }
+}

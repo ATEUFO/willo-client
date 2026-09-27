@@ -1,0 +1,44 @@
+{
+  "preferences": "Preferences & Settings",
+  "tabs": {
+    "account": "Profile & Account",
+    "preferences": "UI Preferences",
+    "system": "System Information"
+  },
+  "account": {
+    "role": "Role",
+    "department": "Department",
+    "badge": "SQLite Authenticated Account",
+    "userId": "Unique Username",
+    "lastLogin": "Last Login",
+    "notConnected": "User Not Logged In"
+  },
+  "prefs": {
+    "language": "Interface language",
+    "languageSub": "Choose the display language",
+    "notifications": "Sound Notifications & Alerts",
+    "notificationsSub": "Enable reminders and emergency alerts",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "system": {
+    "version": "WILLO Electron Client v1.0.0",
+    "stack": "better-sqlite3 • React 19 • TypeScript 5.9",
+    "dbActive": "Local database connected & active"
+  },
+  "titlebar": {
+    "settings": "Preferences & Settings",
+    "logout": "Sign out"
+  },
+  "statusbar": {
+    "connectedServer": "Connected to Server",
+    "offlineLocal": "Offline Mode (Local Database)",
+    "clickConfig": "(Click to configure)",
+    "cachePending": "Local Cache Sync: {{count}} pending",
+    "cacheUpToDate": "Local Cache Sync: Up to date",
+    "activeModule": "Active Module",
+    "facility": "Facility",
+    "langEncoding": "Language & Encoding",
+    "clockTitle": "Real-time system clock"
+  }
+}

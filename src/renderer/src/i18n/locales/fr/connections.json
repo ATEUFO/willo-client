@@ -1,0 +1,74 @@
+{
+  "header": "Configuration Réseau & Connexions",
+  "headerSub": "Gérer la communication locale avec Willo Server",
+  "tabs": {
+    "status": "Statut & Diagnostic",
+    "manual": "Configuration Manuelle",
+    "bonjour": "Recherche Automatique",
+    "subnet": "Scanner Réseau (mDNS Fallback)"
+  },
+  "status": {
+    "title": "État de la connexion",
+    "remoteServer": "Serveur Distant",
+    "latency": "Latence (Ping)",
+    "computing": "Calcul en cours...",
+    "na": "N/A (Déconnecté)",
+    "onlineWs": "En ligne (WebSocket Connecté)",
+    "offlineLocal": "Mode Hors Ligne (Déconnecté)",
+    "localDb": "Base de Données Locale (SQLite)",
+    "lastSync": "Dernière synchronisation incrémentale : {{date}}",
+    "offlineFirst": "Offline-First",
+    "pendingCount": "Modifications locales en attente :",
+    "pendingMsg": "Ces requêtes seront envoyées automatiquement dès la reconnexion.",
+    "noPending": "Aucune donnée en attente de synchronisation.",
+    "syncNow": "Synchroniser maintenant",
+    "posteId": "ID Unique du Poste (UUID) :",
+    "clientType": "Type de client :",
+    "clientTypeValue": "Electron Client (React + TypeScript + better-sqlite3)",
+    "traceNote": "Cet identifiant est communiqué à Willo Server (en-tête X-Poste-Id) pour garantir la traçabilité des dossiers médicaux."
+  },
+  "manual": {
+    "title": "Configuration IP Manuelle",
+    "host": "Adresse IP / Hôte",
+    "hostPlaceholder": "ex: 192.168.1.50",
+    "port": "Port",
+    "portPlaceholder": "ex: 5030",
+    "test": "Tester la connexion",
+    "testing": "Vérification...",
+    "save": "Appliquer & Enregistrer",
+    "successTitle": "Connexion établie avec succès !",
+    "successServer": "Serveur identifié : {{name}}",
+    "errorTitle": "Échec de la connexion"
+  },
+  "bonjour": {
+    "title": "Découverte locale (Bonjour / mDNS)",
+    "search": "Rechercher",
+    "desc": "Le protocole ZeroConf / Bonjour recherche automatiquement les services Willo (_willo._tcp) publiés sur votre réseau local. Aucun paramétrage manuel d'adresse IP n'est requis si le multicast réseau est autorisé.",
+    "scanning": "Recherche de serveurs sur le réseau local...",
+    "noneTitle": "Aucun serveur Willo détecté",
+    "noneMsg": "Vérifiez que le serveur Willo est démarré sur le même réseau local ou tentez le scan de secours.",
+    "columns": {
+      "name": "Nom du Centre",
+      "host": "Adresse IP / Hôte",
+      "port": "Port",
+      "action": "Action"
+    },
+    "connected": "Connecté"
+  },
+  "subnet": {
+    "title": "Scanner de réseau local (mDNS Fallback)",
+    "scan": "Scanner",
+    "desc": "Si la multidiffusion mDNS est bloquée par votre pare-feu ou votre commutateur, le scanner vérifie chaque adresse de la plage réseau locale de classe C (port 5030) pour identifier le serveur de secours.",
+    "scanning": "Scan du réseau local en cours...",
+    "scanTime": "Vérification de la plage IP active (environ 5-10 secondes)...",
+    "noneTitle": "Aucun serveur trouvé via scan IP",
+    "noneMsg": "Cliquez sur Scanner pour sonder le réseau local de classe C et trouver Willo Server.",
+    "columns": {
+      "name": "Nom du Centre",
+      "host": "Adresse IP / Hôte",
+      "port": "Port",
+      "action": "Action"
+    },
+    "connected": "Connecté"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Management & Reports",
+  "tabs": { "overview": "Overview", "stats": "Statistics", "reports": "Reports" },
+  "overview": { "totalPatients": "Total patients", "todayVisits": "Today's visits", "revenue": "Monthly revenue", "pendingInvoices": "Pending invoices" },
+  "stats": { "patientsByDay": "Patients per day", "revenueByMonth": "Revenue per month", "topDiagnoses": "Common diagnoses", "labActivity": "Lab activity" },
+  "reports": { "generate": "Generate report", "period": "Period", "type": "Report type", "export": "Export" }
+}

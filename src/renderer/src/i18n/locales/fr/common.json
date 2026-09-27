@@ -1,0 +1,90 @@
+{
+  "app": {
+    "name": "WILLO HOSPITAL",
+    "subtitle": "Système d'Information Hospitalier",
+    "version": "SIH v1.0.0"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "back": "Retour",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "print": "Imprimer",
+    "refresh": "Rafraîchir",
+    "retry": "Réessayer",
+    "submit": "Soumettre",
+    "validate": "Valider",
+    "apply": "Appliquer",
+    "test": "Tester",
+    "connect": "Connecter",
+    "disconnect": "Déconnecter",
+    "continue": "Continuer"
+  },
+  "status": {
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "pending": "En attente",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté"
+  },
+  "roles": {
+    "admin": "Admin Système",
+    "reception": "Accueil & Triage",
+    "nursing": "Soins & Constantes",
+    "consultation": "Médecin / Clinique",
+    "ai-diagnostic": "Diagnostic IA",
+    "laboratory": "Laboratoire",
+    "pharmacy": "Pharmacie",
+    "billing": "Caisse & Factures",
+    "management": "Direction & Rapports"
+  },
+  "patient": {
+    "label": "Patient",
+    "code": "Code patient",
+    "name": "Nom complet",
+    "age": "Âge",
+    "gender": "Sexe",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "bloodType": "Groupe sanguin",
+    "male": "Masculin",
+    "female": "Féminin"
+  },
+  "time": {
+    "now": "Maintenant",
+    "today": "Aujourd'hui",
+    "date": "Date",
+    "time": "Heure",
+    "never": "Jamais"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue.",
+    "network": "Erreur réseau.",
+    "notFound": "Introuvable.",
+    "unauthorized": "Non autorisé.",
+    "accessDenied": "Accès refusé",
+    "accessDeniedMsg": "Votre rôle actuel ({{role}}) n'a pas les droits requis pour accéder au module sélectionné.",
+    "backToModule": "Retourner à mon espace principal"
+  },
+  "window": {
+    "minimize": "Réduire",
+    "maximize": "Agrandir",
+    "restore": "Restaurer",
+    "close": "Fermer"
+  },
+  "db": {
+    "init": "Initialisation de la base de données SQLite..."
+  }
+}

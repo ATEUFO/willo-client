@@ -1,0 +1,7 @@
+{
+  "title": "Direction & Rapports",
+  "tabs": { "overview": "Vue d'ensemble", "stats": "Statistiques", "reports": "Rapports" },
+  "overview": { "totalPatients": "Total patients", "todayVisits": "Visites aujourd'hui", "revenue": "Revenus du mois", "pendingInvoices": "Factures en attente" },
+  "stats": { "patientsByDay": "Patients par jour", "revenueByMonth": "Revenus par mois", "topDiagnoses": "Diagnostics fréquents", "labActivity": "Activité laboratoire" },
+  "reports": { "generate": "Générer un rapport", "period": "Période", "type": "Type de rapport", "export": "Exporter" }
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Pharmacie",
+  "tabs": { "prescriptions": "Prescriptions", "stock": "Stock", "orders": "Commandes" },
+  "prescriptions": { "title": "Prescriptions à dispenser", "code": "Code", "patient": "Patient", "prescribedBy": "Prescrit par", "date": "Date", "items": "Articles", "total": "Total", "status": "Statut", "dispense": "Dispenser", "statuses": { "pending": "En attente", "dispensed": "Dispensé" } },
+  "stock": { "title": "Stock de médicaments", "code": "Code", "name": "Nom", "category": "Catégorie", "quantity": "Quantité", "minQty": "Qté min", "unitPrice": "Prix unitaire", "expiry": "Expiration", "batch": "Lot", "statuses": { "normal": "Normal", "expiringSoon": "Expire bientôt", "lowStock": "Stock faible", "outOfStock": "Rupture de stock" } },
+  "orders": { "title": "Bons de commande", "code": "Code", "supplier": "Fournisseur", "items": "Articles", "total": "Coût total", "date": "Date", "status": "Statut", "statuses": { "draft": "Brouillon", "sent": "Envoyé", "received": "Reçu" } }
+}

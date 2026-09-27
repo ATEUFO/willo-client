@@ -1,0 +1,69 @@
+{
+  "title": "System Admin",
+  "tabs": {
+    "users": "User Management",
+    "logs": "System Logs",
+    "backup": "Backup & Restore",
+    "metrics": "System Metrics"
+  },
+  "users": {
+    "title": "User Management",
+    "add": "Add user",
+    "search": "Search user...",
+    "columns": {
+      "name": "Name",
+      "username": "Username",
+      "role": "Role",
+      "department": "Department",
+      "status": "Status",
+      "lastLogin": "Last login",
+      "actions": "Actions"
+    },
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "editUser": "Edit user",
+    "deleteUser": "Delete user",
+    "confirmDelete": "Are you sure you want to delete this user?"
+  },
+  "logs": {
+    "title": "System Logs",
+    "level": "Level",
+    "service": "Service",
+    "message": "Message",
+    "timestamp": "Timestamp",
+    "levels": {
+      "info": "Info",
+      "warning": "Warning",
+      "error": "Error",
+      "critical": "Critical"
+    }
+  },
+  "backup": {
+    "title": "Backup & Restore",
+    "createBackup": "Create backup",
+    "restoreBackup": "Restore",
+    "columns": {
+      "filename": "File",
+      "size": "Size",
+      "timestamp": "Date",
+      "type": "Type",
+      "status": "Status"
+    },
+    "types": {
+      "automatic": "Automatic",
+      "manual": "Manual"
+    },
+    "statuses": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "inProgress": "In Progress"
+    }
+  },
+  "metrics": {
+    "title": "System Metrics",
+    "cpu": "CPU",
+    "ram": "RAM Memory",
+    "db": "Database",
+    "uptime": "Uptime"
+  }
+}

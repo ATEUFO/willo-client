@@ -1,0 +1,8 @@
+{
+  "title": "Billing & Invoices",
+  "tabs": { "invoices": "Invoices", "create": "New Invoice" },
+  "columns": { "code": "Invoice No.", "patient": "Patient", "date": "Date", "items": "Services", "subtotal": "Subtotal", "insurance": "Insurance", "share": "Patient share", "status": "Status", "actions": "Actions" },
+  "statuses": { "unpaid": "Unpaid", "paid": "Paid" },
+  "paymentMethods": { "cash": "Cash", "card": "Bank Card", "mobile": "Mobile Money" },
+  "create": { "title": "New Invoice", "selectPatient": "Select patient", "addItem": "Add service", "description": "Description", "category": "Category", "amount": "Amount", "insuranceName": "Insurance", "coveragePercent": "Coverage (%)", "paymentMethod": "Payment method", "markPaid": "Mark as paid", "submit": "Create invoice", "categories": { "consultation": "Consultation", "laboratoire": "Laboratory", "pharmacie": "Pharmacy", "soins": "Care" } }
+}

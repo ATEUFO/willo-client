@@ -1,0 +1,64 @@
+{
+  "title": "Reception & Triage",
+  "tabs": {
+    "queue": "Queue",
+    "register": "Register Patient",
+    "appointments": "Appointments"
+  },
+  "queue": {
+    "title": "Today's queue",
+    "empty": "No patients waiting",
+    "queueNumber": "No.",
+    "arrival": "Arrival",
+    "doctor": "Assigned doctor",
+    "statuses": {
+      "waiting": "Waiting",
+      "vitalsTaken": "Vitals Taken",
+      "inConsultation": "In Consultation",
+      "labPending": "Lab Pending",
+      "pharmacyPending": "Pharmacy Pending",
+      "completed": "Completed"
+    }
+  },
+  "register": {
+    "title": "Register new patient",
+    "editTitle": "Edit patient",
+    "fullName": "Full name",
+    "age": "Age",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "phone": "Phone",
+    "address": "Address",
+    "bloodType": "Blood type",
+    "emergencyContact": "Emergency contact",
+    "assignedDoctor": "Assigned doctor",
+    "submit": "Register",
+    "success": "Patient registered successfully"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "schedule": "Schedule appointment",
+    "columns": {
+      "patient": "Patient",
+      "doctor": "Doctor",
+      "date": "Date",
+      "time": "Time",
+      "department": "Department",
+      "type": "Type",
+      "status": "Status"
+    },
+    "types": {
+      "consultation": "Consultation",
+      "suivi": "Follow-up",
+      "urgence": "Emergency",
+      "controle": "Check-up"
+    },
+    "statuses": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  }
+}

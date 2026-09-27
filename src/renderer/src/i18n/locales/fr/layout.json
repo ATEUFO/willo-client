@@ -1,0 +1,44 @@
+{
+  "preferences": "Préférences & Paramètres",
+  "tabs": {
+    "account": "Profil & Compte",
+    "preferences": "Préférences IHM",
+    "system": "Informations Système"
+  },
+  "account": {
+    "role": "Rôle",
+    "department": "Département",
+    "badge": "Compte Authentifié SQLite",
+    "userId": "Identifiant Unique",
+    "lastLogin": "Dernière Connexion",
+    "notConnected": "Utilisateur Non Connecté"
+  },
+  "prefs": {
+    "language": "Langue de l'interface",
+    "languageSub": "Choisir la langue d'affichage",
+    "notifications": "Notifications Sonores & Alertes",
+    "notificationsSub": "Activer les rappels et alertes urgences",
+    "enabled": "Activées",
+    "disabled": "Désactivées"
+  },
+  "system": {
+    "version": "WILLO Client Electron v1.0.0",
+    "stack": "better-sqlite3 • React 19 • TypeScript 5.9",
+    "dbActive": "Base de données locale connectée & active"
+  },
+  "titlebar": {
+    "settings": "Préférences & Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "statusbar": {
+    "connectedServer": "Connecté au Serveur",
+    "offlineLocal": "Mode Hors Ligne (Base Locale)",
+    "clickConfig": "(Cliquer pour configurer)",
+    "cachePending": "Cache Local Sync: {{count}} en attente",
+    "cacheUpToDate": "Cache Local Sync: À jour",
+    "activeModule": "Module Actif",
+    "facility": "Établissement",
+    "langEncoding": "Langue & Encodage",
+    "clockTitle": "Horloge système temps réel"
+  }
+}

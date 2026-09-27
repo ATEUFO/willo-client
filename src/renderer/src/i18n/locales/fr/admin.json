@@ -1,0 +1,69 @@
+{
+  "title": "Admin Système",
+  "tabs": {
+    "users": "Gestion Utilisateurs",
+    "logs": "Journaux Système",
+    "backup": "Sauvegarde & Restauration",
+    "metrics": "Métriques Système"
+  },
+  "users": {
+    "title": "Gestion des Utilisateurs",
+    "add": "Ajouter un utilisateur",
+    "search": "Rechercher un utilisateur...",
+    "columns": {
+      "name": "Nom",
+      "username": "Identifiant",
+      "role": "Rôle",
+      "department": "Département",
+      "status": "Statut",
+      "lastLogin": "Dernière connexion",
+      "actions": "Actions"
+    },
+    "statusActive": "Actif",
+    "statusInactive": "Inactif",
+    "editUser": "Modifier l'utilisateur",
+    "deleteUser": "Supprimer l'utilisateur",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
+  },
+  "logs": {
+    "title": "Journaux Système",
+    "level": "Niveau",
+    "service": "Service",
+    "message": "Message",
+    "timestamp": "Horodatage",
+    "levels": {
+      "info": "Info",
+      "warning": "Avertissement",
+      "error": "Erreur",
+      "critical": "Critique"
+    }
+  },
+  "backup": {
+    "title": "Sauvegarde & Restauration",
+    "createBackup": "Créer une sauvegarde",
+    "restoreBackup": "Restaurer",
+    "columns": {
+      "filename": "Fichier",
+      "size": "Taille",
+      "timestamp": "Date",
+      "type": "Type",
+      "status": "Statut"
+    },
+    "types": {
+      "automatic": "Automatique",
+      "manual": "Manuel"
+    },
+    "statuses": {
+      "completed": "Terminée",
+      "failed": "Échouée",
+      "inProgress": "En cours"
+    }
+  },
+  "metrics": {
+    "title": "Métriques Système",
+    "cpu": "CPU",
+    "ram": "Mémoire RAM",
+    "db": "Base de Données",
+    "uptime": "Temps de fonctionnement"
+  }
+}

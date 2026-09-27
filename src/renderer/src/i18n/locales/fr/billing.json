@@ -1,0 +1,8 @@
+{
+  "title": "Caisse & Factures",
+  "tabs": { "invoices": "Factures", "create": "Nouvelle facture" },
+  "columns": { "code": "N° Facture", "patient": "Patient", "date": "Date", "items": "Prestations", "subtotal": "Sous-total", "insurance": "Assurance", "share": "Part patient", "status": "Statut", "actions": "Actions" },
+  "statuses": { "unpaid": "Non payé", "paid": "Payé" },
+  "paymentMethods": { "cash": "Espèces", "card": "Carte Bancaire", "mobile": "Mobile Money" },
+  "create": { "title": "Nouvelle facture", "selectPatient": "Sélectionner un patient", "addItem": "Ajouter une prestation", "description": "Description", "category": "Catégorie", "amount": "Montant", "insuranceName": "Assurance", "coveragePercent": "Couverture (%)", "paymentMethod": "Mode de paiement", "markPaid": "Marquer comme payé", "submit": "Créer la facture", "categories": { "consultation": "Consultation", "laboratoire": "Laboratoire", "pharmacie": "Pharmacie", "soins": "Soins" } }
+}

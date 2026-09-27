@@ -1,0 +1,64 @@
+{
+  "title": "Accueil & Triage",
+  "tabs": {
+    "queue": "File d'attente",
+    "register": "Enregistrer un patient",
+    "appointments": "Rendez-vous"
+  },
+  "queue": {
+    "title": "File d'attente du jour",
+    "empty": "Aucun patient en attente",
+    "queueNumber": "N°",
+    "arrival": "Arrivée",
+    "doctor": "Médecin assigné",
+    "statuses": {
+      "waiting": "En attente",
+      "vitalsTaken": "Constantes prises",
+      "inConsultation": "En consultation",
+      "labPending": "Labo en attente",
+      "pharmacyPending": "Pharmacie en attente",
+      "completed": "Terminé"
+    }
+  },
+  "register": {
+    "title": "Enregistrement nouveau patient",
+    "editTitle": "Modifier le patient",
+    "fullName": "Nom complet",
+    "age": "Âge",
+    "gender": "Sexe",
+    "male": "Masculin",
+    "female": "Féminin",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "bloodType": "Groupe sanguin",
+    "emergencyContact": "Contact d'urgence",
+    "assignedDoctor": "Médecin assigné",
+    "submit": "Enregistrer",
+    "success": "Patient enregistré avec succès"
+  },
+  "appointments": {
+    "title": "Rendez-vous",
+    "schedule": "Planifier un RDV",
+    "columns": {
+      "patient": "Patient",
+      "doctor": "Médecin",
+      "date": "Date",
+      "time": "Heure",
+      "department": "Service",
+      "type": "Type",
+      "status": "Statut"
+    },
+    "types": {
+      "consultation": "Consultation",
+      "suivi": "Suivi",
+      "urgence": "Urgence",
+      "controle": "Contrôle"
+    },
+    "statuses": {
+      "scheduled": "Planifié",
+      "confirmed": "Confirmé",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    }
+  }
+}

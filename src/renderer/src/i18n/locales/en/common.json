@@ -1,0 +1,90 @@
+{
+  "app": {
+    "name": "WILLO HOSPITAL",
+    "subtitle": "Hospital Information System",
+    "version": "HIS v1.0.0"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "print": "Print",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "submit": "Submit",
+    "validate": "Validate",
+    "apply": "Apply",
+    "test": "Test",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "continue": "Continue"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "pending": "Pending",
+    "active": "Active",
+    "inactive": "Inactive",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "roles": {
+    "admin": "System Admin",
+    "reception": "Reception & Triage",
+    "nursing": "Nursing & Vitals",
+    "consultation": "Doctor / Clinic",
+    "ai-diagnostic": "AI Diagnostic",
+    "laboratory": "Laboratory",
+    "pharmacy": "Pharmacy",
+    "billing": "Billing & Invoices",
+    "management": "Management & Reports"
+  },
+  "patient": {
+    "label": "Patient",
+    "code": "Patient code",
+    "name": "Full name",
+    "age": "Age",
+    "gender": "Gender",
+    "phone": "Phone",
+    "address": "Address",
+    "bloodType": "Blood type",
+    "male": "Male",
+    "female": "Female"
+  },
+  "time": {
+    "now": "Now",
+    "today": "Today",
+    "date": "Date",
+    "time": "Time",
+    "never": "Never"
+  },
+  "errors": {
+    "generic": "An error occurred.",
+    "network": "Network error.",
+    "notFound": "Not found.",
+    "unauthorized": "Unauthorized.",
+    "accessDenied": "Access Denied",
+    "accessDeniedMsg": "Your current role ({{role}}) does not have permission to access the selected module.",
+    "backToModule": "Return to my main workspace"
+  },
+  "window": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close"
+  },
+  "db": {
+    "init": "Initializing SQLite database..."
+  }
+}

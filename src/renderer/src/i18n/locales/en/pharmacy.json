@@ -1,0 +1,7 @@
+{
+  "title": "Pharmacy",
+  "tabs": { "prescriptions": "Prescriptions", "stock": "Stock", "orders": "Orders" },
+  "prescriptions": { "title": "Prescriptions to dispense", "code": "Code", "patient": "Patient", "prescribedBy": "Prescribed by", "date": "Date", "items": "Items", "total": "Total", "status": "Status", "dispense": "Dispense", "statuses": { "pending": "Pending", "dispensed": "Dispensed" } },
+  "stock": { "title": "Drug Stock", "code": "Code", "name": "Name", "category": "Category", "quantity": "Quantity", "minQty": "Min qty", "unitPrice": "Unit price", "expiry": "Expiry", "batch": "Batch", "statuses": { "normal": "Normal", "expiringSoon": "Expiring Soon", "lowStock": "Low Stock", "outOfStock": "Out of Stock" } },
+  "orders": { "title": "Purchase Orders", "code": "Code", "supplier": "Supplier", "items": "Items", "total": "Total cost", "date": "Date", "status": "Status", "statuses": { "draft": "Draft", "sent": "Sent", "received": "Received" } }
+}

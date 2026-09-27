@@ -1,0 +1,9 @@
+{
+  "title": "Laboratory",
+  "tabs": { "requests": "Requests", "kanban": "Kanban" },
+  "columns": { "requestCode": "Code", "patient": "Patient", "test": "Test", "category": "Category", "requestedBy": "Requested by", "date": "Date", "status": "Status", "actions": "Actions" },
+  "statuses": { "todo": "To Do", "inProgress": "In Progress", "pendingValidation": "Pending Validation", "completed": "Completed" },
+  "categories": { "hematologie": "Hematology", "biochimie": "Biochemistry", "microbiologie": "Microbiology", "immunologie": "Immunology" },
+  "results": { "title": "Enter results", "parameter": "Parameter", "value": "Value", "unit": "Unit", "refRange": "Reference", "abnormal": "Abnormal", "validate": "Validate results", "validatedBy": "Validated by" },
+  "print": { "title": "Laboratory Report", "print": "Print" }
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Connect to Willo Server",
+  "subtitle": "Finding your facility server",
+  "subtitle2": "Select or enter the server address",
+  "modeAuto": "Auto",
+  "modeManual": "Manual",
+  "scanning": {
+    "mdns": "Scanning via ZeroConf / Bonjour (mDNS)...",
+    "subnet": "Scanning local network (fallback)...",
+    "mdnsPhase": "Listening for _willo._tcp services",
+    "subnetPhase": "Probing Class C IPs (port 5030)",
+    "mdnsLabel": "ZeroConf / Bonjour",
+    "subnetLabel": "IP Network Scan"
+  },
+  "results": {
+    "found_one": "{{count}} server found",
+    "found_other": "{{count}} servers found",
+    "noneAuto": "No server detected automatically",
+    "relaunch": "Relaunch",
+    "noServerTitle": "No Willo server found",
+    "noServerMsg": "Make sure Willo Server is running on your local network, or switch to Manual mode to enter the IP address.",
+    "manualEntry": "Manual entry",
+    "current": "Current"
+  },
+  "manual": {
+    "description": "Manually enter the IP address and port of the Willo server.",
+    "host": "IP Address / Host",
+    "hostPlaceholder": "e.g. 192.168.1.50",
+    "port": "Port",
+    "portPlaceholder": "5030",
+    "test": "Test connection",
+    "testing": "Checking...",
+    "success": "Server reachable!",
+    "successMsg": "Identified: {{name}}",
+    "error": "Connection failed"
+  },
+  "actions": {
+    "continue": "Continue with {{host}}:{{port}}",
+    "proceed": "Sign In"
+  },
+  "footer": "WILLO • Hospital Information System"
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Connexion au serveur Willo",
+  "subtitle": "Recherche du serveur de l'établissement",
+  "subtitle2": "Sélectionnez ou saisissez l'adresse du serveur",
+  "modeAuto": "Auto",
+  "modeManual": "Manuel",
+  "scanning": {
+    "mdns": "Recherche via ZeroConf / Bonjour (mDNS)...",
+    "subnet": "Scan du réseau local en cours (fallback)...",
+    "mdnsPhase": "Écoute des services _willo._tcp",
+    "subnetPhase": "Sonde des IPs en classe C (port 5030)",
+    "mdnsLabel": "ZeroConf / Bonjour",
+    "subnetLabel": "Scan Réseau IP"
+  },
+  "results": {
+    "found_one": "{{count}} serveur trouvé",
+    "found_other": "{{count}} serveurs trouvés",
+    "noneAuto": "Aucun serveur détecté automatiquement",
+    "relaunch": "Relancer",
+    "noServerTitle": "Aucun serveur Willo trouvé",
+    "noServerMsg": "Vérifiez que Willo Server est démarré sur votre réseau local, ou passez en mode Manuel pour saisir l'adresse IP.",
+    "manualEntry": "Saisie manuelle",
+    "current": "Actuel"
+  },
+  "manual": {
+    "description": "Saisissez manuellement l'adresse IP et le port du serveur Willo.",
+    "host": "Adresse IP / Hôte",
+    "hostPlaceholder": "ex: 192.168.1.50",
+    "port": "Port",
+    "portPlaceholder": "5030",
+    "test": "Tester la connexion",
+    "testing": "Vérification...",
+    "success": "Serveur accessible !",
+    "successMsg": "Identifié : {{name}}",
+    "error": "Connexion échouée"
+  },
+  "actions": {
+    "continue": "Continuer avec {{host}}:{{port}}",
+    "proceed": "Se connecter"
+  },
+  "footer": "WILLO • Système d'Information Hospitalier"
+}

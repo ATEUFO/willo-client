@@ -1,0 +1,74 @@
+{
+  "header": "Network Configuration & Connections",
+  "headerSub": "Manage local communication with Willo Server",
+  "tabs": {
+    "status": "Status & Diagnostics",
+    "manual": "Manual Configuration",
+    "bonjour": "Auto Discovery",
+    "subnet": "Network Scan (mDNS Fallback)"
+  },
+  "status": {
+    "title": "Connection Status",
+    "remoteServer": "Remote Server",
+    "latency": "Latency (Ping)",
+    "computing": "Computing...",
+    "na": "N/A (Disconnected)",
+    "onlineWs": "Online (WebSocket Connected)",
+    "offlineLocal": "Offline Mode (Disconnected)",
+    "localDb": "Local Database (SQLite)",
+    "lastSync": "Last incremental sync: {{date}}",
+    "offlineFirst": "Offline-First",
+    "pendingCount": "Pending local changes:",
+    "pendingMsg": "These requests will be sent automatically upon reconnection.",
+    "noPending": "No data pending synchronization.",
+    "syncNow": "Sync now",
+    "posteId": "Unique Workstation ID (UUID):",
+    "clientType": "Client type:",
+    "clientTypeValue": "Electron Client (React + TypeScript + better-sqlite3)",
+    "traceNote": "This ID is sent to Willo Server (X-Poste-Id header) to ensure medical record traceability."
+  },
+  "manual": {
+    "title": "Manual IP Configuration",
+    "host": "IP Address / Host",
+    "hostPlaceholder": "e.g. 192.168.1.50",
+    "port": "Port",
+    "portPlaceholder": "e.g. 5030",
+    "test": "Test connection",
+    "testing": "Checking...",
+    "save": "Apply & Save",
+    "successTitle": "Connection established successfully!",
+    "successServer": "Server identified: {{name}}",
+    "errorTitle": "Connection failed"
+  },
+  "bonjour": {
+    "title": "Local Discovery (Bonjour / mDNS)",
+    "search": "Search",
+    "desc": "The ZeroConf / Bonjour protocol automatically discovers Willo services (_willo._tcp) published on your local network. No manual IP configuration needed if network multicast is allowed.",
+    "scanning": "Searching for servers on the local network...",
+    "noneTitle": "No Willo server detected",
+    "noneMsg": "Make sure the Willo server is running on the same local network or try the fallback scanner.",
+    "columns": {
+      "name": "Center Name",
+      "host": "IP Address / Host",
+      "port": "Port",
+      "action": "Action"
+    },
+    "connected": "Connected"
+  },
+  "subnet": {
+    "title": "Local Network Scanner (mDNS Fallback)",
+    "scan": "Scan",
+    "desc": "If mDNS multicast is blocked by your firewall or switch, the scanner checks each address in the local Class C network range (port 5030) to identify the fallback server.",
+    "scanning": "Scanning local network...",
+    "scanTime": "Checking active IP range (approximately 5-10 seconds)...",
+    "noneTitle": "No server found via IP scan",
+    "noneMsg": "Click Scan to probe the Class C local network and find Willo Server.",
+    "columns": {
+      "name": "Center Name",
+      "host": "IP Address / Host",
+      "port": "Port",
+      "action": "Action"
+    },
+    "connected": "Connected"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "title": "Laboratoire",
+  "tabs": {
+    "requests": "Demandes",
+    "kanban": "Kanban"
+  },
+  "columns": {
+    "requestCode": "Code",
+    "patient": "Patient",
+    "test": "Examen",
+    "category": "Catégorie",
+    "requestedBy": "Demandé par",
+    "date": "Date",
+    "status": "Statut",
+    "actions": "Actions"
+  },
+  "statuses": {
+    "todo": "À faire",
+    "inProgress": "En cours",
+    "pendingValidation": "En attente de validation",
+    "completed": "Terminé"
+  },
+  "categories": {
+    "hematologie": "Hématologie",
+    "biochimie": "Biochimie",
+    "microbiologie": "Microbiologie",
+    "immunologie": "Immunologie"
+  },
+  "results": {
+    "title": "Saisie des résultats",
+    "parameter": "Paramètre",
+    "value": "Valeur",
+    "unit": "Unité",
+    "refRange": "Référence",
+    "abnormal": "Anormal",
+    "validate": "Valider les résultats",
+    "validatedBy": "Validé par"
+  },
+  "print": {
+    "title": "Rapport de laboratoire",
+    "print": "Imprimer"
+  }
+}
