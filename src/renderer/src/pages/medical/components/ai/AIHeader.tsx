@@ -19,10 +19,10 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
   const { t } = useTranslation('medical')
 
   return (
-    <div className="bg-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-lg border border-slate-800 relative overflow-hidden">
+    <div className="bg-medical-dark rounded-2xl p-4 sm:p-5 text-white shadow-lg border border-white/10 relative overflow-hidden transition-colors duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-medical-primary/20 border border-medical-primary/30 flex items-center justify-center text-medical-primary shrink-0">
             <Brain className="w-6 h-6" />
           </div>
           <div>
@@ -31,31 +31,31 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
                 {t('aiDiagnosticPage.title')}
               </h1>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-white/70 mt-0.5">
               {t('aiDiagnosticPage.subtitle')}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 bg-slate-800/90 rounded-xl border border-slate-700/80 flex items-center gap-2 text-xs">
+          <div className="px-3 py-1.5 bg-black/20 rounded-xl border border-white/10 flex items-center gap-2 text-xs">
             <span
               className={`w-2 h-2 rounded-full ${
                 healthStatus?.online ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
               }`}
             />
-            <span className="font-semibold text-slate-200">
+            <span className="font-semibold text-white/90">
               {healthStatus?.online ? t('aiDiagnosticPage.serverConnected') : t('aiDiagnosticPage.offlineMode')}
             </span>
           </div>
 
-          <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <div className="flex bg-black/30 p-1 rounded-xl border border-white/10 backdrop-blur-xs">
             <button
               onClick={() => setActiveTab('predict')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'predict'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-medical-primary text-white shadow-sm'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
               <Zap className="w-3.5 h-3.5" /> {t('aiDiagnosticPage.clinicalEvaluation')}
@@ -64,8 +64,8 @@ export const AIHeader: React.FC<AIHeaderProps> = ({
               onClick={() => setActiveTab('history')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'history'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-medical-primary text-white shadow-sm'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
               <History className="w-3.5 h-3.5" /> {t('aiDiagnosticPage.historyTab', { count: historyCount })}

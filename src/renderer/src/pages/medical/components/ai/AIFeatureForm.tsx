@@ -48,7 +48,7 @@ export const AIFeatureForm: React.FC<AIFeatureFormProps> = ({
       <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
         <div>
           <h2 className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-500" /> CONSTANTES MÉDICALES DU PATIENT
+            <Activity className="w-4 h-4 text-medical-primary" /> CONSTANTES MÉDICALES DU PATIENT
           </h2>
           <p className="text-[11px] text-slate-400 font-medium mt-0.5">
             Données physiologiques issues du dossier patient (Non modifiables ici)
@@ -82,7 +82,7 @@ export const AIFeatureForm: React.FC<AIFeatureFormProps> = ({
         type="button"
         onClick={handleRunPrediction}
         disabled={isLoading || !hasSelectedPatient}
-        className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
+        className="w-full py-3 px-4 bg-medical-primary hover:bg-medical-hover text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
       >
         {isLoading ? (
           <>
@@ -91,7 +91,7 @@ export const AIFeatureForm: React.FC<AIFeatureFormProps> = ({
           </>
         ) : (
           <>
-            <Brain className="w-4 h-4 text-emerald-200" />
+            <Brain className="w-4 h-4 text-white/90" />
             <span>Lancer l'Analyse Diagnostique</span>
           </>
         )}

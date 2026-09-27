@@ -3,16 +3,15 @@ import { Copy, Plus, Check, AlertTriangle } from 'lucide-react'
 import { useHospitalStore } from '../store/hospitalStore'
 import {
   aiDiagnosticService,
-  AIModelId,
   AIPredictionRequest,
   AIPredictionResponse,
   HealthStatusResponse
 } from '../../services/aiDiagnosticService'
 import { AIHeader } from './components/ai/AIHeader'
-import { AIModelSelector } from './components/ai/AIModelSelector'
 import { AIPatientSelector } from './components/ai/AIPatientSelector'
 import { AIFeatureForm } from './components/ai/AIFeatureForm'
 import { AIRiskBanner } from './components/ai/AIRiskBanner'
+import { AIMultiConditionGrid } from './components/ai/AIMultiConditionGrid'
 import { AIFactorsTable } from './components/ai/AIFactorsTable'
 import { AIRecommendations } from './components/ai/AIRecommendations'
 import { AIFhirDrawer } from './components/ai/AIFhirDrawer'
@@ -32,9 +31,6 @@ export const AIDiagnosticPage: React.FC = () => {
 
   // Navigation state
   const [activeTab, setActiveTab] = useState<'predict' | 'history'>('predict')
-
-  // Selected AI Model
-  const [selectedModelId, setSelectedModelId] = useState<AIModelId>('sepsis-risk-v1')
 
   // Selected Patient
   const [selectedPatientId, setSelectedPatientId] = useState<string>(patients[0]?.id || '')
@@ -121,7 +117,7 @@ export const AIDiagnosticPage: React.FC = () => {
     setFeatures((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Execute AI Prediction
+  // Execute AI Multi-Condition Prediction
   const handleRunPrediction = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (!selectedPatient) return
@@ -142,7 +138,7 @@ export const AIDiagnosticPage: React.FC = () => {
       })
 
       const payload: AIPredictionRequest = {
-        nomModele: selectedModelId,
+        nomModele: 'comprehensive-multi-risk-v1',
         patientId: selectedPatient.id,
         encounterId: `enc-${selectedPatient.id.substring(0, 8)}`,
         features: cleanFeatures
@@ -180,9 +176,11 @@ export const AIDiagnosticPage: React.FC = () => {
       patientId: selectedPatient.id,
       patientName: selectedPatient.name,
       doctorName: currentUser?.name || 'Dr. Médecin Référent',
-      chiefComplaint: `[Analyse Clinique ${p.intituleDiagnostic}] Risque: ${p.niveauRisque}`,
-      clinicalNotes: `Modèle pathologique: ${predictionResult.nomModele} (v${predictionResult.modelVersion})\nProbabilité: ${Math.round(p.scoreProbabilite * 100)}%\n\nFacteurs contributifs:\n${p.facteursContributifs.map((f) => `- ${f.feature}: ${f.valeur} (${f.explication})`).join('\n')}`,
-      diagnoses: [`Evaluation Pathologique: ${p.intituleDiagnostic} (${Math.round(p.scoreProbabilite * 100)}% probabilité)`],
+      chiefComplaint: `[Évaluation IA Multi-Pathologies] Risque Global: ${p.niveauRisque}`,
+      clinicalNotes: `Modèle: ${predictionResult.nomModele}\nSynthèse: ${p.intituleDiagnostic}\n\nPathologies Évaluées:\n${(p.conditions || []).map((c) => `- ${c.title}: ${c.intituleDiagnostic} (${Math.round(c.scoreProbabilite * 100)}% - Risque ${c.niveauRisque})`).join('\n')}`,
+      diagnoses: (p.conditions || [])
+        .filter((c) => c.niveauRisque !== 'LOW')
+        .map((c) => `${c.title}: ${c.intituleDiagnostic} (${Math.round(c.scoreProbabilite * 100)}%)`),
       prescriptions: [],
       labOrders: p.recommandations || []
     })
@@ -195,18 +193,19 @@ export const AIDiagnosticPage: React.FC = () => {
   const handleCopyReport = () => {
     if (!predictionResult) return
     const p = predictionResult.prediction
-    const text = `--- WILLO HEALTH - RAPPORT D'ÉVALUATION CLINIQUE ---
-Modèle Pathologique: ${predictionResult.nomModele}
+    const text = `--- WILLO HEALTH - RAPPORT D'ÉVALUATION CLINIQUE MULTI-PATHOLOGIES ---
+Synthèse: ${p.intituleDiagnostic}
 Patient: ${selectedPatient?.name || predictionResult.patientId}
 Horodatage: ${predictionResult.timestamp}
-Diagnostic: ${p.intituleDiagnostic}
-Niveau de Risque: ${p.niveauRisque}
-Probabilité: ${Math.round(p.scoreProbabilite * 100)}%
+Niveau de Risque Global: ${p.niveauRisque}
 
-FACTEURS CONTRIBUTIFS:
+PATHOLOGIES ÉVALUÉES:
+${(p.conditions || []).map((c) => `- ${c.title} (${Math.round(c.scoreProbabilite * 100)}%): [Risque ${c.niveauRisque}] ${c.intituleDiagnostic}`).join('\n')}
+
+FACTEURS CONTRIBUTIFS CLÉS:
 ${p.facteursContributifs.map((f) => `- ${f.feature} (${f.valeur}): [${f.impact}] ${f.explication}`).join('\n')}
 
-RECOMMANDATIONS CLINIQUES:
+RECOMMANDATIONS CLINIQUES GLOBALÉS:
 ${p.recommandations.map((r) => `- ${r}`).join('\n')}
 `
     navigator.clipboard.writeText(text)
@@ -225,11 +224,6 @@ ${p.recommandations.map((r) => `- ${r}`).join('\n')}
 
       {activeTab === 'predict' ? (
         <div className="space-y-6">
-          <AIModelSelector
-            selectedModelId={selectedModelId}
-            setSelectedModelId={setSelectedModelId}
-          />
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* LEFT COLUMN: Patient & Feature Form (5 Cols) */}
             <div className="lg:col-span-5 space-y-6">
@@ -241,7 +235,6 @@ ${p.recommandations.map((r) => `- ${r}`).join('\n')}
               />
 
               <AIFeatureForm
-                selectedModelId={selectedModelId}
                 features={features}
                 handleFeatureChange={handleFeatureChange}
                 handleRunPrediction={handleRunPrediction}
@@ -262,12 +255,16 @@ ${p.recommandations.map((r) => `- ${r}`).join('\n')}
 
               {isLoading ? (
                 <AILoadingState
-                  selectedModelId={selectedModelId}
+                  selectedModelId="comprehensive-multi-risk-v1"
                   loadingStep={loadingStep}
                 />
               ) : predictionResult ? (
                 <div className="space-y-6 animate-fade-in">
                   <AIRiskBanner predictionResult={predictionResult} />
+
+                  {predictionResult.prediction.conditions && (
+                    <AIMultiConditionGrid conditions={predictionResult.prediction.conditions} />
+                  )}
 
                   <AIFactorsTable
                     facteursContributifs={predictionResult.prediction.facteursContributifs}
