@@ -104,11 +104,10 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
           <div className="grid grid-cols-2 gap-4">
             {/* Tension Artérielle */}
             <div
-              className={`p-3 rounded-xl border space-y-1.5 ${
-                systolic > 140 || diastolic > 90 || systolic < 90
+              className={`p-3 rounded-xl border space-y-1.5 ${systolic > 140 || diastolic > 90 || systolic < 90
                   ? 'bg-red-50/50 border-red-200'
                   : 'bg-slate-50 border-medical-border'
-              }`}
+                }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
                 <Heart className="w-3.5 h-3.5 text-medical-danger" /> {t('vitalsModal.tensionLabel')}
@@ -136,11 +135,10 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
 
             {/* Température */}
             <div
-              className={`p-3 rounded-xl border space-y-1.5 ${
-                temperature > 38.0 || temperature < 35.5
+              className={`p-3 rounded-xl border space-y-1.5 ${temperature > 38.0 || temperature < 35.5
                   ? 'bg-amber-50/50 border-amber-200'
                   : 'bg-slate-50 border-medical-border'
-              }`}
+                }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
                 <Thermometer className="w-3.5 h-3.5 text-amber-500" /> {t('vitalsModal.tempLabel')}
@@ -157,11 +155,10 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
 
             {/* Pouls BPM */}
             <div
-              className={`p-3 rounded-xl border space-y-1.5 ${
-                pulse > 100 || pulse < 55
+              className={`p-3 rounded-xl border space-y-1.5 ${pulse > 100 || pulse < 55
                   ? 'bg-red-50/50 border-red-200'
                   : 'bg-slate-50 border-medical-border'
-              }`}
+                }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-medical-primary" /> {t('vitalsModal.pulseLabel')}
@@ -177,9 +174,8 @@ export const VitalsFormModal: React.FC<VitalsFormModalProps> = ({ patient, onClo
 
             {/* Saturation SpO2 */}
             <div
-              className={`p-3 rounded-xl border space-y-1.5 ${
-                spO2 < 95 ? 'bg-red-50/50 border-red-200' : 'bg-slate-50 border-medical-border'
-              }`}
+              className={`p-3 rounded-xl border space-y-1.5 ${spO2 < 95 ? 'bg-red-50/50 border-red-200' : 'bg-slate-50 border-medical-border'
+                }`}
             >
               <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-cyan-600" /> {t('vitalsModal.spO2Label')}

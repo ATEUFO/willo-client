@@ -25,6 +25,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     font-family: var(--font-sans);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   #root {
@@ -33,6 +34,47 @@
     flex-direction: column;
     width: 100%;
   }
+}
+
+/* ── Dark Themes Adaptations ── */
+[data-theme-type="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme-type="dark"] .bg-white {
+  background-color: var(--color-medical-cardBg) !important;
+  color: #F3F4F6 !important;
+}
+
+[data-theme-type="dark"] .bg-slate-50,
+[data-theme-type="dark"] .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #E5E7EB !important;
+}
+
+[data-theme-type="dark"] .text-slate-900,
+[data-theme-type="dark"] .text-slate-800,
+[data-theme-type="dark"] .text-slate-700 {
+  color: #E5E7EB !important;
+}
+
+[data-theme-type="dark"] .text-slate-600,
+[data-theme-type="dark"] .text-slate-500 {
+  color: #9CA3AF !important;
+}
+
+[data-theme-type="dark"] input,
+[data-theme-type="dark"] select,
+[data-theme-type="dark"] textarea {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #F9FAFB !important;
+  border-color: var(--color-medical-border) !important;
+}
+
+[data-theme-type="dark"] .border-slate-200,
+[data-theme-type="dark"] .border-slate-300,
+[data-theme-type="dark"] .border-medical-border {
+  border-color: var(--color-medical-border) !important;
 }
 
 /* Print styling for printable invoices */

@@ -35,7 +35,7 @@ export const ConsultationFormModal: React.FC<ConsultationFormModalProps> = ({
   // Form State
   const [chiefComplaint, setChiefComplaint] = useState('')
   const [clinicalNotes, setClinicalNotes] = useState('')
-  
+
   // Diagnoses List Builder
   const [diagnoses, setDiagnoses] = useState<string[]>([])
   const [diagnosisInput, setDiagnosisInput] = useState('')
