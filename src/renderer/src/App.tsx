@@ -23,13 +23,19 @@ import willoLogo from './assets/willo_logo1.png'
 
 import { NotificationModal } from './components/modals/NotificationModal'
 
+import { applyTheme, getSavedThemeId } from './config/themes'
+
 function App(): React.JSX.Element {
   const isSplash = window.location.search.includes('splash=true') || window.location.hash.includes('splash=true')
 
+  useEffect(() => {
+    applyTheme(getSavedThemeId())
+  }, [])
+
   if (isSplash) {
     return (
-      <div className="h-screen w-screen bg-[#07111E] flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-slate-800/50 shadow-2xl">
-        <WilloLogoAnimation className="w-56 h-56 flex items-center justify-center" />
+      <div className="h-screen w-screen bg-medical-dark flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/10 shadow-2xl transition-colors duration-300">
+        <WilloLogoAnimation className="w-56 h-56 flex items-center justify-center" showText={false} />
       </div>
     )
   }

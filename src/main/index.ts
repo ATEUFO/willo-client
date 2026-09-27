@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { getDatabase, closeDatabase } from './database'
@@ -15,13 +15,24 @@ function createWindow(): void {
   const preloadJs = join(__dirname, '../preload/index.js')
   const preloadPath = existsSync(preloadMjs) ? preloadMjs : preloadJs
 
+  // Calculate explicit centered coordinates for Linux WMs and multi-monitor setups
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width: screenWidth, height: screenHeight, x: displayX, y: displayY } = primaryDisplay.bounds
+
+  const splashWidth = 400
+  const splashHeight = 400
+  const splashX = Math.round(displayX + (screenWidth - splashWidth) / 2)
+  const splashY = Math.round(displayY + (screenHeight - splashHeight) / 2)
+
   // Create the splash screen window.
   const splashWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width: splashWidth,
+    height: splashHeight,
+    x: splashX,
+    y: splashY,
     frame: false,
-    transparent: false, // disable transparency for Linux compatibility
-    backgroundColor: '#07111E', // match app theme background
+    transparent: true,
+    backgroundColor: '#00000000',
     alwaysOnTop: true,
     resizable: false,
     center: true,
@@ -33,19 +44,27 @@ function createWindow(): void {
     }
   })
 
-  splashWindow.center()
-
   splashWindow.once('ready-to-show', () => {
+    splashWindow.setPosition(splashX, splashY)
     splashWindow.show()
+    splashWindow.center()
   })
+
+  const mainWidth = 1200
+  const mainHeight = 800
+  const mainX = Math.round(displayX + (screenWidth - mainWidth) / 2)
+  const mainY = Math.round(displayY + (screenHeight - mainHeight) / 2)
 
   // Create the main browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: mainWidth,
+    height: mainHeight,
+    x: mainX,
+    y: mainY,
     show: false,
     frame: false, // frameless window for custom titlebar
     autoHideMenuBar: true,
+    center: true,
     icon,
     webPreferences: {
       preload: preloadPath,
@@ -79,7 +98,9 @@ function createWindow(): void {
   // Show main window after 6 seconds and close splash
   setTimeout(() => {
     splashWindow.destroy()
+    mainWindow.setPosition(mainX, mainY)
     mainWindow.show()
+    mainWindow.center()
   }, 6000)
 }
 
