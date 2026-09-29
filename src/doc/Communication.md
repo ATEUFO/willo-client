@@ -76,6 +76,7 @@ Gestion des comptes, permissions, postes de travail et sessions.
 * **Base URL Directe** : `http://localhost:3001`
 
 #### Endpoints Clés
+
 * `POST /login` : Authentification utilisateur (retourne `accessToken`, `refreshToken`, et `user`)
 * `POST /refresh` : Renouvellement de l'accessToken
 * `GET /me` : Profil de l'utilisateur connecté avec ses rôles et permissions
@@ -95,6 +96,7 @@ curl -X POST http://localhost:5030/api/auth/login \
 ```
 
 **Réponse de succès (`200 OK`)** :
+
 ```json
 {
   "tokens": {
@@ -127,9 +129,11 @@ Cœur du dossier médical patient. Stocke les ressources au format **HL7 FHIR R4
 * **Base URL Directe** : `http://localhost:3002`
 
 #### Ressource FHIR Supportées
+
 `Patient`, `Practitioner`, `Encounter`, `Observation`, `Condition`, `MedicationRequest`, `MedicationDispense`, `ServiceRequest`, `Specimen`, `DiagnosticReport`, `ImagingStudy`, `DocumentReference`, `CarePlan`, `RiskAssessment`, `Coverage`, `Claim`, `Appointment`, etc.
 
 #### Endpoints Standard FHIR
+
 * `GET /:resourceType` : Recherche de ressources (supporte query params : `subject`, `encounter`, `status`, `_page`, `_limit`)
 * `GET /:resourceType/:fhirId` : Récupération par ID FHIR
 * `POST /:resourceType` : Création/Insertion d'une nouvelle ressource FHIR
@@ -170,6 +174,7 @@ Gestion des examens de laboratoire, prélèvements et catalogue de tests locaux.
 * **Base URL Directe** : `http://localhost:3003`
 
 #### Endpoints Clés
+
 * `GET /catalog` : Consultation du catalogue des examens (`TestCatalog`)
 * `POST /catalog` : Ajout d'un examen au catalogue avec ses valeurs de référence
 * `GET /requests` : Liste des demandes d'examens en attente (proxy FHIR `ServiceRequest`)
@@ -192,6 +197,7 @@ Gestion des stocks de médicaments et dispensations d'ordonnances.
 * **Base URL Directe** : `http://localhost:3004`
 
 #### Endpoints Clés
+
 * `GET /stock` : Liste des lots en stock avec état des périmés et alertes seuil bas
 * `POST /stock` : Entrée de stock (`StockItem`)
 * `POST /stock/movement` : Enregistrement d'un mouvement (`StockMovement` : entrée, sortie, ajustement)
@@ -226,6 +232,7 @@ Gestion de la tarification, factures patients et paiements.
 * **Base URL Directe** : `http://localhost:3005`
 
 #### Endpoints Clés
+
 * `GET /tarifs` : Référentiel des tarifs d'actes (`TarifActe`)
 * `POST /invoices` : Création d'une facture (`Invoice`) avec ventilation assurance/patient
 * `GET /invoices/:id` : Détails d'une facture et solde
@@ -256,6 +263,7 @@ Indicateurs de pilotage, agrégation de données et tableaux de bord.
 * **Base URL Directe** : `http://localhost:3006`
 
 #### Endpoints Clés
+
 * `GET /indicators` : Liste des indicateurs configurés
 * `GET /dashboard` : Tableau de bord agrégé avec derniers snapshots
 * `POST /snapshots/calculate` : Déclenchement manuel du calcul d'un indicateur
@@ -270,6 +278,7 @@ Aide au diagnostic par modèles d'intelligence artificielle ONNX.
 * **Base URL Directe** : `http://localhost:3007`
 
 #### Endpoints Clés
+
 * `GET /models` : Liste des modèles ONNX enregistrés (`ModelVersion`)
 * `POST /predict` : Exécution d'une inférence IA sur les constantes/données d'un patient
 * `GET /logs` : Historique des inférences exécutées (`InferenceLog`)
@@ -297,6 +306,7 @@ Système multi-canal de notifications (WebSocket, SMS, Push, Email).
 * **Base URL Directe** : `http://localhost:3008`
 
 #### Endpoints Clés
+
 * `GET /templates` : Catalogue des modèles de messages (`NotificationTemplate`)
 * `POST /send` : Envoi d'une notification à un utilisateur ou patient
 * `GET /sms/logs` : Traçabilité des SMS transmis (`SmsMessage`)
@@ -311,6 +321,7 @@ Journalisation de sécurité, conformité médicale et traçabilité des accès.
 * **Base URL Directe** : `http://localhost:3009`
 
 #### Endpoints Clés
+
 * `POST /events` : Journalisation d'un événement (`AuditEvent` FHIR)
 * `GET /events` : Consultation du registre d'audit avec filtres (par utilisateur, patient, type d'action)
 * `GET /logs/access` : Logs d'accès HTTP (`AccessLog`)
@@ -325,6 +336,7 @@ Gestion des pièces jointes et imagerie médicale stockées sur **MinIO S3**.
 * **Base URL Directe** : `http://localhost:3010`
 
 #### Endpoints Clés
+
 * `POST /upload` : Upload d'un fichier (document, image, DICOM) → génère `FileMetadata` & `DocumentReference` FHIR
 * `GET /files/:id/download` : Téléchargement direct ou génération d'URL pré-signée MinIO
 
@@ -398,3 +410,5 @@ const patient = await willoApi<FhirPatient>('/api/fhir/Patient/pat-123');
 // Consulter le stock
 const stock = await willoApi<StockItem[]>('/api/pharmacie/stock');
 ```
+
+check
